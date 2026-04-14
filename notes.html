@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8b0000">
+    <title>My Notes - NJ Rainbow Convention 2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .note-card {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.3), rgba(139, 0, 0, 0.3));
+            border: 3px solid var(--primary-gold);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+        }
+
+        .note-title {
+            color: var(--primary-gold);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            word-wrap: break-word;
+        }
+
+        .note-content {
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .note-timestamp {
+            color: var(--text-light);
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-edit {
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid var(--primary-gold);
+            color: var(--primary-gold);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-edit:hover {
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+        }
+
+        .note-form {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.2), rgba(139, 0, 0, 0.2));
+            border: 3px solid var(--primary-gold);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .note-form input,
+        .note-form textarea {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .note-form textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .empty-notes {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+
+        .empty-notes-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <header class="app-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
+            <div>
+                <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+                <div class="subtitle">✦ The Greatest Show on Earth ✦</div>
+            </div>
+            <button onclick="window.location.href='index.html'" class="back-btn" style="background: var(--primary-gold); color: var(--dark-bg);">
+                ← Back to Home
+            </button>
+        </div>
+    </header>
+
+    <div class="content">
+        <h2 class="section-title">📝 My Personal Notes 📝</h2>
+
+        <!-- Note Form -->
+        <div class="note-form">
+            <h3 style="color: var(--primary-gold); margin-bottom: 1rem;">
+                <span id="formTitle">✨ Create New Note</span>
+            </h3>
+            <input type="hidden" id="editNoteId">
+            
+            <div class="form-group">
+                <input type="text" id="noteTitle" placeholder="Note title...">
+            </div>
+            
+            <div class="form-group">
+                <textarea id="noteContent" placeholder="Write your note here..."></textarea>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn-save" onclick="saveNote()">💾 Save Note</button>
+                <button class="btn-secondary" onclick="cancelEdit()" id="cancelBtn" style="display: none;">❌ Cancel</button>
+            </div>
+        </div>
+
+        <!-- Notes Grid -->
+        <div id="notesContainer" class="notes-grid">
+            <!-- Notes loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyNotes" class="empty-notes" style="display: none;">
+            <div class="empty-notes-icon">📝</div>
+            <h3 style="color: var(--primary-gold);">No Notes Yet</h3>
+            <p>Create your first note above to keep track of important information!</p>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userId = user.userId;
+
+        // Load notes
+        function loadNotes() {
+            const notes = JSON.parse(localStorage.getItem(`notes_${userId}`) || '[]');
+            const container = document.getElementById('notesContainer');
+            const emptyDiv = document.getElementById('emptyNotes');
+            
+            if (notes.length === 0) {
+                container.innerHTML = '';
+                emptyDiv.style.display = 'block';
+                return;
+            }
+            
+            emptyDiv.style.display = 'none';
+            
+            // Sort by most recent first
+            notes.sort((a, b) => b.id - a.id);
+            
+            container.innerHTML = notes.map(note => `
+                <div class="note-card">
+                    <div class="note-title">${escapeHtml(note.title)}</div>
+                    <div class="note-content">${escapeHtml(note.content)}</div>
+                    <div class="note-timestamp">📅 ${note.date} | ⏰ ${note.time}</div>
+                    <div class="note-actions">
+                        <button class="btn-edit" onclick="editNote(${note.id})">✏️ Edit</button>
+                        <button class="btn-danger" onclick="deleteNote(${note.id})">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Save note
+        function saveNote() {
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+            const editId = document.getElementById('editNoteId').value;
+            
+            if (!title || !content) {
+                alert('Please enter both title and content for your note.');
+                return;
+            }
+            
+            const notes = JSON.parse(localStorage.getItem(`notes_${userId}`) || '[]');
+            
+            if (editId) {
+                // Edit existing note
+                const index = notes.findIndex(n => n.id == editId);
+                if (index !== -1) {
+                    notes[index].title = title;
+                    notes[index].content = content;
+                    notes[index].date = new Date().toLocaleDateString();
+                    notes[index].time = new Date().toLocaleTimeString();
+                }
+            } else {
+                // Create new note
+                const newNote = {
+                    id: Date.now(),
+                    title: title,
+                    content: content,
+                    date: new Date().toLocaleDateString(),
+                    time: new Date().toLocaleTimeString()
+                };
+                notes.push(newNote);
+            }
+            
+            localStorage.setItem(`notes_${userId}`, JSON.stringify(notes));
+            
+            // Reset form
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteContent').value = '';
+            document.getElementById('editNoteId').value = '';
+            document.getElementById('formTitle').textContent = '✨ Create New Note';
+            document.getElementById('cancelBtn').style.display = 'none';
+            
+            loadNotes();
+            alert('✅ Note saved!');
+        }
+
+        // Edit note
+        function editNote(id) {
+            const notes = JSON.parse(localStorage.getItem(`notes_${userId}`) || '[]');
+            const note = notes.find(n => n.id === id);
+            
+            if (!note) return;
+            
+            document.getElementById('editNoteId').value = note.id;
+            document.getElementById('noteTitle').value = note.title;
+            document.getElementById('noteContent').value = note.content;
+            document.getElementById('formTitle').textContent = '✏️ Edit Note';
+            document.getElementById('cancelBtn').style.display = 'inline-block';
+            
+            // Scroll to form
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Cancel edit
+        function cancelEdit() {
+            document.getElementById('editNoteId').value = '';
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteContent').value = '';
+            document.getElementById('formTitle').textContent = '✨ Create New Note';
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+
+        // Delete note
+        function deleteNote(id) {
+            if (!confirm('Are you sure you want to delete this note?')) return;
+            
+            let notes = JSON.parse(localStorage.getItem(`notes_${userId}`) || '[]');
+            notes = notes.filter(n => n.id !== id);
+            localStorage.setItem(`notes_${userId}`, JSON.stringify(notes));
+            
+            loadNotes();
+            alert('✅ Note deleted!');
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        loadNotes();
+    </script>
+</body>
+</html>
