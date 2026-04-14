@@ -63,7 +63,8 @@ async function handleLogin(event) {
                 userId: data.user.userId,
                 username: data.user.username,
                 email: data.user.email,
-                name: data.user.name
+                name: data.user.name,
+                role: data.user.role
             };
             
             localStorage.setItem('currentUser', JSON.stringify(user));
@@ -94,10 +95,16 @@ async function handleSignup(event) {
     const name = document.getElementById('signupName').value;
     const email = document.getElementById('signupEmail').value;
     const username = document.getElementById('signupUsername').value;
+    const role = document.getElementById('signupRole').value;
     const password = document.getElementById('signupPassword').value;
     const confirmPassword = document.getElementById('signupConfirmPassword').value;
 
     // Validation
+    if (!role) {
+        showError('Please select your role!');
+        return false;
+    }
+
     if (password !== confirmPassword) {
         showError('Passwords do not match!');
         return false;
@@ -115,7 +122,7 @@ async function handleSignup(event) {
     submitBtn.disabled = true;
 
     try {
-        const response = await fetch(`${AUTH_SCRIPT_URL}?action=signup&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`, {
+        const response = await fetch(`${AUTH_SCRIPT_URL}?action=signup&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}&role=${encodeURIComponent(role)}&password=${encodeURIComponent(password)}`, {
             method: 'GET',
             redirect: 'follow'
         });
