@@ -10,6 +10,25 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        .notification-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #dc143c;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 2px solid var(--primary-gold);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+    </style>
 </head>
 <body>
     <!-- Check if user is logged in -->
@@ -22,7 +41,7 @@
 
     <!-- HEADER -->
     <header class="app-header">
-        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
             <div>
                 <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
                 <div class="subtitle">✦ The Greatest Show on Earth ✦</div>
@@ -33,417 +52,137 @@
         </div>
     </header>
 
-    <!-- BACK NAVIGATION -->
-    <nav class="back-nav" id="backNav" style="display: none;">
-        <button class="back-btn" id="backButton">← Back to Home</button>
-        <div class="page-title" id="currentPageTitle"></div>
-    </nav>
-
     <!-- MAIN CONTENT -->
     <div class="content">
+        <div class="welcome-banner">
+            <h2>Welcome, <span id="userName">User</span>! 🎭</h2>
+            <p>Step right up and explore everything Convention 2026 has to offer!</p>
+        </div>
         
-        <!-- HOME PAGE -->
-        <div id="home" class="page active">
-            <div class="welcome-banner">
-                <h2>Welcome, <span id="userName">User</span>! 🎭</h2>
-                <p>Step right up and explore everything Convention 2026 has to offer!</p>
-            </div>
-            
-            <div class="tile-grid">
-                <div class="tile" data-page="my-schedule" data-title="My Schedule">
-                    <div class="tile-icon">⭐</div>
-                    <div class="tile-title">My Schedule</div>
-                    <div class="tile-desc">Your favorite events</div>
-                </div>
+        <div class="tile-grid">
+            <a href="my-schedule.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">⭐</div>
+                <div class="tile-title">My Schedule</div>
+                <div class="tile-desc">Your favorite events</div>
+            </a>
 
-                <div class="tile" data-page="schedule" data-title="Master Schedule">
-                    <div class="tile-icon">📅</div>
-                    <div class="tile-title">Schedule</div>
-                    <div class="tile-desc">All convention events</div>
-                </div>
+            <a href="schedule.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">📅</div>
+                <div class="tile-title">Schedule</div>
+                <div class="tile-desc">All convention events</div>
+            </a>
 
-                <div class="tile" data-page="meet-nj" data-title="Meet NJ Rainbow">
-                    <div class="tile-icon">🌈</div>
-                    <div class="tile-title">Meet NJ Rainbow</div>
-                    <div class="tile-desc">Our amazing members</div>
-                </div>
+            <a href="meet-nj.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">🌈</div>
+                <div class="tile-title">Meet NJ Rainbow</div>
+                <div class="tile-desc">Our amazing members</div>
+            </a>
 
-                <div class="tile" data-page="speakers" data-title="Speakers">
-                    <div class="tile-icon">🎤</div>
-                    <div class="tile-title">Speakers</div>
-                    <div class="tile-desc">Featured speakers</div>
-                </div>
+            <a href="speakers.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">🎤</div>
+                <div class="tile-title">Speakers</div>
+                <div class="tile-desc">Featured speakers</div>
+            </a>
 
-                <div class="tile" data-page="notifications" data-title="Notifications">
-                    <div class="tile-icon">🔔</div>
-                    <div class="tile-title">Notifications</div>
-                    <div class="tile-desc">Latest updates</div>
-                </div>
+            <a href="notifications.html" class="tile" style="text-decoration: none; position: relative;" id="notificationsTile">
+                <div class="tile-icon">🔔</div>
+                <div class="tile-title">Notifications</div>
+                <div class="tile-desc">Latest updates</div>
+                <div id="notificationBadge" class="notification-badge" style="display: none;">0</div>
+            </a>
 
-                <div class="tile" data-page="checklist" data-title="Checklist">
-                    <div class="tile-icon">✓</div>
-                    <div class="tile-title">Checklist</div>
-                    <div class="tile-desc">Packing & documents</div>
-                </div>
+            <a href="checklist.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">✓</div>
+                <div class="tile-title">Checklist</div>
+                <div class="tile-desc">Packing & documents</div>
+            </a>
 
-                <div class="tile" data-page="profile" data-title="My Profile">
-                    <div class="tile-icon">👤</div>
-                    <div class="tile-title">My Profile</div>
-                    <div class="tile-desc">Your information</div>
-                </div>
+            <a href="profile.html" class="tile" style="text-decoration: none; position: relative;" id="profileTile">
+                <div class="tile-icon">👤</div>
+                <div class="tile-title">My Profile</div>
+                <div class="tile-desc">Your information</div>
+                <div id="profileAlertBadge" class="notification-badge" style="display: none;">!</div>
+            </a>
 
-                <div class="tile" data-page="messages" data-title="Messages">
-                    <div class="tile-icon">💬</div>
-                    <div class="tile-title">Messages</div>
-                    <div class="tile-desc">Chat with others</div>
-                </div>
+            <a href="messages.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">💬</div>
+                <div class="tile-title">Messages</div>
+                <div class="tile-desc">Chat with others</div>
+            </a>
 
-                <div class="tile" data-page="notes" data-title="My Notes">
-                    <div class="tile-icon">📝</div>
-                    <div class="tile-title">My Notes</div>
-                    <div class="tile-desc">Personal notes</div>
-                </div>
+            <a href="notes.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">📝</div>
+                <div class="tile-title">My Notes</div>
+                <div class="tile-desc">Personal notes</div>
+            </a>
 
-                <div class="tile" data-page="gallery" data-title="Gallery">
-                    <div class="tile-icon">📸</div>
-                    <div class="tile-title">Gallery</div>
-                    <div class="tile-desc">Event photos</div>
-                </div>
+            <a href="gallery.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">📸</div>
+                <div class="tile-title">Gallery</div>
+                <div class="tile-desc">Event photos</div>
+            </a>
 
-                <div class="tile" data-page="admin" data-title="Admin Dashboard">
-                    <div class="tile-icon">⚙️</div>
-                    <div class="tile-title">Admin</div>
-                    <div class="tile-desc">Admin tools</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- MY SCHEDULE PAGE -->
-        <div id="my-schedule" class="page">
-            <h2 class="section-title">⭐ My Favorite Events ⭐</h2>
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-number" id="favoriteCount">0</div>
-                    <div class="stat-label">Favorites</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">3</div>
-                    <div class="stat-label">Days</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">25+</div>
-                    <div class="stat-label">Events</div>
-                </div>
-            </div>
-            <div id="myScheduleList"></div>
-        </div>
-
-        <!-- MASTER SCHEDULE PAGE -->
-        <div id="schedule" class="page">
-            <h2 class="section-title">📅 Master Schedule 📅</h2>
-            <div class="search-box">
-                <input type="text" id="scheduleSearch" placeholder="🔍 Search events by name, type, or speaker...">
-            </div>
-            <div id="scheduleByDay"></div>
-        </div>
-
-        <!-- MEET NJ RAINBOW PAGE -->
-        <div id="meet-nj" class="page">
-            <h2 class="section-title">🌈 Meet NJ Rainbow 🌈</h2>
-            <div class="search-box">
-                <input type="text" id="meetNjSearch" placeholder="🔍 Search members by name, station, or assembly...">
-            </div>
-            <div id="meetNjList"></div>
-        </div>
-
-        <!-- SPEAKERS PAGE -->
-        <div id="speakers" class="page">
-            <h2 class="section-title">🎤 Featured Speakers 🎤</h2>
-            <div class="search-box">
-                <input type="text" id="speakersSearch" placeholder="🔍 Search speakers...">
-            </div>
-            <div id="speakersList"></div>
-        </div>
-
-        <!-- NOTIFICATIONS PAGE -->
-        <div id="notifications" class="page">
-            <h2 class="section-title">🔔 Notifications 🔔</h2>
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-number" id="notifCount">0</div>
-                    <div class="stat-label">Notifications</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">✓</div>
-                    <div class="stat-label">All Read</div>
-                </div>
-            </div>
-            <div id="notificationsList"></div>
-        </div>
-
-        <!-- CHECKLIST PAGE -->
-        <div id="checklist" class="page">
-            <h2 class="section-title">✓ Packing & Documents ✓</h2>
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-number" id="checklistProgress">0%</div>
-                    <div class="stat-label">Complete</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="checklistChecked">0</div>
-                    <div class="stat-label">Checked</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="checklistTotal">0</div>
-                    <div class="stat-label">Total Items</div>
-                </div>
-            </div>
-            <div id="checklistItems"></div>
-        </div>
-
-        <!-- MY PROFILE PAGE -->
-        <div id="profile" class="page">
-            <h2 class="section-title">👤 My Profile 👤</h2>
-            <div class="profile-form">
-                <div class="form-group">
-                    <label>📛 Full Name</label>
-                    <input type="text" id="profileName" placeholder="Enter your full name">
-                </div>
-                <div class="form-group">
-                    <label>🌈 Assembly</label>
-                    <input type="text" id="profileAssembly" placeholder="Your assembly name">
-                </div>
-                <div class="form-group">
-                    <label>⭐ Station/Office</label>
-                    <input type="text" id="profileStation" placeholder="Your station or office held">
-                </div>
-                <div class="form-group">
-                    <label>📧 Email Address</label>
-                    <input type="email" id="profileEmail" placeholder="your.email@example.com">
-                </div>
-                <div class="form-group">
-                    <label>📱 Phone Number</label>
-                    <input type="tel" id="profilePhone" placeholder="(555) 123-4567">
-                </div>
-                <div class="form-group">
-                    <label>📝 About Me</label>
-                    <textarea id="profileBio" rows="4" placeholder="Tell us about yourself..."></textarea>
-                </div>
-                <button class="btn-save" id="saveProfileBtn">💾 Save Profile</button>
-            </div>
-        </div>
-
-        <!-- MESSAGES PAGE -->
-        <div id="messages" class="page">
-            <h2 class="section-title">💬 Messages 💬</h2>
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-number" id="messageCount">0</div>
-                    <div class="stat-label">Messages</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">🟢</div>
-                    <div class="stat-label">Online</div>
-                </div>
-            </div>
-            <div class="message-container" id="messagesList"></div>
-            <div class="message-input-box">
-                <input type="text" id="messageText" placeholder="Type your message...">
-                <button id="sendMessageBtn">📤 Send</button>
-            </div>
-        </div>
-
-        <!-- MY NOTES PAGE -->
-        <div id="notes" class="page">
-            <h2 class="section-title">📝 My Notes 📝</h2>
-            <div class="note-editor">
-                <h3>✍️ Convention Notes</h3>
-                <textarea id="notesText" placeholder="Write your convention notes here..."></textarea>
-                <button class="btn-save" id="saveNotesBtn">💾 Save Notes</button>
-            </div>
-        </div>
-
-        <!-- GALLERY PAGE -->
-        <div id="gallery" class="page">
-            <h2 class="section-title">📸 Photo Gallery 📸</h2>
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-number" id="galleryCount">0</div>
-                    <div class="stat-label">Photos</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">🎉</div>
-                    <div class="stat-label">Memories</div>
-                </div>
-            </div>
-            <div class="gallery-grid" id="galleryGrid"></div>
-        </div>
-
-                <!-- ADMIN PAGE -->
-        <div id="admin" class="page">
-            <h2 class="section-title">⚙️ Admin Dashboard ⚙️</h2>
-            
-            <!-- Access Denied Message (shown if not admin) -->
-            <div id="adminAccessDenied" style="display: none;" class="empty-state">
-                <h3>🚫 Access Denied</h3>
-                <p>Only administrators can access this area.</p>
-            </div>
-
-            <!-- Admin Content (shown if admin) -->
-            <div id="adminContent">
-                <!-- Sync Status -->
-                <div class="admin-section">
-                    <h3>🔄 Data Sync</h3>
-                    <p id="syncStatus">Ready to sync with Google Sheets</p>
-                    <button class="btn-save" id="syncNowBtn">🔄 Sync Data Now</button>
-                </div>
-
-                <!-- Event Management -->
-                <div class="admin-section">
-                    <h3>📅 Event Management</h3>
-                    <button class="btn-save" id="addEventBtn">➕ Add New Event</button>
-                    
-                    <!-- Event Form (hidden by default) -->
-                    <div id="eventForm" style="display: none; margin-top: 1rem; border-top: 2px solid var(--primary-gold); padding-top: 1rem;">
-                        <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Add/Edit Event</h4>
-                        <input type="hidden" id="eventEditId">
-                        <div class="form-group">
-                            <label>Event Title</label>
-                            <input type="text" id="eventTitle" placeholder="Event title">
-                        </div>
-                        <div class="form-group">
-                            <label>Day</label>
-                            <select id="eventDay">
-                                <option value="Friday">Friday</option>
-                                <option value="Saturday">Saturday</option>
-                                <option value="Sunday">Sunday</option>
-                            </select>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div class="form-group">
-                                <label>Start Time</label>
-                                <input type="text" id="eventTime" placeholder="9:00 AM">
-                            </div>
-                            <div class="form-group">
-                                <label>End Time</label>
-                                <input type="text" id="eventTimeEnd" placeholder="10:30 AM">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Location</label>
-                            <input type="text" id="eventLocation" placeholder="Main Ballroom">
-                        </div>
-                        <div class="form-group">
-                            <label>Description</label>
-                            <textarea id="eventDescription" rows="3" placeholder="Event description"></textarea>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div class="form-group">
-                                <label>Type (optional)</label>
-                                <input type="text" id="eventType" placeholder="Workshop, General Session, etc.">
-                            </div>
-                            <div class="form-group">
-                                <label>Speaker (optional)</label>
-                                <input type="text" id="eventSpeaker" placeholder="Speaker name">
-                            </div>
-                        </div>
-                        <div class="btn-group">
-                            <button class="btn-save" id="saveEventBtn">💾 Save Event</button>
-                            <button class="btn-secondary" id="cancelEventBtn">❌ Cancel</button>
-                        </div>
-                    </div>
-
-                    <!-- Events List -->
-                    <div id="adminEventsList" style="margin-top: 1.5rem;"></div>
-                </div>
-
-                <!-- Speaker Management -->
-                <div class="admin-section">
-                    <h3>🎤 Speaker Management</h3>
-                    <button class="btn-save" id="addSpeakerBtn">➕ Add New Speaker</button>
-                    
-                    <!-- Speaker Form (hidden by default) -->
-                    <div id="speakerForm" style="display: none; margin-top: 1rem; border-top: 2px solid var(--primary-gold); padding-top: 1rem;">
-                        <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Add/Edit Speaker</h4>
-                        <input type="hidden" id="speakerEditId">
-                        <div class="form-group">
-                            <label>Speaker Name</label>
-                            <input type="text" id="speakerName" placeholder="Full name">
-                        </div>
-                        <div class="form-group">
-                            <label>Title/Role</label>
-                            <input type="text" id="speakerTitle" placeholder="Leadership Coach, etc.">
-                        </div>
-                        <div class="form-group">
-                            <label>Photo URL</label>
-                            <input type="text" id="speakerPhoto" placeholder="https://example.com/photo.jpg">
-                        </div>
-                        <div class="form-group">
-                            <label>Bio</label>
-                            <textarea id="speakerBio" rows="3" placeholder="Speaker biography"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Speaking At (Event Name)</label>
-                            <input type="text" id="speakerEvent" placeholder="Event name from schedule">
-                        </div>
-                        <div class="btn-group">
-                            <button class="btn-save" id="saveSpeakerBtn">💾 Save Speaker</button>
-                            <button class="btn-secondary" id="cancelSpeakerBtn">❌ Cancel</button>
-                        </div>
-                    </div>
-
-                    <!-- Speakers List -->
-                    <div id="adminSpeakersList" style="margin-top: 1.5rem;"></div>
-                </div>
-
-                <!-- Notification Management -->
-                <div class="admin-section">
-                    <h3>📢 Send Notification</h3>
-                    <div class="form-group">
-                        <label>Notification Title</label>
-                        <input type="text" id="notifTitle" placeholder="Enter notification title">
-                    </div>
-                    <div class="form-group">
-                        <label>Message</label>
-                        <textarea id="notifMessage" placeholder="Enter notification message" rows="4"></textarea>
-                    </div>
-                    <button class="btn-save" id="sendNotifBtn">📤 Send Notification to All Users</button>
-                </div>
-
-                <!-- Statistics -->
-                <div class="admin-section">
-                    <h3>📊 App Statistics</h3>
-                    <div class="stats-bar">
-                        <div class="stat-item">
-                            <div class="stat-number" id="adminEventCount">0</div>
-                            <div class="stat-label">Events</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number" id="adminMemberCount">0</div>
-                            <div class="stat-label">Members</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number" id="adminSpeakerCount">0</div>
-                            <div class="stat-label">Speakers</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Loading indicator -->
-    <div id="loadingIndicator" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(139, 0, 0, 0.95); color: #d4af37; padding: 2rem; border-radius: 10px; border: 3px solid #d4af37; z-index: 1000;">
-        <div style="text-align: center;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
-            <div style="font-size: 1.2rem; font-weight: bold;">Loading data from Google Sheets...</div>
+            <a href="admin.html" class="tile" style="text-decoration: none; position: relative;" id="adminTile">
+                <div class="tile-icon">⚙️</div>
+                <div class="tile-title">Admin</div>
+                <div class="tile-desc">Admin tools</div>
+            </a>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="app.js"></script>
     <script>
+        // Display user info and check permissions
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const isAdmin = user.role === 'Admin';
+        
+        // Display username
+        document.getElementById('userName').textContent = user.name || user.username || 'User';
+        
+        // Hide admin tile if not admin
+        if (!isAdmin) {
+            document.getElementById('adminTile').style.display = 'none';
+        }
+
+        // Check for unread notifications
+        function checkNotifications() {
+            const lastRead = parseInt(localStorage.getItem(`notifications_last_read_${user.userId}`) || '0');
+            const notifications = JSON.parse(localStorage.getItem('custom_notifications') || '[]');
+            const unreadCount = notifications.filter(n => n.id > lastRead).length;
+            
+            const badge = document.getElementById('notificationBadge');
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Check for emergency contact
+        function checkEmergencyContact() {
+            const profile = JSON.parse(localStorage.getItem(`profile_${user.userId}`) || '{}');
+            const hasEmergencyContact = profile.emergencyName && profile.emergencyPhone;
+            
+            const badge = document.getElementById('profileAlertBadge');
+            if (!hasEmergencyContact) {
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Run checks
+        checkNotifications();
+        checkEmergencyContact();
+
         // Register service worker for PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js')
@@ -453,4 +192,3 @@
     </script>
 </body>
 </html>
-
