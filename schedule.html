@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8b0000">
+    <title>Schedule - NJ Rainbow Convention 2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .day-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .day-tab {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(212, 175, 55, 0.2);
+            border: 3px solid var(--primary-gold);
+            border-radius: 12px;
+            color: var(--primary-gold);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-family: inherit;
+        }
+
+        .day-tab.active {
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+            transform: scale(1.05);
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary-gold);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        .timeline-item::before {
+            content: '⭐';
+            position: absolute;
+            left: -2.5rem;
+            top: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .event-card {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.3), rgba(139, 0, 0, 0.3));
+            border: 3px solid var(--primary-gold);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .event-card:hover {
+            transform: translateX(10px);
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+        }
+
+        .event-card.favorited {
+            border-color: #dc143c;
+            box-shadow: 0 0 20px rgba(220, 20, 60, 0.5);
+        }
+
+        .event-time {
+            color: var(--primary-gold);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-title {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-meta {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .event-description {
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .favorite-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid var(--primary-gold);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .favorite-btn:hover {
+            background: var(--primary-gold);
+            transform: scale(1.1);
+        }
+
+        .favorite-btn.favorited {
+            background: #dc143c;
+            border-color: #dc143c;
+            animation: heartbeat 1s ease-in-out;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .event-type-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <header class="app-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
+            <div>
+                <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+                <div class="subtitle">✦ The Greatest Show on Earth ✦</div>
+            </div>
+            <button onclick="window.location.href='index.html'" class="back-btn" style="background: var(--primary-gold); color: var(--dark-bg);">
+                ← Back to Home
+            </button>
+        </div>
+    </header>
+
+    <div class="content">
+        <h2 class="section-title">📅 Convention Schedule 📅</h2>
+
+        <div class="day-tabs">
+            <button class="day-tab active" onclick="filterByDay('All')">🎪 All Days</button>
+            <button class="day-tab" onclick="filterByDay('Friday')">📅 Friday</button>
+            <button class="day-tab" onclick="filterByDay('Saturday')">📅 Saturday</button>
+            <button class="day-tab" onclick="filterByDay('Sunday')">📅 Sunday</button>
+        </div>
+
+        <div id="scheduleContainer">
+            <!-- Schedule loaded here -->
+        </div>
+
+        <div id="noEvents" style="display: none; text-align: center; padding: 3rem; color: var(--text-light);">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">📅</div>
+            <h3 style="color: var(--primary-gold);">No Events Found</h3>
+            <p>No events scheduled for this day yet.</p>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userId = user.userId;
+        const GOOGLE_SHEETS_ID = '2PACX-1vTcWlhv_bK1thPxqX8ZaWaswTyaam1poIRptaJe-18E7IQbK39_ffnKvTUPtfeB8CiL5avfPgCoflCl';
+
+        let allEvents = [];
+        let currentFilter = 'All';
+
+        // Load events from Google Sheets + Admin events
+        async function loadEvents() {
+            try {
+                // Load from Google Sheets
+                const response = await fetch(`https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEETS_ID}/pub?gid=0&single=true&output=csv`);
+                const csvText = await response.text();
+                const sheetEvents = parseCSV(csvText);
+                
+                // Load admin-added events
+                const adminEvents = JSON.parse(localStorage.getItem('admin_events') || '[]');
+                
+                // Merge events
+                allEvents = [...sheetEvents, ...adminEvents];
+                
+                renderSchedule();
+            } catch (error) {
+                console.error('Error loading events:', error);
+                
+                // Fallback to admin events only
+                allEvents = JSON.parse(localStorage.getItem('admin_events') || '[]');
+                renderSchedule();
+            }
+        }
+
+        // Parse CSV from Google Sheets
+        function parseCSV(csv) {
+            const lines = csv.split('\n').filter(line => line.trim());
+            if (lines.length < 2) return [];
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            const events = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                const event = {};
+                
+                headers.forEach((header, index) => {
+                    event[header] = values[index] || '';
+                });
+                
+                if (event.title && event.day) {
+                    events.push(event);
+                }
+            }
+            
+            return events;
+        }
+
+        // Get user's favorites
+        function getFavorites() {
+            return JSON.parse(localStorage.getItem(`favorites_${userId}`) || '[]');
+        }
+
+        // Toggle favorite
+        function toggleFavorite(eventId) {
+            let favorites = getFavorites();
+            
+            if (favorites.includes(eventId)) {
+                favorites = favorites.filter(id => id !== eventId);
+            } else {
+                favorites.push(eventId);
+            }
+            
+            localStorage.setItem(`favorites_${userId}`, JSON.stringify(favorites));
+            renderSchedule();
+        }
+
+        // Filter by day
+        function filterByDay(day) {
+            currentFilter = day;
+            
+            // Update active tab
+            const tabs = document.querySelectorAll('.day-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            renderSchedule();
+        }
+
+        // Render schedule
+        function renderSchedule() {
+            const container = document.getElementById('scheduleContainer');
+            const noEvents = document.getElementById('noEvents');
+            const favorites = getFavorites();
+            
+            // Filter events
+            let filteredEvents = allEvents;
+            if (currentFilter !== 'All') {
+                filteredEvents = allEvents.filter(e => e.day === currentFilter);
+            }
+            
+            if (filteredEvents.length === 0) {
+                container.innerHTML = '';
+                noEvents.style.display = 'block';
+                return;
+            }
+            
+            noEvents.style.display = 'none';
+            
+            // Organize by day
+            const byDay = {
+                'Friday': [],
+                'Saturday': [],
+                'Sunday': []
+            };
+            
+            filteredEvents.forEach(event => {
+                if (byDay[event.day]) {
+                    byDay[event.day].push(event);
+                }
+            });
+            
+            // Sort events by time within each day
+            Object.keys(byDay).forEach(day => {
+                byDay[day].sort((a, b) => {
+                    const timeA = convertTo24Hour(a.time);
+                    const timeB = convertTo24Hour(b.time);
+                    return timeA.localeCompare(timeB);
+                });
+            });
+            
+            // Render HTML
+            let html = '';
+            
+            Object.keys(byDay).forEach(day => {
+                if (byDay[day].length > 0) {
+                    html += `
+                        <h3 style="color: var(--primary-gold); margin: 2rem 0 1rem; font-size: 1.8rem;">
+                            ${day === 'Friday' ? '🎉' : day === 'Saturday' ? '🌟' : '✨'} ${day}
+                        </h3>
+                        <div class="timeline">
+                    `;
+                    
+                    byDay[day].forEach(event => {
+                        const eventId = event.id || event.title;
+                        const isFavorited = favorites.includes(eventId);
+                        
+                        html += `
+                            <div class="timeline-item">
+                                <div class="event-card ${isFavorited ? 'favorited' : ''}">
+                                    <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" 
+                                            onclick="toggleFavorite('${eventId}')">
+                                        ${isFavorited ? '⭐' : '☆'}
+                                    </button>
+                                    
+                                    <div class="event-time">
+                                        ⏰ ${event.time}${event.timeEnd ? ' - ' + event.timeEnd : ''}
+                                    </div>
+                                    
+                                    <div class="event-title">${event.title}</div>
+                                    
+                                    <div class="event-meta">
+                                        ${event.type ? `<span class="event-type-badge">${event.type}</span>` : ''}
+                                        ${event.location ? `📍 ${event.location}` : ''}
+                                        ${event.speaker ? ` | 🎤 ${event.speaker}` : ''}
+                                    </div>
+                                    
+                                    ${event.description ? `
+                                        <div class="event-description">${event.description}</div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `</div>`;
+                }
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Convert time to 24-hour format for sorting
+        function convertTo24Hour(time) {
+            if (!time) return '00:00';
+            
+            const match = time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+            if (!match) return time;
+            
+            let hours = parseInt(match[1]);
+            const minutes = match[2];
+            const period = match[3].toUpperCase();
+            
+            if (period === 'PM' && hours !== 12) {
+                hours += 12;
+            } else if (period === 'AM' && hours === 12) {
+                hours = 0;
+            }
+            
+            return `${hours.toString().padStart(2, '0')}:${minutes}`;
+        }
+
+        // Initialize
+        loadEvents();
+    </script>
+</body>
+</html>
