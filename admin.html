@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8b0000">
+    <title>Admin Dashboard - NJ Rainbow Convention 2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            border-bottom: 3px solid var(--primary-gold);
+        }
+
+        .admin-tab {
+            padding: 1rem 1.5rem;
+            background: rgba(212, 175, 55, 0.2);
+            border: none;
+            color: var(--primary-gold);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+
+        .admin-tab.active {
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+        }
+
+        .admin-tab-content {
+            display: none;
+        }
+
+        .admin-tab-content.active {
+            display: block;
+        }
+
+        .user-item {
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--primary-gold);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .assembly-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--primary-gold);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        if (!currentUser || currentUser.role !== 'Admin') {
+            alert('⚠️ Access Denied: Only administrators can access this area.');
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <header class="app-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
+            <div>
+                <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+                <div class="subtitle">✦ Admin Dashboard ✦</div>
+            </div>
+            <button onclick="window.location.href='index.html'" class="back-btn" style="background: var(--primary-gold); color: var(--dark-bg);">
+                ← Back to Home
+            </button>
+        </div>
+    </header>
+
+    <div class="content">
+        <h2 class="section-title">⚙️ Admin Dashboard ⚙️</h2>
+
+        <!-- Admin Tabs -->
+        <div class="admin-tabs">
+            <button class="admin-tab active" onclick="switchAdminTab('users')">👥 Manage Users</button>
+            <button class="admin-tab" onclick="switchAdminTab('assemblies')">🌈 Assemblies</button>
+            <button class="admin-tab" onclick="switchAdminTab('members')">👤 Meet NJ Rainbow</button>
+            <button class="admin-tab" onclick="switchAdminTab('events')">📅 Events</button>
+            <button class="admin-tab" onclick="switchAdminTab('speakers')">🎤 Speakers</button>
+            <button class="admin-tab" onclick="switchAdminTab('notifications')">📢 Notifications</button>
+            <button class="admin-tab" onclick="switchAdminTab('sync')">🔄 Data Sync</button>
+        </div>
+
+        <!-- USERS TAB -->
+        <div id="users" class="admin-tab-content active">
+            <div class="admin-section">
+                <h3>👥 User Management</h3>
+                <p>View and edit user profiles. Click on a user to modify their information.</p>
+                
+                <div class="search-box" style="margin-bottom: 1rem;">
+                    <input type="text" id="userSearch" placeholder="🔍 Search users by name, email, or role...">
+                </div>
+
+                <button class="btn-save" onclick="createAdminUser()">➕ Create Admin User</button>
+
+                <div id="usersList" style="margin-top: 1.5rem;"></div>
+            </div>
+
+            <!-- User Edit Modal -->
+            <div id="userEditModal" style="display: none;" class="admin-section">
+                <h3>Edit User Profile</h3>
+                <input type="hidden" id="editUserId">
+                
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="editUserName">
+                </div>
+                
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="editUserEmail">
+                </div>
+                
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="editUserUsername">
+                </div>
+                
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="editUserRole">
+                        <option value="Rainbow">Rainbow Girl</option>
+                        <option value="DeMolay">DeMolay</option>
+                        <option value="Mason">Mason</option>
+                        <option value="Eastern Star">Eastern Star</option>
+                        <option value="Amaranth">Order of Amaranth</option>
+                        <option value="Grand Officer">Grand Officer</option>
+                        <option value="Advisor">Advisor</option>
+                        <option value="Parent">Parent/Guardian</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn-save" onclick="saveUserEdit()">💾 Save Changes</button>
+                    <button class="btn-secondary" onclick="closeUserEdit()">❌ Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ASSEMBLIES TAB -->
+        <div id="assemblies" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>🌈 Assembly Management</h3>
+                <p>Manage the list of assemblies available in user profile dropdowns.</p>
+                
+                <div class="form-group">
+                    <label>Add New Assembly</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="newAssembly" placeholder="Rainbow Assembly #XX - City Name">
+                        <button class="btn-save" onclick="addAssembly()">➕ Add</button>
+                    </div>
+                </div>
+
+                <h4 style="color: var(--primary-gold); margin: 1.5rem 0 1rem;">Current Assemblies</h4>
+                <div id="assembliesList"></div>
+            </div>
+        </div>
+
+        <!-- MEET NJ RAINBOW TAB -->
+        <div id="members" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>👤 Meet NJ Rainbow Management</h3>
+                <p>Add and manage members featured in the Meet NJ Rainbow section.</p>
+                
+                <button class="btn-save" onclick="showMemberForm()">➕ Add New Member</button>
+
+                <!-- Member Form -->
+                <div id="memberForm" style="display: none; margin-top: 1rem; border-top: 2px solid var(--primary-gold); padding-top: 1rem;">
+                    <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Add/Edit Member</h4>
+                    <input type="hidden" id="memberEditId">
+                    
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="memberName" placeholder="Full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Station/Office</label>
+                        <input type="text" id="memberStation" placeholder="Grand Worthy Advisor, etc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Assembly</label>
+                        <select id="memberAssembly"></select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Photo URL</label>
+                        <input type="text" id="memberPhoto" placeholder="https://example.com/photo.jpg">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Biography</label>
+                        <textarea id="memberBio" rows="3" placeholder="Short bio about the member"></textarea>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-save" onclick="saveMember()">💾 Save Member</button>
+                        <button class="btn-secondary" onclick="hideMemberForm()">❌ Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Members List -->
+                <div id="membersList" style="margin-top: 1.5rem;"></div>
+            </div>
+        </div>
+
+        <!-- EVENTS TAB -->
+        <div id="events" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>📅 Event Management</h3>
+                <button class="btn-save" onclick="showEventForm()">➕ Add New Event</button>
+                
+                <!-- Event Form -->
+                <div id="eventForm" style="display: none; margin-top: 1rem; border-top: 2px solid var(--primary-gold); padding-top: 1rem;">
+                    <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Add/Edit Event</h4>
+                    <input type="hidden" id="eventEditId">
+                    
+                    <div class="form-group">
+                        <label>Event Title</label>
+                        <input type="text" id="eventTitle" placeholder="Event title">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Day</label>
+                        <select id="eventDay">
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Start Time</label>
+                            <input type="text" id="eventTime" placeholder="9:00 AM">
+                        </div>
+                        <div class="form-group">
+                            <label>End Time</label>
+                            <input type="text" id="eventTimeEnd" placeholder="10:30 AM">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="eventLocation" placeholder="Main Ballroom">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="eventDescription" rows="3" placeholder="Event description"></textarea>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Type (optional)</label>
+                            <input type="text" id="eventType" placeholder="Workshop, General Session, etc.">
+                        </div>
+                        <div class="form-group">
+                            <label>Speaker (optional)</label>
+                            <input type="text" id="eventSpeaker" placeholder="Speaker name">
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-save" onclick="saveEvent()">💾 Save Event</button>
+                        <button class="btn-secondary" onclick="hideEventForm()">❌ Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Events List -->
+                <div id="eventsList" style="margin-top: 1.5rem;"></div>
+            </div>
+        </div>
+
+        <!-- SPEAKERS TAB -->
+        <div id="speakers" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>🎤 Speaker Management</h3>
+                <button class="btn-save" onclick="showSpeakerForm()">➕ Add New Speaker</button>
+                
+                <!-- Speaker Form -->
+                <div id="speakerForm" style="display: none; margin-top: 1rem; border-top: 2px solid var(--primary-gold); padding-top: 1rem;">
+                    <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Add/Edit Speaker</h4>
+                    <input type="hidden" id="speakerEditId">
+                    
+                    <div class="form-group">
+                        <label>Speaker Name</label>
+                        <input type="text" id="speakerName" placeholder="Full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Title/Role</label>
+                        <input type="text" id="speakerTitle" placeholder="Leadership Coach, etc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Photo URL</label>
+                        <input type="text" id="speakerPhoto" placeholder="https://example.com/photo.jpg">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Bio</label>
+                        <textarea id="speakerBio" rows="3" placeholder="Speaker biography"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Speaking At (Event Name)</label>
+                        <input type="text" id="speakerEvent" placeholder="Event name from schedule">
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-save" onclick="saveSpeaker()">💾 Save Speaker</button>
+                        <button class="btn-secondary" onclick="hideSpeakerForm()">❌ Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Speakers List -->
+                <div id="speakersList" style="margin-top: 1.5rem;"></div>
+            </div>
+        </div>
+
+        <!-- NOTIFICATIONS TAB -->
+        <div id="notifications" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>📢 Send Notification</h3>
+                <p>Send notifications to all convention attendees.</p>
+                
+                <div class="form-group">
+                    <label>Notification Title</label>
+                    <input type="text" id="notifTitle" placeholder="Enter notification title">
+                </div>
+                
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="notifMessage" placeholder="Enter notification message" rows="4"></textarea>
+                </div>
+                
+                <button class="btn-save" onclick="sendNotification()">📤 Send Notification to All Users</button>
+            </div>
+        </div>
+
+        <!-- SYNC TAB -->
+        <div id="sync" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>🔄 Data Sync</h3>
+                <p id="syncStatus">Ready to sync with Google Sheets</p>
+                <button class="btn-save" onclick="syncData()">🔄 Sync Data Now</button>
+            </div>
+
+            <div class="admin-section">
+                <h3>📊 App Statistics</h3>
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-number" id="statsEvents">0</div>
+                        <div class="stat-label">Events</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="statsMembers">0</div>
+                        <div class="stat-label">Members</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="statsSpeakers">0</div>
+                        <div class="stat-label">Speakers</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="statsUsers">0</div>
+                        <div class="stat-label">Users</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-script.js"></script>
+</body>
+</html>
