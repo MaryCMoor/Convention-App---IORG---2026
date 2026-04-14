@@ -284,43 +284,154 @@
         <div id="admin" class="page">
             <h2 class="section-title">⚙️ Admin Dashboard ⚙️</h2>
             
-            <div class="admin-section">
-                <h3>🔄 Sync Status</h3>
-                <p id="syncStatus">Ready to sync with Google Sheets</p>
-                <button class="btn-save" id="syncNowBtn">🔄 Sync Data Now</button>
+            <!-- Access Denied Message (shown if not admin) -->
+            <div id="adminAccessDenied" style="display: none;" class="empty-state">
+                <h3>🚫 Access Denied</h3>
+                <p>Only administrators can access this area.</p>
             </div>
 
-            <div class="admin-section">
-                <h3>📢 Send Notification</h3>
-                <div class="form-group">
-                    <label>Notification Title</label>
-                    <input type="text" id="notifTitle" placeholder="Enter notification title">
+            <!-- Admin Content (shown if admin) -->
+            <div id="adminContent">
+                <!-- Sync Status -->
+                <div class="admin-section">
+                    <h3>🔄 Data Sync</h3>
+                    <p id="syncStatus">Ready to sync with Google Sheets</p>
+                    <button class="btn-save" id="syncNowBtn">🔄 Sync Data Now</button>
                 </div>
-                <div class="form-group">
-                    <label>Message</label>
-                    <textarea id="notifMessage" placeholder="Enter notification message" rows="4"></textarea>
-                </div>
-                <button class="btn-save" id="sendNotifBtn">📤 Send Notification</button>
-            </div>
 
-            <div class="admin-section">
-                <h3>📊 App Statistics</h3>
-                <div class="stats-bar">
-                    <div class="stat-item">
-                        <div class="stat-number" id="adminEventCount">0</div>
-                        <div class="stat-label">Events</div>
+                <!-- Event Management -->
+                <div class="admin-section">
+                    <h3>📅 Event Management</h3>
+                    <button class="btn-save" id="addEventBtn">➕ Add New Event</button>
+                    
+                    <!-- Event Form (hidden by default) -->
+                    <div id="eventForm" style="display: none; margin-top: 1rem; border-top: 2px solid var(--primary-gold); padding-top: 1rem;">
+                        <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Add/Edit Event</h4>
+                        <input type="hidden" id="eventEditId">
+                        <div class="form-group">
+                            <label>Event Title</label>
+                            <input type="text" id="eventTitle" placeholder="Event title">
+                        </div>
+                        <div class="form-group">
+                            <label>Day</label>
+                            <select id="eventDay">
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                                <option value="Sunday">Sunday</option>
+                            </select>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label>Start Time</label>
+                                <input type="text" id="eventTime" placeholder="9:00 AM">
+                            </div>
+                            <div class="form-group">
+                                <label>End Time</label>
+                                <input type="text" id="eventTimeEnd" placeholder="10:30 AM">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" id="eventLocation" placeholder="Main Ballroom">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="eventDescription" rows="3" placeholder="Event description"></textarea>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label>Type (optional)</label>
+                                <input type="text" id="eventType" placeholder="Workshop, General Session, etc.">
+                            </div>
+                            <div class="form-group">
+                                <label>Speaker (optional)</label>
+                                <input type="text" id="eventSpeaker" placeholder="Speaker name">
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn-save" id="saveEventBtn">💾 Save Event</button>
+                            <button class="btn-secondary" id="cancelEventBtn">❌ Cancel</button>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="adminMemberCount">0</div>
-                        <div class="stat-label">Members</div>
+
+                    <!-- Events List -->
+                    <div id="adminEventsList" style="margin-top: 1.5rem;"></div>
+                </div>
+
+                <!-- Speaker Management -->
+                <div class="admin-section">
+                    <h3>🎤 Speaker Management</h3>
+                    <button class="btn-save" id="addSpeakerBtn">➕ Add New Speaker</button>
+                    
+                    <!-- Speaker Form (hidden by default) -->
+                    <div id="speakerForm" style="display: none; margin-top: 1rem; border-top: 2px solid var(--primary-gold); padding-top: 1rem;">
+                        <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Add/Edit Speaker</h4>
+                        <input type="hidden" id="speakerEditId">
+                        <div class="form-group">
+                            <label>Speaker Name</label>
+                            <input type="text" id="speakerName" placeholder="Full name">
+                        </div>
+                        <div class="form-group">
+                            <label>Title/Role</label>
+                            <input type="text" id="speakerTitle" placeholder="Leadership Coach, etc.">
+                        </div>
+                        <div class="form-group">
+                            <label>Photo URL</label>
+                            <input type="text" id="speakerPhoto" placeholder="https://example.com/photo.jpg">
+                        </div>
+                        <div class="form-group">
+                            <label>Bio</label>
+                            <textarea id="speakerBio" rows="3" placeholder="Speaker biography"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Speaking At (Event Name)</label>
+                            <input type="text" id="speakerEvent" placeholder="Event name from schedule">
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn-save" id="saveSpeakerBtn">💾 Save Speaker</button>
+                            <button class="btn-secondary" id="cancelSpeakerBtn">❌ Cancel</button>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="adminSpeakerCount">0</div>
-                        <div class="stat-label">Speakers</div>
+
+                    <!-- Speakers List -->
+                    <div id="adminSpeakersList" style="margin-top: 1.5rem;"></div>
+                </div>
+
+                <!-- Notification Management -->
+                <div class="admin-section">
+                    <h3>📢 Send Notification</h3>
+                    <div class="form-group">
+                        <label>Notification Title</label>
+                        <input type="text" id="notifTitle" placeholder="Enter notification title">
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea id="notifMessage" placeholder="Enter notification message" rows="4"></textarea>
+                    </div>
+                    <button class="btn-save" id="sendNotifBtn">📤 Send Notification to All Users</button>
+                </div>
+
+                <!-- Statistics -->
+                <div class="admin-section">
+                    <h3>📊 App Statistics</h3>
+                    <div class="stats-bar">
+                        <div class="stat-item">
+                            <div class="stat-number" id="adminEventCount">0</div>
+                            <div class="stat-label">Events</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="adminMemberCount">0</div>
+                            <div class="stat-label">Members</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="adminSpeakerCount">0</div>
+                            <div class="stat-label">Speakers</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
 
     </div>
 
