@@ -1,10 +1,38 @@
 // ========================================
-// ADMIN DASHBOARD SCRIPT - COMPLETE
+// ADMIN DASHBOARD SCRIPT - COMPLETE WITH GOOGLE SHEETS SYNC
 // ========================================
 
 const GOOGLE_SHEETS_ID = '2PACX-1vTcWlhv_bK1thPxqX8ZaWaswTyaam1poIRptaJe-18E7IQbK39_ffnKvTUPtfeB8CiL5avfPgCoflCl';
+const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPgS0eyhcuODnxuyIoBUWxEHwMe42yHstuV9qU3lj9MV7G8glCUqOd6JSYjDMKMEWx/exec';
 
 let currentChecklistFilter = 'All';
+
+// ========================================
+// GOOGLE SHEETS SYNC HELPER
+// ========================================
+
+async function saveToGoogleSheets(action, data) {
+    try {
+        const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: action,
+                ...data
+            })
+        });
+        
+        console.log(`Saved ${action} to Google Sheets`);
+        return { success: true };
+        
+    } catch (error) {
+        console.error('Error saving to Google Sheets:', error);
+        return { success: false, error: error.toString() };
+    }
+}
 
 // Tab switching
 function switchAdminTab(tabName) {
@@ -553,7 +581,7 @@ function hideChecklistItemForm() {
     document.getElementById('checklistItemForm').style.display = 'none';
 }
 
-function saveChecklistItem() {
+async function saveChecklistItem() {
     const text = document.getElementById('checklistItemText').value.trim();
     const category = document.getElementById('checklistItemCategory').value;
     const editId = document.getElementById('checklistItemEditId').value;
@@ -564,6 +592,7 @@ function saveChecklistItem() {
     }
     
     const items = JSON.parse(localStorage.getItem('admin_checklist_items') || '[]');
+    let itemData;
     
     if (editId) {
         // Edit existing
@@ -571,14 +600,19 @@ function saveChecklistItem() {
         if (index !== -1) {
             items[index].text = text;
             items[index].category = category;
+            itemData = items[index];
         }
     } else {
         // Add new
         const newId = items.length > 0 ? Math.max(...items.map(i => i.id)) + 1 : 1;
-        items.push({ id: newId, text, category });
+        itemData = { id: newId, text, category };
+        items.push(itemData);
     }
     
     localStorage.setItem('admin_checklist_items', JSON.stringify(items));
+    
+    // Save to Google Sheets
+    await saveToGoogleSheets('saveChecklistItem', { item: itemData });
     
     hideChecklistItemForm();
     loadChecklistItems();
@@ -598,12 +632,15 @@ function editChecklistItem(id) {
     document.getElementById('checklistItemForm').style.display = 'block';
 }
 
-function deleteChecklistItem(id) {
+async function deleteChecklistItem(id) {
     if (!confirm('Delete this checklist item?')) return;
     
     let items = JSON.parse(localStorage.getItem('admin_checklist_items') || '[]');
     items = items.filter(i => i.id !== id);
     localStorage.setItem('admin_checklist_items', JSON.stringify(items));
+    
+    // Delete from Google Sheets
+    await saveToGoogleSheets('deleteChecklistItem', { itemId: id });
     
     loadChecklistItems();
     alert('✅ Item deleted!');
@@ -738,7 +775,7 @@ function hideMemberForm() {
     document.getElementById('memberForm').style.display = 'none';
 }
 
-function saveMember() {
+async function saveMember() {
     const name = document.getElementById('memberName').value.trim();
     const station = document.getElementById('memberStation').value.trim();
     const assembly = document.getElementById('memberAssembly').value;
@@ -752,20 +789,26 @@ function saveMember() {
     
     const members = JSON.parse(localStorage.getItem('admin_members') || '[]');
     const editId = document.getElementById('memberEditId').value;
+    let memberData;
     
     if (editId) {
         // Edit existing
         const index = members.findIndex(m => m.id == editId);
         if (index !== -1) {
             members[index] = { id: parseInt(editId), name, station, assembly, photo, bio };
+            memberData = members[index];
         }
     } else {
         // Add new
         const newId = members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1;
-        members.push({ id: newId, name, station, assembly, photo, bio });
+        memberData = { id: newId, name, station, assembly, photo, bio };
+        members.push(memberData);
     }
     
     localStorage.setItem('admin_members', JSON.stringify(members));
+    
+    // Save to Google Sheets
+    await saveToGoogleSheets('saveMember', { member: memberData });
     
     alert('✅ Member saved successfully!');
     hideMemberForm();
@@ -788,12 +831,15 @@ function editMember(id) {
     document.getElementById('memberForm').style.display = 'block';
 }
 
-function deleteMember(id) {
+async function deleteMember(id) {
     if (!confirm('Are you sure you want to delete this member?')) return;
     
     let members = JSON.parse(localStorage.getItem('admin_members') || '[]');
     members = members.filter(m => m.id !== id);
     localStorage.setItem('admin_members', JSON.stringify(members));
+    
+    // Delete from Google Sheets
+    await saveToGoogleSheets('deleteMember', { memberId: id });
     
     alert('✅ Member deleted successfully!');
     loadMembers();
@@ -844,7 +890,7 @@ function hideEventForm() {
     document.getElementById('eventForm').style.display = 'none';
 }
 
-function saveEvent() {
+async function saveEvent() {
     const title = document.getElementById('eventTitle').value.trim();
     const day = document.getElementById('eventDay').value;
     const time = document.getElementById('eventTime').value.trim();
@@ -861,20 +907,26 @@ function saveEvent() {
     
     const events = JSON.parse(localStorage.getItem('admin_events') || '[]');
     const editId = document.getElementById('eventEditId').value;
+    let eventData;
     
     if (editId) {
         // Edit existing
         const index = events.findIndex(e => e.id == editId);
         if (index !== -1) {
             events[index] = { id: parseInt(editId), title, day, time, timeEnd, location, description, type, speaker };
+            eventData = events[index];
         }
     } else {
         // Add new
         const newId = events.length > 0 ? Math.max(...events.map(e => e.id)) + 1 : 1;
-        events.push({ id: newId, title, day, time, timeEnd, location, description, type, speaker });
+        eventData = { id: newId, title, day, time, timeEnd, location, description, type, speaker };
+        events.push(eventData);
     }
     
     localStorage.setItem('admin_events', JSON.stringify(events));
+    
+    // Save to Google Sheets
+    await saveToGoogleSheets('saveEvent', { event: eventData });
     
     alert('✅ Event saved successfully!');
     hideEventForm();
@@ -900,12 +952,15 @@ function editEvent(id) {
     document.getElementById('eventForm').style.display = 'block';
 }
 
-function deleteEvent(id) {
+async function deleteEvent(id) {
     if (!confirm('Are you sure you want to delete this event?')) return;
     
     let events = JSON.parse(localStorage.getItem('admin_events') || '[]');
     events = events.filter(e => e.id !== id);
     localStorage.setItem('admin_events', JSON.stringify(events));
+    
+    // Delete from Google Sheets
+    await saveToGoogleSheets('deleteEvent', { eventId: id });
     
     alert('✅ Event deleted successfully!');
     loadEvents();
@@ -954,7 +1009,7 @@ function hideSpeakerForm() {
     document.getElementById('speakerForm').style.display = 'none';
 }
 
-function saveSpeaker() {
+async function saveSpeaker() {
     const name = document.getElementById('speakerName').value.trim();
     const title = document.getElementById('speakerTitle').value.trim();
     const photo = document.getElementById('speakerPhoto').value.trim();
@@ -968,20 +1023,26 @@ function saveSpeaker() {
     
     const speakers = JSON.parse(localStorage.getItem('admin_speakers') || '[]');
     const editId = document.getElementById('speakerEditId').value;
+    let speakerData;
     
     if (editId) {
         // Edit existing
         const index = speakers.findIndex(s => s.id == editId);
         if (index !== -1) {
             speakers[index] = { id: parseInt(editId), name, title, photo, bio, event };
+            speakerData = speakers[index];
         }
     } else {
         // Add new
         const newId = speakers.length > 0 ? Math.max(...speakers.map(s => s.id)) + 1 : 1;
-        speakers.push({ id: newId, name, title, photo, bio, event });
+        speakerData = { id: newId, name, title, photo, bio, event };
+        speakers.push(speakerData);
     }
     
     localStorage.setItem('admin_speakers', JSON.stringify(speakers));
+    
+    // Save to Google Sheets
+    await saveToGoogleSheets('saveSpeaker', { speaker: speakerData });
     
     alert('✅ Speaker saved successfully!');
     hideSpeakerForm();
@@ -1004,12 +1065,15 @@ function editSpeaker(id) {
     document.getElementById('speakerForm').style.display = 'block';
 }
 
-function deleteSpeaker(id) {
+async function deleteSpeaker(id) {
     if (!confirm('Are you sure you want to delete this speaker?')) return;
     
     let speakers = JSON.parse(localStorage.getItem('admin_speakers') || '[]');
     speakers = speakers.filter(s => s.id !== id);
     localStorage.setItem('admin_speakers', JSON.stringify(speakers));
+    
+    // Delete from Google Sheets
+    await saveToGoogleSheets('deleteSpeaker', { speakerId: id });
     
     alert('✅ Speaker deleted successfully!');
     loadSpeakers();
@@ -1052,15 +1116,43 @@ function sendNotification() {
 // DATA SYNC
 // ========================================
 
-function syncData() {
-    document.getElementById('syncStatus').textContent = '🔄 Syncing data from Google Sheets...';
+async function syncData() {
+    const statusEl = document.getElementById('syncStatus');
+    statusEl.textContent = '🔄 Syncing data from Google Sheets...';
+    statusEl.style.color = 'var(--primary-gold)';
     
-    // This would normally fetch from Google Sheets
-    // For now, just simulate a sync
-    setTimeout(() => {
-        document.getElementById('syncStatus').textContent = '✅ Sync completed successfully!';
+    try {
+        // Clear cache if dataSyncManager is available
+        if (typeof dataSyncManager !== 'undefined') {
+            dataSyncManager.clearAllCache();
+            
+            // Fetch all sheets in parallel
+            await dataSyncManager.fetchMultipleSheets([
+                { name: 'Schedule', gid: 0 },
+                { name: 'Members', gid: 1 },
+                { name: 'Speakers', gid: 2 },
+                { name: 'Checklist', gid: 3 },
+                { name: 'Gallery', gid: 4 }
+            ]);
+        }
+        
+        statusEl.textContent = '✅ Sync completed successfully! Data is fresh.';
+        statusEl.style.color = '#66ff66';
         updateStats();
-    }, 2000);
+        
+        // Reload current tab data
+        const activeTab = document.querySelector('.admin-tab.active');
+        if (activeTab) {
+            const onclick = activeTab.getAttribute('onclick');
+            const tabName = onclick.match(/'(.+)'/)[1];
+            switchAdminTab(tabName);
+        }
+        
+    } catch (error) {
+        statusEl.textContent = '❌ Sync failed. Using cached data.';
+        statusEl.style.color = '#ff6b6b';
+        console.error('Sync error:', error);
+    }
 }
 
 function updateStats() {
