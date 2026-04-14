@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8b0000">
+    <title>My Schedule - NJ Rainbow Convention 2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .stats-banner {
+            background: linear-gradient(135deg, var(--primary-gold), #b8960f);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--dark-bg);
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-box {
+            background: rgba(26, 5, 5, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--light-cream);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--light-cream);
+            margin-top: 0.25rem;
+        }
+
+        .day-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .day-header {
+            color: var(--primary-gold);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid var(--primary-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .event-card {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.3), rgba(139, 0, 0, 0.3));
+            border: 3px solid var(--primary-gold);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+        }
+
+        .event-time {
+            color: var(--primary-gold);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-title {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-meta {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .event-description {
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(139, 0, 0, 0.8);
+            border: 2px solid var(--primary-gold);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .remove-btn:hover {
+            background: #dc143c;
+            transform: scale(1.1);
+        }
+
+        .event-type-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .empty-schedule {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+
+        .empty-schedule-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        .export-btn {
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid var(--primary-gold);
+            color: var(--primary-gold);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-family: inherit;
+            margin-top: 1rem;
+        }
+
+        .export-btn:hover {
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <header class="app-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
+            <div>
+                <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+                <div class="subtitle">✦ The Greatest Show on Earth ✦</div>
+            </div>
+            <button onclick="window.location.href='index.html'" class="back-btn" style="background: var(--primary-gold); color: var(--dark-bg);">
+                ← Back to Home
+            </button>
+        </div>
+    </header>
+
+    <div class="content">
+        <h2 class="section-title">⭐ My Personal Schedule ⭐</h2>
+
+        <!-- Stats Banner -->
+        <div class="stats-banner">
+            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">Your Convention Schedule</h3>
+            <p style="margin: 0; opacity: 0.9;">You've planned your perfect convention experience!</p>
+            
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-number" id="totalEvents">0</div>
+                    <div class="stat-label">Total Events</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="fridayEvents">0</div>
+                    <div class="stat-label">Friday</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="saturdayEvents">0</div>
+                    <div class="stat-label">Saturday</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="sundayEvents">0</div>
+                    <div class="stat-label">Sunday</div>
+                </div>
+            </div>
+
+            <button class="export-btn" onclick="exportSchedule()">📤 Export My Schedule</button>
+        </div>
+
+        <!-- Schedule by Day -->
+        <div id="scheduleContainer">
+            <!-- Events loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptySchedule" class="empty-schedule" style="display: none;">
+            <div class="empty-schedule-icon">📅</div>
+            <h3 style="color: var(--primary-gold); margin-bottom: 0.5rem;">Your Schedule is Empty</h3>
+            <p>Start building your perfect convention schedule by favoriting events!</p>
+            <button class="btn-save" onclick="window.location.href='schedule.html'" style="margin-top: 1.5rem;">
+                Browse Full Schedule →
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userId = user.userId;
+        const GOOGLE_SHEETS_ID = '2PACX-1vTcWlhv_bK1thPxqX8ZaWaswTyaam1poIRptaJe-18E7IQbK39_ffnKvTUPtfeB8CiL5avfPgCoflCl';
+
+        let allEvents = [];
+
+        // Load all events
+        async function loadEvents() {
+            try {
+                // Load from Google Sheets
+                const response = await fetch(`https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEETS_ID}/pub?gid=0&single=true&output=csv`);
+                const csvText = await response.text();
+                const sheetEvents = parseCSV(csvText);
+                
+                // Load admin-added events
+                const adminEvents = JSON.parse(localStorage.getItem('admin_events') || '[]');
+                
+                // Merge events
+                allEvents = [...sheetEvents, ...adminEvents];
+                
+                renderMySchedule();
+            } catch (error) {
+                console.error('Error loading events:', error);
+                
+                // Fallback to admin events only
+                allEvents = JSON.parse(localStorage.getItem('admin_events') || '[]');
+                renderMySchedule();
+            }
+        }
+
+        // Parse CSV from Google Sheets
+        function parseCSV(csv) {
+            const lines = csv.split('\n').filter(line => line.trim());
+            if (lines.length < 2) return [];
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            const events = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                const event = {};
+                
+                headers.forEach((header, index) => {
+                    event[header] = values[index] || '';
+                });
+                
+                if (event.title && event.day) {
+                    events.push(event);
+                }
+            }
+            
+            return events;
+        }
+
+        // Get user's favorites
+        function getFavorites() {
+            return JSON.parse(localStorage.getItem(`favorites_${userId}`) || '[]');
+        }
+
+        // Remove from favorites
+        function removeFavorite(eventId) {
+            if (!confirm('Remove this event from your schedule?')) return;
+            
+            let favorites = getFavorites();
+            favorites = favorites.filter(id => id !== eventId);
+            localStorage.setItem(`favorites_${userId}`, JSON.stringify(favorites));
+            
+            renderMySchedule();
+        }
+
+        // Render user's schedule
+        function renderMySchedule() {
+            const container = document.getElementById('scheduleContainer');
+            const emptyDiv = document.getElementById('emptySchedule');
+            const favorites = getFavorites();
+            
+            // Filter to only favorited events
+            const favoriteEvents = allEvents.filter(event => {
+                const eventId = event.id || event.title;
+                return favorites.includes(eventId);
+            });
+            
+            // Update stats
+            const byDay = {
+                'Friday': favoriteEvents.filter(e => e.day === 'Friday').length,
+                'Saturday': favoriteEvents.filter(e => e.day === 'Saturday').length,
+                'Sunday': favoriteEvents.filter(e => e.day === 'Sunday').length
+            };
+            
+            document.getElementById('totalEvents').textContent = favoriteEvents.length;
+            document.getElementById('fridayEvents').textContent = byDay.Friday;
+            document.getElementById('saturdayEvents').textContent = byDay.Saturday;
+            document.getElementById('sundayEvents').textContent = byDay.Sunday;
+            
+            // Show empty state if no favorites
+            if (favoriteEvents.length === 0) {
+                container.innerHTML = '';
+                emptyDiv.style.display = 'block';
+                return;
+            }
+            
+            emptyDiv.style.display = 'none';
+            
+            // Organize by day
+            const eventsByDay = {
+                'Friday': [],
+                'Saturday': [],
+                'Sunday': []
+            };
+            
+            favoriteEvents.forEach(event => {
+                if (eventsByDay[event.day]) {
+                    eventsByDay[event.day].push(event);
+                }
+            });
+            
+            // Sort by time within each day
+            Object.keys(eventsByDay).forEach(day => {
+                eventsByDay[day].sort((a, b) => {
+                    const timeA = convertTo24Hour(a.time);
+                    const timeB = convertTo24Hour(b.time);
+                    return timeA.localeCompare(timeB);
+                });
+            });
+            
+            // Render HTML
+            let html = '';
+            
+            Object.keys(eventsByDay).forEach(day => {
+                if (eventsByDay[day].length > 0) {
+                    html += `
+                        <div class="day-section">
+                            <h3 class="day-header">
+                                ${day === 'Friday' ? '🎉' : day === 'Saturday' ? '🌟' : '✨'} ${day}
+                            </h3>
+                    `;
+                    
+                    eventsByDay[day].forEach(event => {
+                        const eventId = event.id || event.title;
+                        
+                        html += `
+                            <div class="event-card">
+                                <button class="remove-btn" onclick="removeFavorite('${eventId}')" title="Remove from schedule">
+                                    ✕
+                                </button>
+                                
+                                <div class="event-time">
+                                    ⏰ ${event.time}${event.timeEnd ? ' - ' + event.timeEnd : ''}
+                                </div>
+                                
+                                <div class="event-title">${event.title}</div>
+                                
+                                <div class="event-meta">
+                                    ${event.type ? `<span class="event-type-badge">${event.type}</span>` : ''}
+                                    ${event.location ? `📍 ${event.location}` : ''}
+                                    ${event.speaker ? ` | 🎤 ${event.speaker}` : ''}
+                                </div>
+                                
+                                ${event.description ? `
+                                    <div class="event-description">${event.description}</div>
+                                ` : ''}
+                            </div>
+                        `;
+                    });
+                    
+                    html += `</div>`;
+                }
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Convert time to 24-hour format for sorting
+        function convertTo24Hour(time) {
+            if (!time) return '00:00';
+            
+            const match = time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+            if (!match) return time;
+            
+            let hours = parseInt(match[1]);
+            const minutes = match[2];
+            const period = match[3].toUpperCase();
+            
+            if (period === 'PM' && hours !== 12) {
+                hours += 12;
+            } else if (period === 'AM' && hours === 12) {
+                hours = 0;
+            }
+            
+            return `${hours.toString().padStart(2, '0')}:${minutes}`;
+        }
+
+        // Export schedule as text
+        function exportSchedule() {
+            const favorites = getFavorites();
+            const favoriteEvents = allEvents.filter(event => {
+                const eventId = event.id || event.title;
+                return favorites.includes(eventId);
+            });
+            
+            if (favoriteEvents.length === 0) {
+                alert('Your schedule is empty. Add some events first!');
+                return;
+            }
+            
+            // Organize by day
+            const eventsByDay = {
+                'Friday': [],
+                'Saturday': [],
+                'Sunday': []
+            };
+            
+            favoriteEvents.forEach(event => {
+                if (eventsByDay[event.day]) {
+                    eventsByDay[event.day].push(event);
+                }
+            });
+            
+            // Sort by time
+            Object.keys(eventsByDay).forEach(day => {
+                eventsByDay[day].sort((a, b) => {
+                    const timeA = convertTo24Hour(a.time);
+                    const timeB = convertTo24Hour(b.time);
+                    return timeA.localeCompare(timeB);
+                });
+            });
+            
+            // Build text
+            let text = `MY NJ RAINBOW CONVENTION 2026 SCHEDULE\n`;
+            text += `Generated for: ${user.name || user.username}\n`;
+            text += `Date: ${new Date().toLocaleDateString()}\n`;
+            text += `\n========================================\n\n`;
+            
+            Object.keys(eventsByDay).forEach(day => {
+                if (eventsByDay[day].length > 0) {
+                    text += `${day.toUpperCase()}\n`;
+                    text += `${'='.repeat(day.length)}\n\n`;
+                    
+                    eventsByDay[day].forEach(event => {
+                        text += `${event.time}${event.timeEnd ? ' - ' + event.timeEnd : ''}\n`;
+                        text += `${event.title}\n`;
+                        if (event.location) text += `Location: ${event.location}\n`;
+                        if (event.speaker) text += `Speaker: ${event.speaker}\n`;
+                        if (event.description) text += `${event.description}\n`;
+                        text += `\n`;
+                    });
+                    
+                    text += `\n`;
+                }
+            });
+            
+            // Download as file
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'my-convention-schedule.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('✅ Schedule exported! Check your downloads.');
+        }
+
+        // Initialize
+        loadEvents();
+    </script>
+</body>
+</html>
