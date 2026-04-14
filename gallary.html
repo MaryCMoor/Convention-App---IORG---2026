@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8b0000">
+    <title>Gallery - NJ Rainbow Convention 2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .gallery-item {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.3), rgba(139, 0, 0, 0.3));
+            border: 3px solid var(--primary-gold);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 32px rgba(212, 175, 55, 0.6);
+            border-color: var(--light-cream);
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-placeholder {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, var(--primary-gold), #b8960f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+        }
+
+        .gallery-caption {
+            padding: 1rem;
+            color: var(--text-light);
+            text-align: center;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .upload-section {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.2), rgba(139, 0, 0, 0.2));
+            border: 3px solid var(--primary-gold);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .upload-note {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .upload-form input {
+            width: 100%;
+        }
+
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+
+        .lightbox-image {
+            max-width: 100%;
+            max-height: 80vh;
+            border: 5px solid var(--primary-gold);
+            border-radius: 12px;
+        }
+
+        .lightbox-caption {
+            color: white;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -3rem;
+            right: 0;
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 2rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .lightbox-close:hover {
+            background: var(--light-cream);
+            transform: scale(1.1);
+        }
+
+        .empty-gallery {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+
+        .empty-gallery-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <header class="app-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
+            <div>
+                <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+                <div class="subtitle">✦ The Greatest Show on Earth ✦</div>
+            </div>
+            <button onclick="window.location.href='index.html'" class="back-btn" style="background: var(--primary-gold); color: var(--dark-bg);">
+                ← Back to Home
+            </button>
+        </div>
+    </header>
+
+    <div class="content">
+        <h2 class="section-title">📸 Photo Gallery 📸</h2>
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 2rem;">
+            Share and view photos from the convention!
+        </p>
+
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <h3 style="color: var(--primary-gold); margin-bottom: 1rem;">📤 Share a Photo</h3>
+            <p class="upload-note">
+                Add photo URLs to share your convention memories with everyone!
+            </p>
+            
+            <div class="upload-form">
+                <input type="text" id="photoUrl" placeholder="Photo URL (e.g., https://example.com/photo.jpg)">
+                <input type="text" id="photoCaption" placeholder="Caption (optional)">
+                <button class="btn-save" onclick="uploadPhoto()">📷 Add Photo</button>
+            </div>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div id="galleryContainer" class="gallery-grid">
+            <!-- Photos loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyGallery" class="empty-gallery" style="display: none;">
+            <div class="empty-gallery-icon">📸</div>
+            <h3 style="color: var(--primary-gold);">No Photos Yet</h3>
+            <p>Be the first to share a photo from the convention!</p>
+        </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <div class="lightbox-content" onclick="event.stopPropagation()">
+            <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+            <img id="lightboxImage" class="lightbox-image" src="" alt="">
+            <div id="lightboxCaption" class="lightbox-caption"></div>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userId = user.userId;
+        const GOOGLE_SHEETS_ID = '2PACX-1vTcWlhv_bK1thPxqX8ZaWaswTyaam1poIRptaJe-18E7IQbK39_ffnKvTUPtfeB8CiL5avfPgCoflCl';
+
+        let allPhotos = [];
+
+        // Load gallery
+        async function loadGallery() {
+            try {
+                // Load from Google Sheets (Gallery tab)
+                const response = await fetch(`https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEETS_ID}/pub?gid=4&single=true&output=csv`);
+                const csvText = await response.text();
+                const sheetPhotos = parseCSV(csvText);
+                
+                // Load user-uploaded photos
+                const userPhotos = JSON.parse(localStorage.getItem('gallery_photos') || '[]');
+                
+                // Merge photos
+                allPhotos = [...sheetPhotos, ...userPhotos];
+                
+                renderGallery();
+            } catch (error) {
+                console.error('Error loading gallery:', error);
+                
+                // Fallback to user photos only
+                allPhotos = JSON.parse(localStorage.getItem('gallery_photos') || '[]');
+                renderGallery();
+            }
+        }
+
+        // Parse CSV
+        function parseCSV(csv) {
+            const lines = csv.split('\n').filter(line => line.trim());
+            if (lines.length < 2) return [];
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            const photos = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                const photo = {};
+                
+                headers.forEach((header, index) => {
+                    photo[header] = values[index] || '';
+                });
+                
+                if (photo.url) {
+                    photos.push(photo);
+                }
+            }
+            
+            return photos;
+        }
+
+        // Render gallery
+        function renderGallery() {
+            const container = document.getElementById('galleryContainer');
+            const emptyDiv = document.getElementById('emptyGallery');
+            
+            if (allPhotos.length === 0) {
+                container.innerHTML = '';
+                emptyDiv.style.display = 'block';
+                return;
+            }
+            
+            emptyDiv.style.display = 'none';
+            
+            // Sort by most recent first
+            const sortedPhotos = [...allPhotos].reverse();
+            
+            container.innerHTML = sortedPhotos.map((photo, index) => `
+                <div class="gallery-item" onclick="openLightbox('${escapeHtml(photo.url)}', '${escapeHtml(photo.caption || '')}')">
+                    ${photo.url ? 
+                        `<img src="${photo.url}" alt="${photo.caption || 'Gallery photo'}" class="gallery-image" onerror="this.parentElement.innerHTML='<div class=gallery-placeholder>📸</div><div class=gallery-caption>${escapeHtml(photo.caption || 'Image unavailable')}</div>'">` :
+                        `<div class="gallery-placeholder">📸</div>`
+                    }
+                    ${photo.caption ? 
+                        `<div class="gallery-caption">${escapeHtml(photo.caption)}</div>` : 
+                        ''
+                    }
+                </div>
+            `).join('');
+        }
+
+        // Upload photo
+        function uploadPhoto() {
+            const url = document.getElementById('photoUrl').value.trim();
+            const caption = document.getElementById('photoCaption').value.trim();
+            
+            if (!url) {
+                alert('Please enter a photo URL.');
+                return;
+            }
+            
+            // Basic URL validation
+            try {
+                new URL(url);
+            } catch {
+                alert('Please enter a valid URL (must start with http:// or https://)');
+                return;
+            }
+            
+            const photos = JSON.parse(localStorage.getItem('gallery_photos') || '[]');
+            
+            const newPhoto = {
+                id: Date.now(),
+                url: url,
+                caption: caption,
+                uploadedBy: user.name || user.username,
+                uploadedById: userId,
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString()
+            };
+            
+            photos.push(newPhoto);
+            localStorage.setItem('gallery_photos', JSON.stringify(photos));
+            
+            document.getElementById('photoUrl').value = '';
+            document.getElementById('photoCaption').value = '';
+            
+            loadGallery();
+            alert('✅ Photo added to gallery!');
+        }
+
+        // Open lightbox
+        function openLightbox(url, caption) {
+            document.getElementById('lightboxImage').src = url;
+            document.getElementById('lightboxCaption').textContent = caption || '';
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close lightbox
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close lightbox with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        loadGallery();
+    </script>
+</body>
+</html>
