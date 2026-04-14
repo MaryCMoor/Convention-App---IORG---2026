@@ -1,5 +1,5 @@
-// Google Apps Script Web App URL (you'll create this next)
-const AUTH_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+// Google Apps Script Web App URL
+const AUTH_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyD1W69Socavo7kZAwJj7TPOQ_Kteq8AKjpTTzSBr2Bd6B8s1EHA5Tx6BQ7em4SgOTQ/exec';
 
 function switchTab(tab) {
     // Update tabs
@@ -44,29 +44,26 @@ async function handleLogin(event) {
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
 
+    // Show loading state
+    const submitBtn = event.target.querySelector('.submit-btn');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '⏳ Logging in...';
+    submitBtn.disabled = true;
+
     try {
-        const response = await fetch(AUTH_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                action: 'login',
-                username: username,
-                password: password
-            })
+        const response = await fetch(`${AUTH_SCRIPT_URL}?action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`, {
+            method: 'GET',
+            redirect: 'follow'
         });
 
-        // Since we're using no-cors, we can't read the response
-        // So we'll use a workaround with JSONP or direct sheet reading
-        // For now, simulate login
-        if (username && password) {
+        const data = await response.json();
+
+        if (data.success) {
             const user = {
-                username: username,
-                name: username,
-                email: username,
-                userId: btoa(username) // Simple ID generation
+                userId: data.user.userId,
+                username: data.user.username,
+                email: data.user.email,
+                name: data.user.name
             };
             
             localStorage.setItem('currentUser', JSON.stringify(user));
@@ -76,11 +73,15 @@ async function handleLogin(event) {
                 window.location.href = 'index.html';
             }, 1000);
         } else {
-            showError('Invalid credentials');
+            showError(data.message || 'Invalid credentials. Please try again.');
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
         }
     } catch (error) {
         console.error('Login error:', error);
-        showError('Login failed. Please try again.');
+        showError('Login failed. Please check your connection and try again.');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
     }
 
     return false;
@@ -107,33 +108,47 @@ async function handleSignup(event) {
         return false;
     }
 
+    // Show loading state
+    const submitBtn = event.target.querySelector('.submit-btn');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '⏳ Creating account...';
+    submitBtn.disabled = true;
+
     try {
-        const response = await fetch(AUTH_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                action: 'signup',
-                name: name,
-                email: email,
-                username: username,
-                password: password
-            })
+        const response = await fetch(`${AUTH_SCRIPT_URL}?action=signup&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`, {
+            method: 'GET',
+            redirect: 'follow'
         });
 
-        // Simulate successful signup
-        showSuccess('Account created successfully! Please log in.');
-        
-        setTimeout(() => {
-            switchTab('login');
-            document.getElementById('loginUsername').value = username;
-        }, 2000);
+        const data = await response.json();
+
+        if (data.success) {
+            showSuccess('Account created successfully! Please log in.');
+            
+            setTimeout(() => {
+                // Switch to login tab
+                document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('active'));
+                document.querySelector('.form-tab[onclick*="login"]').classList.add('active');
+                document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+                document.getElementById('loginForm').classList.add('active');
+                
+                // Pre-fill username
+                document.getElementById('loginUsername').value = username;
+                
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }, 2000);
+        } else {
+            showError(data.message || 'Signup failed. Please try again.');
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
 
     } catch (error) {
         console.error('Signup error:', error);
-        showError('Signup failed. Please try again.');
+        showError('Signup failed. Please check your connection and try again.');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
     }
 
     return false;
