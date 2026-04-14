@@ -23,8 +23,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     class ConventionApp {
         constructor() {
+            // Check if user is logged in
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            this.user = JSON.parse(currentUser);
             this.currentPage = 'home';
-            this.favorites = new Set(JSON.parse(localStorage.getItem('favorites') || '[]'));
+            
+            // Load user-specific favorites from their own storage key
+            this.favorites = new Set(JSON.parse(localStorage.getItem(`favorites_${this.user.userId}`) || '[]'));
+            
             this.data = {
                 schedule: [],
                 scheduleByDay: {},
@@ -41,6 +52,12 @@ document.addEventListener('DOMContentLoaded', function() {
         async init() {
             console.log('App initializing...');
             this.setupEventListeners();
+            
+            // Display user name
+            const userNameElement = document.getElementById('userName');
+            if (userNameElement) {
+                userNameElement.textContent = this.user.name || this.user.username;
+            }
             
             // Try to load from Google Sheets
             await this.loadFromGoogleSheets();
@@ -64,58 +81,101 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             // Back button
-            document.getElementById('backButton').addEventListener('click', () => {
-                this.goHome();
-            });
+            const backButton = document.getElementById('backButton');
+            if (backButton) {
+                backButton.addEventListener('click', () => {
+                    this.goHome();
+                });
+            }
+
+            // Logout button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    if (confirm('Are you sure you want to logout?')) {
+                        localStorage.removeItem('currentUser');
+                        window.location.href = 'login.html';
+                    }
+                });
+            }
 
             // Profile save button
-            document.getElementById('saveProfileBtn').addEventListener('click', () => {
-                this.saveProfile();
-            });
+            const saveProfileBtn = document.getElementById('saveProfileBtn');
+            if (saveProfileBtn) {
+                saveProfileBtn.addEventListener('click', () => {
+                    this.saveProfile();
+                });
+            }
 
             // Notes save button
-            document.getElementById('saveNotesBtn').addEventListener('click', () => {
-                this.saveNotes();
-            });
+            const saveNotesBtn = document.getElementById('saveNotesBtn');
+            if (saveNotesBtn) {
+                saveNotesBtn.addEventListener('click', () => {
+                    this.saveNotes();
+                });
+            }
 
             // Message send button
-            document.getElementById('sendMessageBtn').addEventListener('click', () => {
-                this.sendMessage();
-            });
+            const sendMessageBtn = document.getElementById('sendMessageBtn');
+            if (sendMessageBtn) {
+                sendMessageBtn.addEventListener('click', () => {
+                    this.sendMessage();
+                });
+            }
 
             // Message input enter key
-            document.getElementById('messageText').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    this.sendMessage();
-                }
-            });
+            const messageText = document.getElementById('messageText');
+            if (messageText) {
+                messageText.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+            }
 
             // Admin buttons
-            document.getElementById('sendNotifBtn').addEventListener('click', () => {
-                this.sendNotification();
-            });
+            const sendNotifBtn = document.getElementById('sendNotifBtn');
+            if (sendNotifBtn) {
+                sendNotifBtn.addEventListener('click', () => {
+                    this.sendNotification();
+                });
+            }
 
-            document.getElementById('syncNowBtn').addEventListener('click', () => {
-                this.loadFromGoogleSheets();
-            });
+            const syncNowBtn = document.getElementById('syncNowBtn');
+            if (syncNowBtn) {
+                syncNowBtn.addEventListener('click', () => {
+                    this.loadFromGoogleSheets();
+                });
+            }
 
             // Search handlers
-            document.getElementById('scheduleSearch').addEventListener('input', (e) => {
-                this.renderScheduleByDay(e.target.value);
-            });
+            const scheduleSearch = document.getElementById('scheduleSearch');
+            if (scheduleSearch) {
+                scheduleSearch.addEventListener('input', (e) => {
+                    this.renderScheduleByDay(e.target.value);
+                });
+            }
 
-            document.getElementById('meetNjSearch').addEventListener('input', (e) => {
-                this.renderMeetNJ(e.target.value);
-            });
+            const meetNjSearch = document.getElementById('meetNjSearch');
+            if (meetNjSearch) {
+                meetNjSearch.addEventListener('input', (e) => {
+                    this.renderMeetNJ(e.target.value);
+                });
+            }
 
-            document.getElementById('speakersSearch').addEventListener('input', (e) => {
-                this.renderSpeakers(e.target.value);
-            });
+            const speakersSearch = document.getElementById('speakersSearch');
+            if (speakersSearch) {
+                speakersSearch.addEventListener('input', (e) => {
+                    this.renderSpeakers(e.target.value);
+                });
+            }
         }
 
         showLoading(show) {
             const indicator = document.getElementById('loadingIndicator');
-            indicator.style.display = show ? 'block' : 'none';
+            if (indicator) {
+                indicator.style.display = show ? 'block' : 'none';
+            }
         }
 
         async loadFromGoogleSheets() {
@@ -123,7 +183,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const syncStatus = document.getElementById('syncStatus');
             
             try {
-                syncStatus.textContent = 'Syncing with Google Sheets...';
+                if (syncStatus) {
+                    syncStatus.textContent = 'Syncing with Google Sheets...';
+                }
                 
                 // Load all sheets
                 await Promise.all([
@@ -136,12 +198,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 ]);
                 
                 this.renderAll();
-                syncStatus.textContent = `Last synced: ${new Date().toLocaleString()}`;
+                if (syncStatus) {
+                    syncStatus.textContent = `Last synced: ${new Date().toLocaleString()}`;
+                }
                 console.log('Data loaded successfully from Google Sheets');
                 
             } catch (error) {
                 console.error('Error loading from Google Sheets:', error);
-                syncStatus.textContent = 'Error syncing. Using cached data.';
+                if (syncStatus) {
+                    syncStatus.textContent = 'Error syncing. Using cached data.';
+                }
                 alert('⚠️ Could not load data from Google Sheets. Please check your internet connection.');
             }
             
@@ -150,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         async loadSheetData(sheetType) {
             const sheetName = GOOGLE_SHEETS_CONFIG.sheets[sheetType];
-            const url = `${GOOGLE_SHEETS_CONFIG.baseUrl}${GOOGLE_SHEETS_CONFIG.sheetId}/pub?output=csv&gid=0`;
+            const url = `${GOOGLE_SHEETS_CONFIG.baseUrl}${GOOGLE_SHEETS_CONFIG.sheetId}/pub?output=csv`;
             
             try {
                 const response = await fetch(url);
@@ -165,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             item[header] = row[index] || '';
                         });
                         return item;
-                    });
+                    }).filter(item => item.id || item.name || item.title); // Filter out empty rows
 
                     this.data[sheetType] = items;
                     
@@ -242,9 +308,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             this.data.schedule.forEach(event => {
                 // Convert id to number
-                event.id = parseInt(event.id);
+                if (event.id) {
+                    event.id = parseInt(event.id);
+                }
                 
-                if (this.data.scheduleByDay[event.day]) {
+                if (event.day && this.data.scheduleByDay[event.day]) {
                     this.data.scheduleByDay[event.day].push(event);
                 }
             });
@@ -269,10 +337,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const pageTitle = document.getElementById('currentPageTitle');
             
             if (pageId === 'home') {
-                backNav.style.display = 'none';
+                if (backNav) backNav.style.display = 'none';
             } else {
-                backNav.style.display = 'flex';
-                pageTitle.textContent = title;
+                if (backNav) backNav.style.display = 'flex';
+                if (pageTitle) pageTitle.textContent = title;
             }
 
             this.currentPage = pageId;
@@ -325,8 +393,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         renderScheduleByDay(filter = '') {
             const container = document.getElementById('scheduleByDay');
-            const self = this;
+            if (!container) return;
             
+            const self = this;
             let html = '';
             
             ['Friday', 'Saturday', 'Sunday'].forEach(day => {
@@ -400,10 +469,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         renderMySchedule() {
             const container = document.getElementById('myScheduleList');
+            if (!container) return;
+            
             const self = this;
             const favoriteEvents = this.data.schedule.filter(item => this.favorites.has(item.id));
 
-            document.getElementById('favoriteCount').textContent = favoriteEvents.length;
+            const favoriteCountElement = document.getElementById('favoriteCount');
+            if (favoriteCountElement) {
+                favoriteCountElement.textContent = favoriteEvents.length;
+            }
 
             if (favoriteEvents.length === 0) {
                 container.innerHTML = '<div class="empty-state"><h3>No favorites yet</h3><p>Go to the Master Schedule and tap the 🤍 icon!</p></div>';
@@ -471,13 +545,16 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 this.favorites.add(eventId);
             }
-            localStorage.setItem('favorites', JSON.stringify([...this.favorites]));
+            // Save with user ID
+            localStorage.setItem(`favorites_${this.user.userId}`, JSON.stringify([...this.favorites]));
             this.renderScheduleByDay();
             this.renderMySchedule();
         }
 
         renderMeetNJ(filter = '') {
             const container = document.getElementById('meetNjList');
+            if (!container) return;
+            
             let items = this.data.members;
 
             if (filter) {
@@ -493,7 +570,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             container.innerHTML = items.map(item => `
                 <div class="profile-card">
-                    <img src="${item.photo || 'https://via.placeholder.com/100/8b0000/d4af37?text=' + (item.name ? item.name.charAt(0) : 'M')}" alt="${item.name}" class="profile-photo">
+                    <img src="${item.photo || 'https://via.placeholder.com/100/8b0000/d4af37?text=' + (item.name ? item.name.charAt(0) : 'M')}" alt="${item.name}" class="profile-photo" onerror="this.src='https://via.placeholder.com/100/8b0000/d4af37?text=M'">
                     <div class="profile-info">
                         <div class="profile-name">${item.name || 'Member'}</div>
                         <div class="profile-station">${item.station || ''}</div>
@@ -508,6 +585,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         renderSpeakers(filter = '') {
             const container = document.getElementById('speakersList');
+            if (!container) return;
+            
             let items = this.data.speakers;
 
             if (filter) {
@@ -523,7 +602,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             container.innerHTML = items.map(item => `
                 <div class="profile-card">
-                    <img src="${item.photo || 'https://via.placeholder.com/100/8b0000/d4af37?text=' + (item.name ? item.name.charAt(0) : 'S')}" alt="${item.name}" class="profile-photo">
+                    <img src="${item.photo || 'https://via.placeholder.com/100/8b0000/d4af37?text=' + (item.name ? item.name.charAt(0) : 'S')}" alt="${item.name}" class="profile-photo" onerror="this.src='https://via.placeholder.com/100/8b0000/d4af37?text=S'">
                     <div class="profile-info">
                         <div class="profile-name">${item.name || 'Speaker'}</div>
                         <div class="profile-station">${item.title || ''}</div>
@@ -538,9 +617,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         renderNotifications() {
             const container = document.getElementById('notificationsList');
+            if (!container) return;
+            
             const items = this.data.notifications;
 
-            document.getElementById('notifCount').textContent = items.length;
+            const notifCountElement = document.getElementById('notifCount');
+            if (notifCountElement) {
+                notifCountElement.textContent = items.length;
+            }
 
             if (items.length === 0) {
                 container.innerHTML = '<div class="empty-state"><h3>No notifications yet</h3></div>';
@@ -560,8 +644,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         sendNotification() {
-            const title = document.getElementById('notifTitle').value;
-            const message = document.getElementById('notifMessage').value;
+            const titleElement = document.getElementById('notifTitle');
+            const messageElement = document.getElementById('notifMessage');
+            
+            if (!titleElement || !messageElement) return;
+            
+            const title = titleElement.value;
+            const message = messageElement.value;
 
             if (!title || !message) {
                 alert('⚠️ Please enter both title and message');
@@ -583,24 +672,28 @@ document.addEventListener('DOMContentLoaded', function() {
             
             this.renderNotifications();
 
-            document.getElementById('notifTitle').value = '';
-            document.getElementById('notifMessage').value = '';
+            titleElement.value = '';
+            messageElement.value = '';
 
             alert('✅ Notification sent!');
         }
 
         renderChecklist() {
             const container = document.getElementById('checklistItems');
+            if (!container) return;
+            
             const self = this;
             
-            const checkedItems = JSON.parse(localStorage.getItem('checklist') || '[]');
+            const checkedItems = JSON.parse(localStorage.getItem(`checklist_${this.user.userId}`) || '[]');
             
             this.data.checklist.forEach(item => {
-                item.id = parseInt(item.id);
-                item.checked = checkedItems.includes(item.id);
+                if (item.id) {
+                    item.id = parseInt(item.id);
+                    item.checked = checkedItems.includes(item.id);
+                }
             });
 
-            const categories = [...new Set(this.data.checklist.map(item => item.category))];
+            const categories = [...new Set(this.data.checklist.map(item => item.category))].filter(c => c);
 
             if (categories.length === 0) {
                 container.innerHTML = '<div class="empty-state"><h3>No checklist items</h3></div>';
@@ -642,7 +735,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const checkedItems = this.data.checklist
                     .filter(i => i.checked)
                     .map(i => i.id);
-                localStorage.setItem('checklist', JSON.stringify(checkedItems));
+                localStorage.setItem(`checklist_${this.user.userId}`, JSON.stringify(checkedItems));
                 this.renderChecklist();
             }
         }
@@ -652,16 +745,25 @@ document.addEventListener('DOMContentLoaded', function() {
             const checked = this.data.checklist.filter(i => i.checked).length;
             const progress = total > 0 ? Math.round((checked / total) * 100) : 0;
 
-            document.getElementById('checklistTotal').textContent = total;
-            document.getElementById('checklistChecked').textContent = checked;
-            document.getElementById('checklistProgress').textContent = progress + '%';
+            const totalElement = document.getElementById('checklistTotal');
+            const checkedElement = document.getElementById('checklistChecked');
+            const progressElement = document.getElementById('checklistProgress');
+            
+            if (totalElement) totalElement.textContent = total;
+            if (checkedElement) checkedElement.textContent = checked;
+            if (progressElement) progressElement.textContent = progress + '%';
         }
 
         renderGallery() {
             const container = document.getElementById('galleryGrid');
+            if (!container) return;
+            
             const items = this.data.gallery;
 
-            document.getElementById('galleryCount').textContent = items.length;
+            const galleryCountElement = document.getElementById('galleryCount');
+            if (galleryCountElement) {
+                galleryCountElement.textContent = items.length;
+            }
 
             if (items.length === 0) {
                 container.innerHTML = '<div class="empty-state"><h3>No photos yet</h3></div>';
@@ -670,20 +772,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
             container.innerHTML = items.map(item => `
                 <div class="gallery-item">
-                    <img src="${item.url || 'https://via.placeholder.com/300/8b0000/d4af37?text=Photo'}" alt="${item.caption || 'Photo'}">
+                    <img src="${item.url || 'https://via.placeholder.com/300/8b0000/d4af37?text=Photo'}" alt="${item.caption || 'Photo'}" onerror="this.src='https://via.placeholder.com/300/8b0000/d4af37?text=Photo'">
                     <div class="gallery-caption">${item.caption || 'Photo'}</div>
                 </div>
             `).join('');
         }
 
         loadProfile() {
-            const profile = JSON.parse(localStorage.getItem('profile') || '{}');
-            document.getElementById('profileName').value = profile.name || '';
-            document.getElementById('profileAssembly').value = profile.assembly || '';
-            document.getElementById('profileStation').value = profile.station || '';
-            document.getElementById('profileEmail').value = profile.email || '';
-            document.getElementById('profilePhone').value = profile.phone || '';
-            document.getElementById('profileBio').value = profile.bio || '';
+            const profile = JSON.parse(localStorage.getItem(`profile_${this.user.userId}`) || '{}');
+            
+            const nameElement = document.getElementById('profileName');
+            const assemblyElement = document.getElementById('profileAssembly');
+            const stationElement = document.getElementById('profileStation');
+            const emailElement = document.getElementById('profileEmail');
+            const phoneElement = document.getElementById('profilePhone');
+            const bioElement = document.getElementById('profileBio');
+            
+            if (nameElement) nameElement.value = profile.name || this.user.name || '';
+            if (assemblyElement) assemblyElement.value = profile.assembly || '';
+            if (stationElement) stationElement.value = profile.station || '';
+            if (emailElement) emailElement.value = profile.email || this.user.email || '';
+            if (phoneElement) phoneElement.value = profile.phone || '';
+            if (bioElement) bioElement.value = profile.bio || '';
         }
 
         saveProfile() {
@@ -695,32 +805,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 phone: document.getElementById('profilePhone').value,
                 bio: document.getElementById('profileBio').value
             };
-            localStorage.setItem('profile', JSON.stringify(profile));
+            localStorage.setItem(`profile_${this.user.userId}`, JSON.stringify(profile));
             alert('✅ Profile saved!');
         }
 
         loadNotes() {
-            const notes = localStorage.getItem('notes') || '';
-            document.getElementById('notesText').value = notes;
+            const notes = localStorage.getItem(`notes_${this.user.userId}`) || '';
+            const notesElement = document.getElementById('notesText');
+            if (notesElement) {
+                notesElement.value = notes;
+            }
         }
 
         saveNotes() {
-            const notes = document.getElementById('notesText').value;
-            localStorage.setItem('notes', notes);
+            const notesElement = document.getElementById('notesText');
+            if (!notesElement) return;
+            
+            const notes = notesElement.value;
+            localStorage.setItem(`notes_${this.user.userId}`, notes);
             alert('✅ Notes saved!');
         }
 
         loadMessages() {
-            const messages = JSON.parse(localStorage.getItem('messages') || '[]');
+            const messages = JSON.parse(localStorage.getItem(`messages_${this.user.userId}`) || '[]');
             this.data.messages = messages;
             this.renderMessages();
         }
 
         renderMessages() {
             const container = document.getElementById('messagesList');
+            if (!container) return;
+            
             const messages = this.data.messages;
 
-            document.getElementById('messageCount').textContent = messages.length;
+            const messageCountElement = document.getElementById('messageCount');
+            if (messageCountElement) {
+                messageCountElement.textContent = messages.length;
+            }
             
             if (messages.length === 0) {
                 container.innerHTML = '<div class="empty-state"><h3>No messages yet</h3><p>Start a conversation!</p></div>';
@@ -741,11 +862,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         sendMessage() {
-            const text = document.getElementById('messageText').value.trim();
+            const messageTextElement = document.getElementById('messageText');
+            if (!messageTextElement) return;
+            
+            const text = messageTextElement.value.trim();
             if (!text) return;
 
-            const profile = JSON.parse(localStorage.getItem('profile') || '{}');
-            const sender = profile.name || 'Anonymous';
+            const sender = this.user.name || this.user.username || 'Anonymous';
 
             const message = {
                 sender: sender,
@@ -754,16 +877,20 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             this.data.messages.push(message);
-            localStorage.setItem('messages', JSON.stringify(this.data.messages));
+            localStorage.setItem(`messages_${this.user.userId}`, JSON.stringify(this.data.messages));
             
-            document.getElementById('messageText').value = '';
+            messageTextElement.value = '';
             this.renderMessages();
         }
 
         updateAdminStats() {
-            document.getElementById('adminEventCount').textContent = this.data.schedule.length;
-            document.getElementById('adminMemberCount').textContent = this.data.members.length;
-            document.getElementById('adminSpeakerCount').textContent = this.data.speakers.length;
+            const eventCountElement = document.getElementById('adminEventCount');
+            const memberCountElement = document.getElementById('adminMemberCount');
+            const speakerCountElement = document.getElementById('adminSpeakerCount');
+            
+            if (eventCountElement) eventCountElement.textContent = this.data.schedule.length;
+            if (memberCountElement) memberCountElement.textContent = this.data.members.length;
+            if (speakerCountElement) speakerCountElement.textContent = this.data.speakers.length;
         }
 
         updateStats() {
