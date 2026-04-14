@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8b0000">
+    <title>Notifications - NJ Rainbow Convention 2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .notification-card {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.3), rgba(139, 0, 0, 0.3));
+            border: 3px solid var(--primary-gold);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .notification-card.unread {
+            border-color: #dc143c;
+            box-shadow: 0 0 20px rgba(220, 20, 60, 0.5);
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.5), rgba(139, 0, 0, 0.5));
+        }
+
+        .notification-card.unread::before {
+            content: '🔴';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.75rem;
+        }
+
+        .notification-title {
+            color: var(--primary-gold);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .notification-meta {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .notification-message {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .mark-read-btn {
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid var(--primary-gold);
+            color: var(--primary-gold);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .mark-read-btn:hover {
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+        }
+
+        .no-notifications {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .no-notifications-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <header class="app-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
+            <div>
+                <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+                <div class="subtitle">✦ The Greatest Show on Earth ✦</div>
+            </div>
+            <button onclick="window.location.href='index.html'" class="back-btn" style="background: var(--primary-gold); color: var(--dark-bg);">
+                ← Back to Home
+            </button>
+        </div>
+    </header>
+
+    <div class="content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2 class="section-title">🔔 Notifications 🔔</h2>
+            <button class="btn-secondary" onclick="markAllAsRead()">✓ Mark All as Read</button>
+        </div>
+
+        <div id="notificationsContainer">
+            <!-- Notifications loaded here -->
+        </div>
+
+        <div id="noNotifications" class="no-notifications" style="display: none;">
+            <div class="no-notifications-icon">📭</div>
+            <h3 style="color: var(--primary-gold);">No Notifications Yet</h3>
+            <p>You're all caught up! Check back later for updates.</p>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userId = user.userId;
+
+        // Get last read notification ID
+        function getLastReadId() {
+            return parseInt(localStorage.getItem(`notifications_last_read_${userId}`) || '0');
+        }
+
+        // Set last read notification ID
+        function setLastReadId(id) {
+            localStorage.setItem(`notifications_last_read_${userId}`, id.toString());
+        }
+
+        // Load and display notifications
+        function loadNotifications() {
+            const notifications = JSON.parse(localStorage.getItem('custom_notifications') || '[]');
+            const container = document.getElementById('notificationsContainer');
+            const noNotificationsDiv = document.getElementById('noNotifications');
+            
+            if (notifications.length === 0) {
+                container.innerHTML = '';
+                noNotificationsDiv.style.display = 'block';
+                return;
+            }
+            
+            noNotificationsDiv.style.display = 'none';
+            
+            const lastReadId = getLastReadId();
+            
+            // Sort by ID descending (newest first)
+            const sortedNotifications = [...notifications].sort((a, b) => b.id - a.id);
+            
+            container.innerHTML = sortedNotifications.map(notif => {
+                const isUnread = notif.id > lastReadId;
+                
+                return `
+                    <div class="notification-card ${isUnread ? 'unread' : ''}" data-id="${notif.id}">
+                        <div class="notification-header">
+                            <h3 class="notification-title">${notif.title}</h3>
+                        </div>
+                        <div class="notification-meta">
+                            📅 ${notif.date} | ⏰ ${notif.time}
+                        </div>
+                        <div class="notification-message">
+                            ${notif.message}
+                        </div>
+                        ${isUnread ? `
+                            <div style="margin-top: 1rem; text-align: right;">
+                                <button class="mark-read-btn" onclick="markAsRead(${notif.id})">
+                                    ✓ Mark as Read
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Mark single notification as read
+        function markAsRead(notificationId) {
+            const lastReadId = getLastReadId();
+            
+            if (notificationId > lastReadId) {
+                setLastReadId(notificationId);
+            }
+            
+            loadNotifications();
+        }
+
+        // Mark all notifications as read
+        function markAllAsRead() {
+            const notifications = JSON.parse(localStorage.getItem('custom_notifications') || '[]');
+            
+            if (notifications.length === 0) {
+                alert('No notifications to mark as read.');
+                return;
+            }
+            
+            const maxId = Math.max(...notifications.map(n => n.id));
+            setLastReadId(maxId);
+            
+            loadNotifications();
+            alert('✅ All notifications marked as read!');
+        }
+
+        // Auto-mark as read when user scrolls to bottom
+        window.addEventListener('scroll', () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+                // User scrolled near bottom - mark all visible as read
+                const notifications = JSON.parse(localStorage.getItem('custom_notifications') || '[]');
+                if (notifications.length > 0) {
+                    const maxId = Math.max(...notifications.map(n => n.id));
+                    const currentLastRead = getLastReadId();
+                    
+                    if (maxId > currentLastRead) {
+                        setLastReadId(maxId);
+                    }
+                }
+            }
+        });
+
+        // Initialize
+        loadNotifications();
+
+        // Optional: Mark all as read when leaving the page (auto-read behavior)
+        window.addEventListener('beforeunload', () => {
+            const notifications = JSON.parse(localStorage.getItem('custom_notifications') || '[]');
+            if (notifications.length > 0) {
+                const maxId = Math.max(...notifications.map(n => n.id));
+                setLastReadId(maxId);
+            }
+        });
+    </script>
+</body>
+</html>
