@@ -93,6 +93,39 @@
             padding: 1rem;
             margin-bottom: 1rem;
         }
+
+        .checklist-admin-item {
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--primary-gold);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter-btn {
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid var(--primary-gold);
+            color: var(--primary-gold);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+        }
+
+        .filter-btn:hover {
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+        }
     </style>
 </head>
 <body>
@@ -125,6 +158,7 @@
             <button class="admin-tab" onclick="switchAdminTab('emergency')">🚨 Emergency Contacts</button>
             <button class="admin-tab" onclick="switchAdminTab('roles')">🏷️ Role Management</button>
             <button class="admin-tab" onclick="switchAdminTab('required')">⭐ Required Events</button>
+            <button class="admin-tab" onclick="switchAdminTab('checklist')">✓ Checklist Items</button>
             <button class="admin-tab" onclick="switchAdminTab('assemblies')">🌈 Assemblies</button>
             <button class="admin-tab" onclick="switchAdminTab('members')">👤 Meet NJ Rainbow</button>
             <button class="admin-tab" onclick="switchAdminTab('events')">📅 Events</button>
@@ -251,6 +285,59 @@
 
                 <!-- Required Events List -->
                 <div id="requiredEventsList" style="margin-top: 1.5rem;"></div>
+            </div>
+        </div>
+
+        <!-- CHECKLIST MANAGEMENT TAB -->
+        <div id="checklist" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>✓ Required Checklist Items</h3>
+                <p>Manage the required items that all attendees should pack. These appear on everyone's checklist.</p>
+                
+                <button class="btn-save" onclick="showChecklistItemForm()">➕ Add Required Item</button>
+
+                <!-- Checklist Item Form -->
+                <div id="checklistItemForm" style="display: none; margin-top: 1rem; border-top: 2px solid var(--primary-gold); padding-top: 1rem;">
+                    <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Add/Edit Required Item</h4>
+                    <input type="hidden" id="checklistItemEditId">
+                    
+                    <div class="form-group">
+                        <label>Item Description</label>
+                        <input type="text" id="checklistItemText" placeholder="e.g., Convention registration confirmation">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="checklistItemCategory">
+                            <option value="Documents">Documents</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Personal Care">Personal Care</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-save" onclick="saveChecklistItem()">💾 Save Item</button>
+                        <button class="btn-secondary" onclick="hideChecklistItemForm()">❌ Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Organize by Category -->
+                <div style="margin-top: 2rem;">
+                    <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Items by Category</h4>
+                    
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                        <button class="filter-btn active" onclick="filterChecklistItems('All')">All Items</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Documents')">📄 Documents</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Clothing')">👗 Clothing</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Personal Care')">🧴 Personal Care</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Electronics')">🔌 Electronics</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Other')">📦 Other</button>
+                    </div>
+
+                    <div id="checklistItemsList"></div>
+                </div>
             </div>
         </div>
 
