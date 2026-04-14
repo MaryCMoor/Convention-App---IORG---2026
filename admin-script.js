@@ -1,8 +1,10 @@
 // ========================================
-// ADMIN DASHBOARD SCRIPT
+// ADMIN DASHBOARD SCRIPT - COMPLETE
 // ========================================
 
 const GOOGLE_SHEETS_ID = '2PACX-1vTcWlhv_bK1thPxqX8ZaWaswTyaam1poIRptaJe-18E7IQbK39_ffnKvTUPtfeB8CiL5avfPgCoflCl';
+
+let currentChecklistFilter = 'All';
 
 // Tab switching
 function switchAdminTab(tabName) {
@@ -22,6 +24,19 @@ function switchAdminTab(tabName) {
     switch(tabName) {
         case 'users':
             loadUsers();
+            break;
+        case 'emergency':
+            loadEmergencyContacts();
+            break;
+        case 'roles':
+            loadRoles();
+            break;
+        case 'required':
+            loadRequiredEvents();
+            loadEventsForDropdown();
+            break;
+        case 'checklist':
+            loadChecklistItems();
             break;
         case 'assemblies':
             loadAssemblies();
@@ -55,20 +70,27 @@ function loadUsers() {
         return;
     }
     
-    container.innerHTML = users.map(user => `
-        <div class="user-item">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <strong style="color: var(--primary-gold);">${user.name || user.username}</strong>
-                    <br>
-                    <span style="color: var(--text-light); font-size: 0.9rem;">
-                        📧 ${user.email} | 👤 ${user.role} | 🆔 ${user.username}
-                    </span>
+    container.innerHTML = users.map(user => {
+        const roleDisplay = Array.isArray(user.roles) ? user.roles.join(', ') : (user.role || 'User');
+        return `
+            <div class="user-item">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong style="color: var(--primary-gold);">${user.name || user.username}</strong>
+                        <br>
+                        <span style="color: var(--text-light); font-size: 0.9rem;">
+                            📧 ${user.email} | 🆔 ${user.username}
+                        </span>
+                        <br>
+                        <div style="margin-top: 0.5rem;">
+                            ${Array.isArray(user.roles) ? user.roles.map(r => `<span class="role-badge">${r}</span>`).join('') : `<span class="role-badge">${user.role || 'User'}</span>`}
+                        </div>
+                    </div>
+                    <button class="btn-secondary" onclick="editUser('${user.userId}')">✏️ Edit</button>
                 </div>
-                <button class="btn-secondary" onclick="editUser('${user.userId}')">✏️ Edit</button>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function getAllUsers() {
@@ -78,15 +100,14 @@ function getAllUsers() {
         if (key.startsWith('profile_')) {
             const userId = key.replace('profile_', '');
             const profile = JSON.parse(localStorage.getItem(key) || '{}');
-            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
             
-            // Try to get user from registration data
             users.push({
                 userId: userId,
                 name: profile.name || 'Unknown',
                 email: profile.email || 'No email',
                 username: userId,
-                role: profile.role || 'User'
+                role: profile.role || 'User',
+                roles: profile.roles || [profile.role || 'User']
             });
         }
     }
@@ -95,12 +116,22 @@ function getAllUsers() {
 
 function editUser(userId) {
     const profile = JSON.parse(localStorage.getItem(`profile_${userId}`) || '{}');
+    const availableRoles = getAvailableRoles();
     
     document.getElementById('editUserId').value = userId;
     document.getElementById('editUserName').value = profile.name || '';
     document.getElementById('editUserEmail').value = profile.email || '';
     document.getElementById('editUserUsername').value = userId;
-    document.getElementById('editUserRole').value = profile.role || 'Rainbow';
+    
+    // Load roles checkboxes
+    const userRoles = profile.roles || [profile.role || 'User'];
+    const rolesContainer = document.getElementById('editUserRoles');
+    rolesContainer.innerHTML = availableRoles.map(role => `
+        <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-light); cursor: pointer;">
+            <input type="checkbox" value="${role}" ${userRoles.includes(role) ? 'checked' : ''}>
+            ${role}
+        </label>
+    `).join('');
     
     document.getElementById('userEditModal').style.display = 'block';
     document.getElementById('usersList').style.display = 'none';
@@ -112,7 +143,16 @@ function saveUserEdit() {
     
     profile.name = document.getElementById('editUserName').value;
     profile.email = document.getElementById('editUserEmail').value;
-    profile.role = document.getElementById('editUserRole').value;
+    
+    // Get selected roles
+    const selectedRoles = Array.from(document.querySelectorAll('#editUserRoles input:checked')).map(cb => cb.value);
+    if (selectedRoles.length === 0) {
+        alert('Please select at least one role.');
+        return;
+    }
+    
+    profile.roles = selectedRoles;
+    profile.role = selectedRoles[0]; // Primary role
     
     localStorage.setItem(`profile_${userId}`, JSON.stringify(profile));
     
@@ -150,6 +190,7 @@ function createAdminUser() {
         email: email,
         name: name,
         role: 'Admin',
+        roles: ['Admin'],
         dateCreated: new Date().toISOString()
     };
     
@@ -169,6 +210,415 @@ document.getElementById('userSearch')?.addEventListener('input', (e) => {
         user.style.display = text.includes(search) ? 'block' : 'none';
     });
 });
+
+// ========================================
+// EMERGENCY CONTACTS
+// ========================================
+
+function loadEmergencyContacts() {
+    const users = getAllUsers();
+    const container = document.getElementById('emergencyList');
+    
+    const usersWithEmergency = users.map(user => {
+        const profile = JSON.parse(localStorage.getItem(`profile_${user.userId}`) || '{}');
+        return {
+            ...user,
+            emergencyName: profile.emergencyName,
+            emergencyPhone: profile.emergencyPhone,
+            emergencyRelation: profile.emergencyRelation
+        };
+    });
+    
+    // Sort: missing emergency contacts first
+    usersWithEmergency.sort((a, b) => {
+        const aMissing = !a.emergencyName || !a.emergencyPhone;
+        const bMissing = !b.emergencyName || !b.emergencyPhone;
+        if (aMissing && !bMissing) return -1;
+        if (!aMissing && bMissing) return 1;
+        return 0;
+    });
+    
+    container.innerHTML = usersWithEmergency.map(user => {
+        const hasMissing = !user.emergencyName || !user.emergencyPhone;
+        
+        return `
+            <div class="emergency-contact-card ${hasMissing ? 'missing' : ''}">
+                <strong style="color: var(--primary-gold); font-size: 1.1rem;">${user.name}</strong>
+                <br>
+                <span style="color: var(--text-light); font-size: 0.9rem;">
+                    📧 ${user.email} | ${Array.isArray(user.roles) ? user.roles.join(', ') : user.role}
+                </span>
+                <hr style="border: 1px solid var(--primary-gold); margin: 0.75rem 0;">
+                ${hasMissing ? 
+                    `<div style="color: #ff6b6b; font-weight: bold;">⚠️ EMERGENCY CONTACT MISSING</div>` :
+                    `
+                    <div style="color: var(--text-light);">
+                        <strong style="color: #66ff66;">Emergency Contact:</strong><br>
+                        👤 ${user.emergencyName}<br>
+                        📞 ${user.emergencyPhone}<br>
+                        🔗 Relationship: ${user.emergencyRelation}
+                    </div>
+                    `
+                }
+            </div>
+        `;
+    }).join('');
+}
+
+function exportEmergencyContacts() {
+    const users = getAllUsers();
+    
+    let csv = 'Name,Email,Username,Roles,Emergency Contact Name,Emergency Contact Phone,Emergency Contact Relationship\n';
+    
+    users.forEach(user => {
+        const profile = JSON.parse(localStorage.getItem(`profile_${user.userId}`) || '{}');
+        const roles = Array.isArray(user.roles) ? user.roles.join(';') : user.role;
+        
+        csv += `"${user.name}","${user.email}","${user.username}","${roles}","${profile.emergencyName || 'MISSING'}","${profile.emergencyPhone || 'MISSING'}","${profile.emergencyRelation || 'MISSING'}"\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'emergency-contacts-' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    alert('✅ Emergency contacts exported!');
+}
+
+// Search emergency contacts
+document.getElementById('emergencySearch')?.addEventListener('input', (e) => {
+    const search = e.target.value.toLowerCase();
+    const cards = document.querySelectorAll('.emergency-contact-card');
+    
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(search) ? 'block' : 'none';
+    });
+});
+
+// ========================================
+// ROLE MANAGEMENT
+// ========================================
+
+function getAvailableRoles() {
+    const defaultRoles = [
+        'Rainbow Girl',
+        'DeMolay',
+        'Mason',
+        'Eastern Star',
+        'Order of Amaranth',
+        'Grand Officer',
+        'Advisor',
+        'Mother Advisor',
+        'Parent/Guardian',
+        'Admin'
+    ];
+    
+    const customRoles = JSON.parse(localStorage.getItem('custom_roles') || '[]');
+    return [...defaultRoles, ...customRoles];
+}
+
+function loadRoles() {
+    const roles = getAvailableRoles();
+    const container = document.getElementById('rolesList');
+    
+    const defaultRoles = [
+        'Rainbow Girl',
+        'DeMolay',
+        'Mason',
+        'Eastern Star',
+        'Order of Amaranth',
+        'Grand Officer',
+        'Advisor',
+        'Mother Advisor',
+        'Parent/Guardian',
+        'Admin'
+    ];
+    
+    container.innerHTML = roles.map(role => {
+        const isDefault = defaultRoles.includes(role);
+        
+        return `
+            <div class="assembly-item">
+                <span style="color: var(--text-light);">
+                    ${role} ${isDefault ? '<em style="font-size: 0.8rem; opacity: 0.7;">(Default)</em>' : ''}
+                </span>
+                ${!isDefault ? 
+                    `<button class="btn-danger" onclick="deleteRole('${role}')">🗑️ Remove</button>` :
+                    '<span style="color: var(--text-light); font-size: 0.8rem;">Cannot delete default role</span>'
+                }
+            </div>
+        `;
+    }).join('');
+}
+
+function addRole() {
+    const input = document.getElementById('newRole');
+    const roleName = input.value.trim();
+    
+    if (!roleName) {
+        alert('Please enter a role name.');
+        return;
+    }
+    
+    const roles = getAvailableRoles();
+    
+    if (roles.includes(roleName)) {
+        alert('This role already exists.');
+        return;
+    }
+    
+    const customRoles = JSON.parse(localStorage.getItem('custom_roles') || '[]');
+    customRoles.push(roleName);
+    localStorage.setItem('custom_roles', JSON.stringify(customRoles));
+    
+    input.value = '';
+    loadRoles();
+    alert('✅ Role added successfully!');
+}
+
+function deleteRole(roleName) {
+    if (!confirm(`Are you sure you want to remove the role "${roleName}"?`)) return;
+    
+    let customRoles = JSON.parse(localStorage.getItem('custom_roles') || '[]');
+    customRoles = customRoles.filter(r => r !== roleName);
+    localStorage.setItem('custom_roles', JSON.stringify(customRoles));
+    
+    loadRoles();
+    alert('✅ Role removed successfully!');
+}
+
+// ========================================
+// REQUIRED EVENTS BY ROLE
+// ========================================
+
+function loadRequiredEvents() {
+    const requiredEvents = JSON.parse(localStorage.getItem('required_events') || '[]');
+    const container = document.getElementById('requiredEventsList');
+    
+    if (requiredEvents.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-light);">No required events set yet.</p>';
+        return;
+    }
+    
+    container.innerHTML = requiredEvents.map(req => `
+        <div class="event-item">
+            <strong style="color: var(--primary-gold);">${req.eventTitle}</strong>
+            <br>
+            <span style="color: var(--text-light);">
+                Required for: ${req.roles.map(r => `<span class="role-badge">${r}</span>`).join(' ')}
+            </span>
+            <div class="btn-group" style="margin-top: 0.5rem;">
+                <button class="btn-danger" onclick="deleteRequiredEvent('${req.eventId}')">🗑️ Remove</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function loadEventsForDropdown() {
+    const adminEvents = JSON.parse(localStorage.getItem('admin_events') || '[]');
+    const select = document.getElementById('requiredEventSelect');
+    
+    select.innerHTML = '<option value="">Select an event...</option>';
+    adminEvents.forEach(event => {
+        const option = document.createElement('option');
+        option.value = event.id;
+        option.textContent = `${event.title} (${event.day})`;
+        select.appendChild(option);
+    });
+}
+
+function showRequiredEventForm() {
+    loadEventsForDropdown();
+    
+    const roles = getAvailableRoles();
+    const container = document.getElementById('requiredRolesCheckboxes');
+    
+    container.innerHTML = roles.map(role => `
+        <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-light); cursor: pointer;">
+            <input type="checkbox" value="${role}">
+            ${role}
+        </label>
+    `).join('');
+    
+    document.getElementById('requiredEventForm').style.display = 'block';
+}
+
+function hideRequiredEventForm() {
+    document.getElementById('requiredEventForm').style.display = 'none';
+}
+
+function saveRequiredEvent() {
+    const eventId = document.getElementById('requiredEventSelect').value;
+    
+    if (!eventId) {
+        alert('Please select an event.');
+        return;
+    }
+    
+    const selectedRoles = Array.from(document.querySelectorAll('#requiredRolesCheckboxes input:checked')).map(cb => cb.value);
+    
+    if (selectedRoles.length === 0) {
+        alert('Please select at least one role.');
+        return;
+    }
+    
+    const adminEvents = JSON.parse(localStorage.getItem('admin_events') || '[]');
+    const event = adminEvents.find(e => e.id == eventId);
+    
+    if (!event) {
+        alert('Event not found.');
+        return;
+    }
+    
+    const requiredEvents = JSON.parse(localStorage.getItem('required_events') || '[]');
+    
+    // Check if already exists
+    const existingIndex = requiredEvents.findIndex(r => r.eventId == eventId);
+    
+    if (existingIndex !== -1) {
+        requiredEvents[existingIndex].roles = selectedRoles;
+    } else {
+        requiredEvents.push({
+            eventId: eventId,
+            eventTitle: event.title,
+            roles: selectedRoles
+        });
+    }
+    
+    localStorage.setItem('required_events', JSON.stringify(requiredEvents));
+    
+    hideRequiredEventForm();
+    loadRequiredEvents();
+    alert('✅ Required event saved!');
+}
+
+function deleteRequiredEvent(eventId) {
+    if (!confirm('Remove this required event setting?')) return;
+    
+    let requiredEvents = JSON.parse(localStorage.getItem('required_events') || '[]');
+    requiredEvents = requiredEvents.filter(r => r.eventId != eventId);
+    localStorage.setItem('required_events', JSON.stringify(requiredEvents));
+    
+    loadRequiredEvents();
+    alert('✅ Required event removed!');
+}
+
+// ========================================
+// CHECKLIST ITEM MANAGEMENT
+// ========================================
+
+function loadChecklistItems() {
+    const items = JSON.parse(localStorage.getItem('admin_checklist_items') || '[]');
+    
+    // Apply filter
+    let filteredItems = items;
+    if (currentChecklistFilter !== 'All') {
+        filteredItems = items.filter(item => item.category === currentChecklistFilter);
+    }
+    
+    const container = document.getElementById('checklistItemsList');
+    
+    if (filteredItems.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-light);">No items in this category yet.</p>';
+        return;
+    }
+    
+    container.innerHTML = filteredItems.map(item => `
+        <div class="checklist-admin-item">
+            <div>
+                <strong style="color: var(--primary-gold);">${item.text}</strong>
+                <br>
+                <span style="color: var(--text-light); font-size: 0.9rem;">Category: ${item.category}</span>
+            </div>
+            <div class="btn-group">
+                <button class="btn-secondary" onclick="editChecklistItem(${item.id})">✏️ Edit</button>
+                <button class="btn-danger" onclick="deleteChecklistItem(${item.id})">🗑️ Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showChecklistItemForm() {
+    document.getElementById('checklistItemForm').style.display = 'block';
+    document.getElementById('checklistItemEditId').value = '';
+    document.getElementById('checklistItemText').value = '';
+    document.getElementById('checklistItemCategory').value = 'Documents';
+}
+
+function hideChecklistItemForm() {
+    document.getElementById('checklistItemForm').style.display = 'none';
+}
+
+function saveChecklistItem() {
+    const text = document.getElementById('checklistItemText').value.trim();
+    const category = document.getElementById('checklistItemCategory').value;
+    const editId = document.getElementById('checklistItemEditId').value;
+    
+    if (!text) {
+        alert('Please enter an item description.');
+        return;
+    }
+    
+    const items = JSON.parse(localStorage.getItem('admin_checklist_items') || '[]');
+    
+    if (editId) {
+        // Edit existing
+        const index = items.findIndex(i => i.id == editId);
+        if (index !== -1) {
+            items[index].text = text;
+            items[index].category = category;
+        }
+    } else {
+        // Add new
+        const newId = items.length > 0 ? Math.max(...items.map(i => i.id)) + 1 : 1;
+        items.push({ id: newId, text, category });
+    }
+    
+    localStorage.setItem('admin_checklist_items', JSON.stringify(items));
+    
+    hideChecklistItemForm();
+    loadChecklistItems();
+    alert('✅ Checklist item saved!');
+}
+
+function editChecklistItem(id) {
+    const items = JSON.parse(localStorage.getItem('admin_checklist_items') || '[]');
+    const item = items.find(i => i.id === id);
+    
+    if (!item) return;
+    
+    document.getElementById('checklistItemEditId').value = item.id;
+    document.getElementById('checklistItemText').value = item.text;
+    document.getElementById('checklistItemCategory').value = item.category;
+    
+    document.getElementById('checklistItemForm').style.display = 'block';
+}
+
+function deleteChecklistItem(id) {
+    if (!confirm('Delete this checklist item?')) return;
+    
+    let items = JSON.parse(localStorage.getItem('admin_checklist_items') || '[]');
+    items = items.filter(i => i.id !== id);
+    localStorage.setItem('admin_checklist_items', JSON.stringify(items));
+    
+    loadChecklistItems();
+    alert('✅ Item deleted!');
+}
+
+function filterChecklistItems(category) {
+    currentChecklistFilter = category;
+    
+    // Update active button
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    loadChecklistItems();
+}
 
 // ========================================
 // ASSEMBLY MANAGEMENT
