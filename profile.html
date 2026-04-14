@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8b0000">
+    <title>My Profile - NJ Rainbow Convention 2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .emergency-alert {
+            background: linear-gradient(135deg, #ff6b6b, #dc143c);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 3px solid var(--primary-gold);
+            margin-bottom: 2rem;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .emergency-section {
+            background: rgba(255, 107, 107, 0.1);
+            border: 3px solid #ff6b6b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .emergency-section h3 {
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-divider {
+            height: 3px;
+            background: var(--primary-gold);
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <header class="app-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
+            <div>
+                <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+                <div class="subtitle">✦ The Greatest Show on Earth ✦</div>
+            </div>
+            <button onclick="window.location.href='index.html'" class="back-btn" style="background: var(--primary-gold); color: var(--dark-bg);">
+                ← Back to Home
+            </button>
+        </div>
+    </header>
+
+    <div class="content">
+        <h2 class="section-title">👤 My Profile 👤</h2>
+
+        <!-- Emergency Contact Alert (shown if not filled) -->
+        <div id="emergencyAlert" class="emergency-alert" style="display: none;">
+            <h3>⚠️ Emergency Contact Required!</h3>
+            <p>Please add your emergency contact information below for safety purposes.</p>
+        </div>
+
+        <div class="profile-form">
+            <!-- Emergency Contact Section -->
+            <div class="emergency-section">
+                <h3>🚨 Emergency Contact Information</h3>
+                <p style="color: var(--text-light); margin-bottom: 1rem; font-size: 0.9rem;">
+                    Required for convention attendance. This person will be contacted in case of emergency.
+                </p>
+                
+                <div class="form-group">
+                    <label>Emergency Contact Name *</label>
+                    <input type="text" id="emergencyName" placeholder="Full name of emergency contact" required>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Emergency Contact Phone *</label>
+                        <input type="tel" id="emergencyPhone" placeholder="(555) 123-4567" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Relationship *</label>
+                        <select id="emergencyRelation" required>
+                            <option value="">Select relationship</option>
+                            <option value="Parent">Parent</option>
+                            <option value="Guardian">Guardian</option>
+                            <option value="Spouse">Spouse</option>
+                            <option value="Sibling">Sibling</option>
+                            <option value="Other Family">Other Family</option>
+                            <option value="Friend">Friend</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- Personal Information -->
+            <h3 style="color: var(--primary-gold); margin-bottom: 1rem;">Personal Information</h3>
+            
+            <div class="form-group">
+                <label>📛 Full Name</label>
+                <input type="text" id="profileName" placeholder="Enter your full name">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label>🌈 Assembly</label>
+                    <select id="profileAssembly">
+                        <option value="">Select your assembly</option>
+                        <!-- Dynamically loaded from admin settings -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>⭐ Station/Office</label>
+                    <input type="text" id="profileStation" placeholder="Your station or office held">
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- Contact Information -->
+            <h3 style="color: var(--primary-gold); margin-bottom: 1rem;">Contact Information</h3>
+
+            <div class="form-group">
+                <label>📧 Email Address</label>
+                <input type="email" id="profileEmail" placeholder="your.email@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label>📱 Phone Number</label>
+                <input type="tel" id="profilePhone" placeholder="(555) 123-4567">
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- Additional Information -->
+            <h3 style="color: var(--primary-gold); margin-bottom: 1rem;">Additional Information</h3>
+            
+            <div class="form-group">
+                <label>📝 About Me</label>
+                <textarea id="profileBio" rows="4" placeholder="Tell us about yourself..."></textarea>
+            </div>
+
+            <button class="btn-save" id="saveProfileBtn">💾 Save Profile</button>
+            
+            <p style="color: var(--text-light); margin-top: 1rem; text-align: center; font-size: 0.9rem;">
+                * Required fields must be completed
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        
+        // Load assemblies list
+        function loadAssemblies() {
+            const assemblies = JSON.parse(localStorage.getItem('assemblies_list') || '[]');
+            const defaultAssemblies = [
+                'Rainbow Assembly #1 - Cherry Hill',
+                'Rainbow Assembly #5 - Princeton',
+                'Rainbow Assembly #8 - Newark',
+                'Rainbow Assembly #12 - Toms River',
+                'Rainbow Assembly #15 - Cape May',
+                'Rainbow Assembly #20 - Atlantic City'
+            ];
+            
+            const assemblyList = assemblies.length > 0 ? assemblies : defaultAssemblies;
+            const select = document.getElementById('profileAssembly');
+            
+            assemblyList.forEach(assembly => {
+                const option = document.createElement('option');
+                option.value = assembly;
+                option.textContent = assembly;
+                select.appendChild(option);
+            });
+        }
+
+        // Load profile data
+        function loadProfile() {
+            const profile = JSON.parse(localStorage.getItem(`profile_${user.userId}`) || '{}');
+            
+            // Emergency contact
+            document.getElementById('emergencyName').value = profile.emergencyName || '';
+            document.getElementById('emergencyPhone').value = profile.emergencyPhone || '';
+            document.getElementById('emergencyRelation').value = profile.emergencyRelation || '';
+            
+            // Check if emergency contact is missing
+            if (!profile.emergencyName || !profile.emergencyPhone || !profile.emergencyRelation) {
+                document.getElementById('emergencyAlert').style.display = 'block';
+            }
+            
+            // Personal info
+            document.getElementById('profileName').value = profile.name || user.name || '';
+            document.getElementById('profileAssembly').value = profile.assembly || '';
+            document.getElementById('profileStation').value = profile.station || '';
+            document.getElementById('profileEmail').value = profile.email || user.email || '';
+            document.getElementById('profilePhone').value = profile.phone || '';
+            document.getElementById('profileBio').value = profile.bio || '';
+        }
+
+        // Save profile
+        document.getElementById('saveProfileBtn').addEventListener('click', () => {
+            // Validate emergency contact
+            const emergencyName = document.getElementById('emergencyName').value.trim();
+            const emergencyPhone = document.getElementById('emergencyPhone').value.trim();
+            const emergencyRelation = document.getElementById('emergencyRelation').value;
+            
+            if (!emergencyName || !emergencyPhone || !emergencyRelation) {
+                alert('⚠️ Please complete all emergency contact fields before saving!');
+                document.getElementById('emergencyAlert').style.display = 'block';
+                return;
+            }
+            
+            const profile = {
+                emergencyName: emergencyName,
+                emergencyPhone: emergencyPhone,
+                emergencyRelation: emergencyRelation,
+                name: document.getElementById('profileName').value,
+                assembly: document.getElementById('profileAssembly').value,
+                station: document.getElementById('profileStation').value,
+                email: document.getElementById('profileEmail').value,
+                phone: document.getElementById('profilePhone').value,
+                bio: document.getElementById('profileBio').value,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            localStorage.setItem(`profile_${user.userId}`, JSON.stringify(profile));
+            document.getElementById('emergencyAlert').style.display = 'none';
+            
+            alert('✅ Profile saved successfully!');
+        });
+
+        // Initialize
+        loadAssemblies();
+        loadProfile();
+    </script>
+</body>
+</html>
