@@ -13,6 +13,7 @@
             margin-bottom: 2rem;
             overflow-x: auto;
             border-bottom: 3px solid var(--primary-gold);
+            flex-wrap: wrap;
         }
 
         .admin-tab {
@@ -50,6 +51,19 @@
             margin-bottom: 0.75rem;
         }
 
+        .emergency-contact-card {
+            background: rgba(255, 107, 107, 0.1);
+            border: 2px solid #ff6b6b;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .emergency-contact-card.missing {
+            border-color: #dc143c;
+            background: rgba(220, 20, 60, 0.2);
+        }
+
         .assembly-item {
             display: flex;
             justify-content: space-between;
@@ -59,6 +73,25 @@
             border-radius: 8px;
             padding: 1rem;
             margin-bottom: 0.5rem;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 0.25rem;
+        }
+
+        .required-event-form {
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--primary-gold);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
@@ -88,7 +121,10 @@
 
         <!-- Admin Tabs -->
         <div class="admin-tabs">
-            <button class="admin-tab active" onclick="switchAdminTab('users')">👥 Manage Users</button>
+            <button class="admin-tab active" onclick="switchAdminTab('users')">👥 Users</button>
+            <button class="admin-tab" onclick="switchAdminTab('emergency')">🚨 Emergency Contacts</button>
+            <button class="admin-tab" onclick="switchAdminTab('roles')">🏷️ Role Management</button>
+            <button class="admin-tab" onclick="switchAdminTab('required')">⭐ Required Events</button>
             <button class="admin-tab" onclick="switchAdminTab('assemblies')">🌈 Assemblies</button>
             <button class="admin-tab" onclick="switchAdminTab('members')">👤 Meet NJ Rainbow</button>
             <button class="admin-tab" onclick="switchAdminTab('events')">📅 Events</button>
@@ -133,24 +169,88 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Role</label>
-                    <select id="editUserRole">
-                        <option value="Rainbow">Rainbow Girl</option>
-                        <option value="DeMolay">DeMolay</option>
-                        <option value="Mason">Mason</option>
-                        <option value="Eastern Star">Eastern Star</option>
-                        <option value="Amaranth">Order of Amaranth</option>
-                        <option value="Grand Officer">Grand Officer</option>
-                        <option value="Advisor">Advisor</option>
-                        <option value="Parent">Parent/Guardian</option>
-                        <option value="Admin">Admin</option>
-                    </select>
+                    <label>Roles (select multiple)</label>
+                    <div id="editUserRoles" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                        <!-- Roles loaded dynamically -->
+                    </div>
                 </div>
 
                 <div class="btn-group">
                     <button class="btn-save" onclick="saveUserEdit()">💾 Save Changes</button>
                     <button class="btn-secondary" onclick="closeUserEdit()">❌ Cancel</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- EMERGENCY CONTACTS TAB -->
+        <div id="emergency" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>🚨 Emergency Contact Information</h3>
+                <p>View emergency contact information for all registered users.</p>
+                
+                <div class="search-box" style="margin-bottom: 1rem;">
+                    <input type="text" id="emergencySearch" placeholder="🔍 Search by name...">
+                </div>
+
+                <button class="btn-secondary" onclick="exportEmergencyContacts()">📥 Export to CSV</button>
+
+                <div id="emergencyList" style="margin-top: 1.5rem;"></div>
+            </div>
+        </div>
+
+        <!-- ROLE MANAGEMENT TAB -->
+        <div id="roles" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>🏷️ Role Management</h3>
+                <p>Manage the list of available roles for users.</p>
+                
+                <div class="form-group">
+                    <label>Add New Role</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="newRole" placeholder="Role name (e.g., 'Mother Advisor')">
+                        <button class="btn-save" onclick="addRole()">➕ Add</button>
+                    </div>
+                </div>
+
+                <h4 style="color: var(--primary-gold); margin: 1.5rem 0 1rem;">Current Roles</h4>
+                <div id="rolesList"></div>
+            </div>
+        </div>
+
+        <!-- REQUIRED EVENTS TAB -->
+        <div id="required" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>⭐ Required Events by Role</h3>
+                <p>Mark events as required for specific roles. These will appear in gold on users' schedules.</p>
+                
+                <button class="btn-save" onclick="showRequiredEventForm()">➕ Add Required Event</button>
+
+                <!-- Required Event Form -->
+                <div id="requiredEventForm" style="display: none; margin-top: 1rem;" class="required-event-form">
+                    <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Set Event as Required</h4>
+                    
+                    <div class="form-group">
+                        <label>Select Event</label>
+                        <select id="requiredEventSelect">
+                            <option value="">Select an event...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Required for Roles (select multiple)</label>
+                        <div id="requiredRolesCheckboxes" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                            <!-- Roles loaded dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-save" onclick="saveRequiredEvent()">💾 Save</button>
+                        <button class="btn-secondary" onclick="hideRequiredEventForm()">❌ Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Required Events List -->
+                <div id="requiredEventsList" style="margin-top: 1.5rem;"></div>
             </div>
         </div>
 
