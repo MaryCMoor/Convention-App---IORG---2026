@@ -6,22 +6,32 @@
     <meta name="description" content="NJ Rainbow Convention 2026 - The Greatest Show on Earth">
     <meta name="theme-color" content="#8b0000">
     <title>NJ Rainbow Convention 2026</title>
-    
-    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
-    
-    <!-- Stylesheets -->
     <link rel="stylesheet" href="styles.css">
-    
-    <!-- Icons -->
     <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
+    <!-- Check if user is logged in -->
+    <script>
+        // Check authentication before loading the page
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
     <!-- HEADER -->
     <header class="app-header">
-        <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
-        <div class="subtitle">✦ The Greatest Show on Earth ✦</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
+            <div>
+                <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+                <div class="subtitle">✦ The Greatest Show on Earth ✦</div>
+            </div>
+            <button id="logoutBtn" class="back-btn" style="background: rgba(255,255,255,0.2); color: white;">
+                🚪 Logout
+            </button>
+        </div>
     </header>
 
     <!-- BACK NAVIGATION -->
@@ -36,7 +46,7 @@
         <!-- HOME PAGE -->
         <div id="home" class="page active">
             <div class="welcome-banner">
-                <h2>Welcome to the Show! 🎭</h2>
+                <h2>Welcome, <span id="userName">User</span>! 🎭</h2>
                 <p>Step right up and explore everything Convention 2026 has to offer!</p>
             </div>
             
@@ -314,7 +324,6 @@
 
     </div>
 
-    <!-- Loading indicator -->
     <div id="loadingIndicator" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(139, 0, 0, 0.95); color: #d4af37; padding: 2rem; border-radius: 10px; border: 3px solid #d4af37; z-index: 1000;">
         <div style="text-align: center;">
             <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
@@ -322,10 +331,8 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="app.js"></script>
     <script>
-        // Register service worker for PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js')
                 .then(reg => console.log('Service Worker registered', reg))
