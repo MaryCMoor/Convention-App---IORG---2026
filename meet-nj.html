@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8b0000">
+    <title>Meet NJ Rainbow - NJ Rainbow Convention 2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .member-card {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.3), rgba(139, 0, 0, 0.3));
+            border: 3px solid var(--primary-gold);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .member-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) rotate(180deg); }
+        }
+
+        .member-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 32px rgba(212, 175, 55, 0.5);
+            border-color: var(--light-cream);
+        }
+
+        .member-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid var(--primary-gold);
+            object-fit: cover;
+            margin: 0 auto 1.5rem;
+            display: block;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .member-photo-placeholder {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid var(--primary-gold);
+            background: linear-gradient(135deg, var(--primary-gold), #b8960f);
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .member-name {
+            color: var(--primary-gold);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .member-station {
+            color: var(--light-cream);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .member-assembly {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .member-bio {
+            color: var(--text-light);
+            line-height: 1.6;
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+            text-align: left;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        .filter-btn {
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid var(--primary-gold);
+            color: var(--primary-gold);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+        }
+
+        .filter-btn:hover {
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .no-members {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+
+        .no-members-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <header class="app-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
+            <div>
+                <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+                <div class="subtitle">✦ The Greatest Show on Earth ✦</div>
+            </div>
+            <button onclick="window.location.href='index.html'" class="back-btn" style="background: var(--primary-gold); color: var(--dark-bg);">
+                ← Back to Home
+            </button>
+        </div>
+    </header>
+
+    <div class="content">
+        <h2 class="section-title">🌈 Meet NJ Rainbow 🌈</h2>
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 2rem;">
+            Get to know the amazing members of New Jersey Rainbow Girls!
+        </p>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <button class="filter-btn active" onclick="filterMembers('All')">🌈 All Members</button>
+            <button class="filter-btn" onclick="filterMembers('Officer')">⭐ Officers</button>
+            <button class="filter-btn" onclick="filterMembers('Grand')">👑 Grand Officers</button>
+            <div class="search-box">
+                <input type="text" id="memberSearch" placeholder="🔍 Search members by name or assembly...">
+            </div>
+        </div>
+
+        <!-- Members Grid -->
+        <div id="membersContainer" class="members-grid">
+            <!-- Members loaded here -->
+        </div>
+
+        <!-- No Members State -->
+        <div id="noMembers" class="no-members" style="display: none;">
+            <div class="no-members-icon">🌈</div>
+            <h3 style="color: var(--primary-gold);">No Members Found</h3>
+            <p>Check back soon to meet our amazing Rainbow Girls!</p>
+        </div>
+    </div>
+
+    <script>
+        const GOOGLE_SHEETS_ID = '2PACX-1vTcWlhv_bK1thPxqX8ZaWaswTyaam1poIRptaJe-18E7IQbK39_ffnKvTUPtfeB8CiL5avfPgCoflCl';
+        
+        let allMembers = [];
+        let currentFilter = 'All';
+
+        // Load members from Google Sheets + Admin
+        async function loadMembers() {
+            try {
+                // Load from Google Sheets (Members tab - gid may vary)
+                const response = await fetch(`https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEETS_ID}/pub?gid=1&single=true&output=csv`);
+                const csvText = await response.text();
+                const sheetMembers = parseCSV(csvText);
+                
+                // Load admin-added members
+                const adminMembers = JSON.parse(localStorage.getItem('admin_members') || '[]');
+                
+                // Merge members
+                allMembers = [...sheetMembers, ...adminMembers];
+                
+                renderMembers();
+            } catch (error) {
+                console.error('Error loading members:', error);
+                
+                // Fallback to admin members only
+                allMembers = JSON.parse(localStorage.getItem('admin_members') || '[]');
+                renderMembers();
+            }
+        }
+
+        // Parse CSV from Google Sheets
+        function parseCSV(csv) {
+            const lines = csv.split('\n').filter(line => line.trim());
+            if (lines.length < 2) return [];
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            const members = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                const member = {};
+                
+                headers.forEach((header, index) => {
+                    member[header] = values[index] || '';
+                });
+                
+                if (member.name) {
+                    members.push(member);
+                }
+            }
+            
+            return members;
+        }
+
+        // Filter members
+        function filterMembers(filter) {
+            currentFilter = filter;
+            
+            // Update active button
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            renderMembers();
+        }
+
+        // Render members
+        function renderMembers() {
+            const container = document.getElementById('membersContainer');
+            const noMembersDiv = document.getElementById('noMembers');
+            
+            // Apply filter
+            let filteredMembers = allMembers;
+            
+            if (currentFilter === 'Officer') {
+                filteredMembers = allMembers.filter(m => 
+                    m.station && m.station.toLowerCase().includes('worthy') || 
+                    m.station && m.station.toLowerCase().includes('officer')
+                );
+            } else if (currentFilter === 'Grand') {
+                filteredMembers = allMembers.filter(m => 
+                    m.station && m.station.toLowerCase().includes('grand')
+                );
+            }
+            
+            // Apply search filter
+            const searchTerm = document.getElementById('memberSearch').value.toLowerCase();
+            if (searchTerm) {
+                filteredMembers = filteredMembers.filter(m => 
+                    m.name.toLowerCase().includes(searchTerm) ||
+                    (m.assembly && m.assembly.toLowerCase().includes(searchTerm)) ||
+                    (m.station && m.station.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            if (filteredMembers.length === 0) {
+                container.innerHTML = '';
+                noMembersDiv.style.display = 'block';
+                return;
+            }
+            
+            noMembersDiv.style.display = 'none';
+            
+            container.innerHTML = filteredMembers.map(member => `
+                <div class="member-card">
+                    ${member.photo ? 
+                        `<img src="${member.photo}" alt="${member.name}" class="member-photo">` :
+                        `<div class="member-photo-placeholder">🌈</div>`
+                    }
+                    
+                    <h3 class="member-name">${member.name}</h3>
+                    
+                    ${member.station ? 
+                        `<div class="member-station">⭐ ${member.station}</div>` : ''
+                    }
+                    
+                    ${member.assembly ? 
+                        `<div class="member-assembly">🏛️ ${member.assembly}</div>` : ''
+                    }
+                    
+                    ${member.bio ? 
+                        `<div class="member-bio">${member.bio}</div>` : ''
+                    }
+                </div>
+            `).join('');
+        }
+
+        // Search functionality
+        document.getElementById('memberSearch').addEventListener('input', () => {
+            renderMembers();
+        });
+
+        // Initialize
+        loadMembers();
+    </script>
+</body>
+</html>
