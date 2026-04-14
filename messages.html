@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8b0000">
+    <title>Messages - NJ Rainbow Convention 2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .messages-container {
+            background: linear-gradient(135deg, rgba(220, 20, 60, 0.2), rgba(139, 0, 0, 0.2));
+            border: 3px solid var(--primary-gold);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.sent {
+            background: linear-gradient(135deg, var(--primary-gold), #b8960f);
+            color: var(--dark-bg);
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message.received {
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid var(--primary-gold);
+            color: var(--text-light);
+        }
+
+        .message-sender {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .message.sent .message-sender {
+            color: var(--dark-bg);
+        }
+
+        .message.received .message-sender {
+            color: var(--primary-gold);
+        }
+
+        .message-text {
+            line-height: 1.4;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            opacity: 0.8;
+        }
+
+        .message-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .message-form textarea {
+            flex: 1;
+            resize: none;
+            height: 80px;
+        }
+
+        .send-btn {
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .send-btn:hover {
+            background: var(--light-cream);
+            transform: scale(1.05);
+        }
+
+        .empty-messages {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .chat-note {
+            background: rgba(220, 20, 60, 0.2);
+            border: 2px solid var(--primary-gold);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <header class="app-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
+            <div>
+                <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+                <div class="subtitle">✦ The Greatest Show on Earth ✦</div>
+            </div>
+            <button onclick="window.location.href='index.html'" class="back-btn" style="background: var(--primary-gold); color: var(--dark-bg);">
+                ← Back to Home
+            </button>
+        </div>
+    </header>
+
+    <div class="content">
+        <h2 class="section-title">💬 Messages 💬</h2>
+
+        <div class="chat-note">
+            <strong>📢 Community Chat</strong><br>
+            This is a shared message board for all convention attendees. Be respectful and kind!
+        </div>
+
+        <div class="messages-container">
+            <div class="messages-list" id="messagesList">
+                <!-- Messages loaded here -->
+            </div>
+
+            <div class="message-form">
+                <textarea id="messageText" placeholder="Type your message here..."></textarea>
+                <button class="send-btn" onclick="sendMessage()">📤<br>Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userId = user.userId;
+
+        // Load messages
+        function loadMessages() {
+            const messages = JSON.parse(localStorage.getItem('messages_all') || '[]');
+            const container = document.getElementById('messagesList');
+            
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-messages">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">💬</div>
+                        <p>No messages yet. Be the first to say hello!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = messages.map(msg => {
+                const isSent = msg.userId === userId;
+                const senderName = msg.userName || msg.username || 'Anonymous';
+                
+                return `
+                    <div class="message ${isSent ? 'sent' : 'received'}">
+                        <div class="message-sender">${isSent ? 'You' : senderName}</div>
+                        <div class="message-text">${escapeHtml(msg.text)}</div>
+                        <div class="message-time">${msg.time}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Auto-scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Send message
+        function sendMessage() {
+            const text = document.getElementById('messageText').value.trim();
+            
+            if (!text) {
+                alert('Please enter a message.');
+                return;
+            }
+            
+            const messages = JSON.parse(localStorage.getItem('messages_all') || '[]');
+            
+            const newMessage = {
+                id: Date.now(),
+                userId: userId,
+                userName: user.name || user.username,
+                username: user.username,
+                text: text,
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString()
+            };
+            
+            messages.push(newMessage);
+            localStorage.setItem('messages_all', JSON.stringify(messages));
+            
+            document.getElementById('messageText').value = '';
+            loadMessages();
+        }
+
+        // Allow Enter to send (Shift+Enter for new line)
+        document.getElementById('messageText').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Auto-refresh messages every 5 seconds
+        setInterval(loadMessages, 5000);
+
+        // Initialize
+        loadMessages();
+    </script>
+</body>
+</html>
