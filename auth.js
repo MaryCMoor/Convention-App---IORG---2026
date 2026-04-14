@@ -1,5 +1,5 @@
 // Google Apps Script Web App URL
-const AUTH_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyzx4Ru8ac3wgBHKtfosugNMprKbLDwvnJb83OQifsv9MZ6W9U8go8XZUp--wWV_VEw/exec';
+const AUTH_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbys_9bjJfjv7pBmGLrrOLXfohiY0fXOoy7AgxJ122ItzqSg0RiPC3BV7nGIg81EJOEn/exec';
 
 function switchTab(tab) {
     // Update tabs
