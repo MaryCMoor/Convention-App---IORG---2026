@@ -92,7 +92,8 @@
             font-size: 1rem;
         }
 
-        .form-group input {
+        .form-group input,
+        .form-group select {
             width: 100%;
             padding: 0.75rem;
             border: 2px solid var(--primary-gold);
@@ -100,9 +101,11 @@
             font-size: 1rem;
             background: rgba(255, 255, 255, 0.95);
             color: var(--text-dark);
+            font-family: inherit;
         }
 
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             outline: none;
             border-color: var(--light-cream);
             box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.3);
@@ -125,6 +128,11 @@
         .submit-btn:hover {
             background: var(--light-cream);
             transform: scale(1.02);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .error-message {
@@ -191,6 +199,21 @@
                 <div class="form-group">
                     <label>👤 Username</label>
                     <input type="text" id="signupUsername" placeholder="Choose a username" required>
+                </div>
+                <div class="form-group">
+                    <label>👥 I am a...</label>
+                    <select id="signupRole" required>
+                        <option value="">Select your role</option>
+                        <option value="Rainbow">Rainbow Girl</option>
+                        <option value="DeMolay">DeMolay</option>
+                        <option value="Mason">Mason</option>
+                        <option value="Eastern Star">Eastern Star</option>
+                        <option value="Amaranth">Order of Amaranth</option>
+                        <option value="Grand Officer">Grand Officer</option>
+                        <option value="Advisor">Advisor</option>
+                        <option value="Parent">Parent/Guardian</option>
+                        <option value="Admin">Admin</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>🔒 Password</label>
