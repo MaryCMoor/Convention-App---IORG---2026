@@ -185,9 +185,9 @@
 
         <!-- Filter Section -->
         <div class="filter-section">
-            <button class="filter-btn active" onclick="filterMembers('All')">🌈 All Members</button>
-            <button class="filter-btn" onclick="filterMembers('Officer')">⭐ Officers</button>
-            <button class="filter-btn" onclick="filterMembers('Grand')">👑 Grand Officers</button>
+            <button class="filter-btn active" onclick="filterMembers('All', this)">🌈 All Members</button>
+            <button class="filter-btn" onclick="filterMembers('Officer', this)">⭐ Officers</button>
+            <button class="filter-btn" onclick="filterMembers('Grand', this)">👑 Grand Officers</button>
             <div class="search-box">
                 <input type="text" id="memberSearch" placeholder="🔍 Search members by name or assembly...">
             </div>
@@ -212,13 +212,75 @@
         let allMembers = [];
         let currentFilter = 'All';
 
+        // Parse CSV helper
+        function parseCSV(text) {
+            const rows = [];
+            let currentRow = [];
+            let currentField = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const nextChar = text[i + 1];
+                
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        currentField += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    currentRow.push(currentField.trim());
+                    currentField = '';
+                } else if ((char === '\n' || char === '\r') && !inQuotes) {
+                    if (currentField || currentRow.length > 0) {
+                        currentRow.push(currentField.trim());
+                        rows.push(currentRow);
+                        currentRow = [];
+                        currentField = '';
+                    }
+                    if (char === '\r' && nextChar === '\n') {
+                        i++;
+                    }
+                } else {
+                    currentField += char;
+                }
+            }
+            
+            if (currentField || currentRow.length > 0) {
+                currentRow.push(currentField.trim());
+                rows.push(currentRow);
+            }
+            
+            return rows;
+        }
+
         // Load members from Google Sheets + Admin
         async function loadMembers() {
             try {
                 // Load from Google Sheets (Members tab - gid may vary)
                 const response = await fetch(`https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEETS_ID}/pub?gid=1&single=true&output=csv`);
                 const csvText = await response.text();
-                const sheetMembers = parseCSV(csvText);
+                const rows = parseCSV(csvText);
+                
+                const sheetMembers = [];
+                if (rows.length > 1) {
+                    const headers = rows[0].map(h => h.toLowerCase());
+                    
+                    for (let i = 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        const member = {};
+                        
+                        headers.forEach((header, index) => {
+                            member[header] = row[index] || '';
+                        });
+                        
+                        if (member.name) {
+                            sheetMembers.push(member);
+                        }
+                    }
+                }
                 
                 // Load admin-added members
                 const adminMembers = JSON.parse(localStorage.getItem('admin_members') || '[]');
@@ -236,38 +298,14 @@
             }
         }
 
-        // Parse CSV from Google Sheets
-        function parseCSV(csv) {
-            const lines = csv.split('\n').filter(line => line.trim());
-            if (lines.length < 2) return [];
-            
-            const headers = lines[0].split(',').map(h => h.trim());
-            const members = [];
-            
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',').map(v => v.trim());
-                const member = {};
-                
-                headers.forEach((header, index) => {
-                    member[header] = values[index] || '';
-                });
-                
-                if (member.name) {
-                    members.push(member);
-                }
-            }
-            
-            return members;
-        }
-
         // Filter members
-        function filterMembers(filter) {
+        function filterMembers(filter, buttonElement) {
             currentFilter = filter;
             
             // Update active button
             const buttons = document.querySelectorAll('.filter-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            if (buttonElement) buttonElement.classList.add('active');
             
             renderMembers();
         }
@@ -282,8 +320,8 @@
             
             if (currentFilter === 'Officer') {
                 filteredMembers = allMembers.filter(m => 
-                    m.station && m.station.toLowerCase().includes('worthy') || 
-                    m.station && m.station.toLowerCase().includes('officer')
+                    m.station && (m.station.toLowerCase().includes('worthy') || 
+                    m.station.toLowerCase().includes('officer'))
                 );
             } else if (currentFilter === 'Grand') {
                 filteredMembers = allMembers.filter(m => 
@@ -312,22 +350,22 @@
             container.innerHTML = filteredMembers.map(member => `
                 <div class="member-card">
                     ${member.photo ? 
-                        `<img src="${member.photo}" alt="${member.name}" class="member-photo">` :
+                        `<img src="${escapeHtml(member.photo)}" alt="${escapeHtml(member.name)}" class="member-photo" onerror="this.outerHTML='<div class=member-photo-placeholder>🌈</div>'">` :
                         `<div class="member-photo-placeholder">🌈</div>`
                     }
                     
-                    <h3 class="member-name">${member.name}</h3>
+                    <h3 class="member-name">${escapeHtml(member.name)}</h3>
                     
                     ${member.station ? 
-                        `<div class="member-station">⭐ ${member.station}</div>` : ''
+                        `<div class="member-station">⭐ ${escapeHtml(member.station)}</div>` : ''
                     }
                     
                     ${member.assembly ? 
-                        `<div class="member-assembly">🏛️ ${member.assembly}</div>` : ''
+                        `<div class="member-assembly">🏛️ ${escapeHtml(member.assembly)}</div>` : ''
                     }
                     
                     ${member.bio ? 
-                        `<div class="member-bio">${member.bio}</div>` : ''
+                        `<div class="member-bio">${escapeHtml(member.bio)}</div>` : ''
                     }
                 </div>
             `).join('');
@@ -337,6 +375,14 @@
         document.getElementById('memberSearch').addEventListener('input', () => {
             renderMembers();
         });
+
+        // Escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
         // Initialize
         loadMembers();
