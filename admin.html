@@ -126,6 +126,30 @@
             background: var(--primary-gold);
             color: var(--dark-bg);
         }
+
+        .event-item {
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--primary-gold);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .btn-danger {
+            background: rgba(139, 0, 0, 0.8);
+            border: 2px solid #dc143c;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-danger:hover {
+            background: #dc143c;
+        }
     </style>
 </head>
 <body>
@@ -154,17 +178,17 @@
 
         <!-- Admin Tabs -->
         <div class="admin-tabs">
-            <button class="admin-tab active" onclick="switchAdminTab('users')">👥 Users</button>
-            <button class="admin-tab" onclick="switchAdminTab('emergency')">🚨 Emergency Contacts</button>
-            <button class="admin-tab" onclick="switchAdminTab('roles')">🏷️ Role Management</button>
-            <button class="admin-tab" onclick="switchAdminTab('required')">⭐ Required Events</button>
-            <button class="admin-tab" onclick="switchAdminTab('checklist')">✓ Checklist Items</button>
-            <button class="admin-tab" onclick="switchAdminTab('assemblies')">🌈 Assemblies</button>
-            <button class="admin-tab" onclick="switchAdminTab('members')">👤 Meet NJ Rainbow</button>
-            <button class="admin-tab" onclick="switchAdminTab('events')">📅 Events</button>
-            <button class="admin-tab" onclick="switchAdminTab('speakers')">🎤 Speakers</button>
-            <button class="admin-tab" onclick="switchAdminTab('notifications')">📢 Notifications</button>
-            <button class="admin-tab" onclick="switchAdminTab('sync')">🔄 Data Sync</button>
+            <button class="admin-tab active" onclick="switchAdminTab('users', this)">👥 Users</button>
+            <button class="admin-tab" onclick="switchAdminTab('emergency', this)">🚨 Emergency Contacts</button>
+            <button class="admin-tab" onclick="switchAdminTab('roles', this)">🏷️ Role Management</button>
+            <button class="admin-tab" onclick="switchAdminTab('required', this)">⭐ Required Events</button>
+            <button class="admin-tab" onclick="switchAdminTab('checklist', this)">✓ Checklist Items</button>
+            <button class="admin-tab" onclick="switchAdminTab('assemblies', this)">🌈 Assemblies</button>
+            <button class="admin-tab" onclick="switchAdminTab('members', this)">👤 Meet NJ Rainbow</button>
+            <button class="admin-tab" onclick="switchAdminTab('events', this)">📅 Events</button>
+            <button class="admin-tab" onclick="switchAdminTab('speakers', this)">🎤 Speakers</button>
+            <button class="admin-tab" onclick="switchAdminTab('notifications', this)">📢 Notifications</button>
+            <button class="admin-tab" onclick="switchAdminTab('sync', this)">🔄 Data Sync</button>
         </div>
 
         <!-- USERS TAB -->
@@ -199,7 +223,7 @@
                 
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" id="editUserUsername">
+                    <input type="text" id="editUserUsername" readonly>
                 </div>
                 
                 <div class="form-group">
@@ -328,12 +352,12 @@
                     <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Items by Category</h4>
                     
                     <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
-                        <button class="filter-btn active" onclick="filterChecklistItems('All')">All Items</button>
-                        <button class="filter-btn" onclick="filterChecklistItems('Documents')">📄 Documents</button>
-                        <button class="filter-btn" onclick="filterChecklistItems('Clothing')">👗 Clothing</button>
-                        <button class="filter-btn" onclick="filterChecklistItems('Personal Care')">🧴 Personal Care</button>
-                        <button class="filter-btn" onclick="filterChecklistItems('Electronics')">🔌 Electronics</button>
-                        <button class="filter-btn" onclick="filterChecklistItems('Other')">📦 Other</button>
+                        <button class="filter-btn active" onclick="filterChecklistItems('All', this)">All Items</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Documents', this)">📄 Documents</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Clothing', this)">👗 Clothing</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Personal Care', this)">🧴 Personal Care</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Electronics', this)">🔌 Electronics</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Other', this)">📦 Other</button>
                     </div>
 
                     <div id="checklistItemsList"></div>
