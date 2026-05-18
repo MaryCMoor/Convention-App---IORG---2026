@@ -4,275 +4,167 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#8b0000">
-    <title>Admin Panel - NJ Rainbow Convention 2026</title>
+    <title>Admin Dashboard - NJ Rainbow Convention 2026</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        .admin-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .admin-nav {
+        .admin-tabs {
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
             margin-bottom: 2rem;
+            overflow-x: auto;
+            border-bottom: 3px solid var(--primary-gold);
             flex-wrap: wrap;
         }
 
-        .admin-nav button {
-            flex: 1;
-            min-width: 150px;
-            padding: 1rem;
+        .admin-tab {
+            padding: 1rem 1.5rem;
             background: rgba(212, 175, 55, 0.2);
-            border: 2px solid var(--primary-gold);
+            border: none;
             color: var(--primary-gold);
-            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 1rem;
-        }
-
-        .admin-nav button:hover {
-            background: rgba(212, 175, 55, 0.4);
-        }
-
-        .admin-nav button.active {
-            background: var(--primary-gold);
-            color: var(--dark-bg);
-        }
-
-        .admin-section {
-            display: none;
-        }
-
-        .admin-section.active {
-            display: block;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .section-title {
-            color: var(--primary-gold);
-            font-size: 2rem;
-        }
-
-        .data-table {
-            width: 100%;
-            background: rgba(220, 20, 60, 0.2);
-            border: 2px solid var(--primary-gold);
-            border-radius: 12px;
-            overflow-x: auto;
-        }
-
-        .data-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-table th {
-            background: var(--primary-gold);
-            color: var(--dark-bg);
-            padding: 1rem;
-            text-align: left;
-            font-weight: bold;
-        }
-
-        .data-table td {
-            padding: 1rem;
-            border-top: 1px solid rgba(212, 175, 55, 0.3);
-            color: var(--text-light);
-        }
-
-        .data-table tr:hover {
-            background: rgba(212, 175, 55, 0.1);
-        }
-
-        .btn-add {
-            background: var(--primary-gold);
-            color: var(--dark-bg);
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1rem;
-        }
-
-        .btn-add:hover {
-            background: var(--light-cream);
-            transform: scale(1.05);
-        }
-
-        .btn-edit {
-            background: rgba(52, 152, 219, 0.8);
-            color: white;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-right: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .btn-delete {
-            background: rgba(231, 76, 60, 0.8);
-            color: white;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .form-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            overflow-y: auto;
-            padding: 2rem;
-        }
-
-        .form-container {
-            background: linear-gradient(135deg, rgba(220, 20, 60, 0.95), rgba(139, 0, 0, 0.95));
-            border: 3px solid var(--primary-gold);
-            border-radius: 16px;
-            padding: 2rem;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .form-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .form-title {
-            color: var(--primary-gold);
-            font-size: 1.5rem;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--primary-gold);
-            font-size: 2rem;
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            color: var(--primary-gold);
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid var(--primary-gold);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.95);
-            color: var(--text-dark);
-            font-size: 1rem;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            white-space: nowrap;
             font-family: inherit;
         }
 
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
+        .admin-tab:hover {
+            background: rgba(212, 175, 55, 0.4);
         }
 
-        .form-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .btn-save {
-            flex: 1;
+        .admin-tab.active {
             background: var(--primary-gold);
             color: var(--dark-bg);
-            padding: 1rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1rem;
         }
 
-        .btn-cancel {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.2);
-            color: var(--text-light);
-            padding: 1rem;
+        .admin-tab-content {
+            display: none;
+        }
+
+        .admin-tab-content.active {
+            display: block;
+        }
+
+        .user-item {
+            background: rgba(212, 175, 55, 0.1);
             border: 2px solid var(--primary-gold);
             border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
         }
 
-        .info-text {
-            color: var(--text-light);
-            line-height: 1.6;
+        .emergency-contact-card {
+            background: rgba(255, 107, 107, 0.1);
+            border: 2px solid #ff6b6b;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .emergency-contact-card.missing {
+            border-color: #dc143c;
+            background: rgba(220, 20, 60, 0.2);
+        }
+
+        .assembly-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--primary-gold);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 0.25rem;
+        }
+
+        .required-event-form {
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--primary-gold);
+            border-radius: 8px;
+            padding: 1rem;
             margin-bottom: 1rem;
+        }
+
+        .checklist-admin-item {
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--primary-gold);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter-btn {
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid var(--primary-gold);
+            color: var(--primary-gold);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+        }
+
+        .filter-btn:hover {
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+        }
+
+        .event-item {
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--primary-gold);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
         }
     </style>
 </head>
 <body>
     <script>
         const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        if (!currentUser.userId) {
-            window.location.href = 'login.html';
-        }
-        if (currentUser.role !== 'Admin' && currentUser.role !== 'Grand Officer') {
-            alert('Access Denied: Admin privileges required');
+        if (!currentUser || (currentUser.role !== 'Admin' && currentUser.role !== 'Grand Officer')) {
+            alert('⚠️ Access Denied: Only administrators can access this area.');
             window.location.href = 'index.html';
         }
 
-        // Define switchAdminTab inline to ensure it's available immediately
+        // Define switchAdminTab inline so it's available immediately
         function switchAdminTab(tabName, buttonElement) {
-            // Hide all sections
-            document.querySelectorAll('.admin-section').forEach(section => {
-                section.classList.remove('active');
-            });
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.admin-tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
             
-            // Show selected section
-            const targetSection = document.getElementById(tabName + 'Section');
-            if (targetSection) {
-                targetSection.classList.add('active');
+            // Remove active from all tab buttons
+            const tabButtons = document.querySelectorAll('.admin-tab');
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            const targetTab = document.getElementById(tabName);
+            if (targetTab) {
+                targetTab.classList.add('active');
             }
             
-            // Update button states
-            document.querySelectorAll('.admin-nav button').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            // Set button active
             if (buttonElement) {
                 buttonElement.classList.add('active');
             }
@@ -280,336 +172,441 @@
     </script>
 
     <header class="app-header">
-        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; width: 100%;">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
             <div>
-                <h1>🎪 ADMIN PANEL 🎪</h1>
-                <div class="subtitle">✦ Manage Convention Content ✦</div>
+                <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+                <div class="subtitle">✦ Admin Dashboard ✦</div>
             </div>
             <button onclick="window.location.href='index.html'" class="back-btn" style="background: var(--primary-gold); color: var(--dark-bg);">
-                ← Back to App
+                ← Back to Home
             </button>
         </div>
     </header>
 
-    <div class="admin-container">
-        <!-- Navigation -->
-        <div class="admin-nav">
-            <button class="active" onclick="switchAdminTab('events', this)">📅 Events</button>
-            <button onclick="switchAdminTab('speakers', this)">🎤 Speakers</button>
-            <button onclick="switchAdminTab('gallery', this)">🖼️ Gallery</button>
-            <button onclick="switchAdminTab('users', this)">👥 Users</button>
-            <button onclick="switchAdminTab('announcements', this)">📢 Announcements</button>
-            <button onclick="switchAdminTab('settings', this)">⚙️ Settings</button>
+    <div class="content">
+        <h2 class="section-title">⚙️ Admin Dashboard ⚙️</h2>
+
+        <!-- Admin Tabs -->
+        <div class="admin-tabs">
+            <button class="admin-tab active" onclick="switchAdminTab('users', this)">👥 Users</button>
+            <button class="admin-tab" onclick="switchAdminTab('emergency', this)">🚨 Emergency Contacts</button>
+            <button class="admin-tab" onclick="switchAdminTab('roles', this)">🏷️ Role Management</button>
+            <button class="admin-tab" onclick="switchAdminTab('required', this)">⭐ Required Events</button>
+            <button class="admin-tab" onclick="switchAdminTab('checklist', this)">✓ Checklist Items</button>
+            <button class="admin-tab" onclick="switchAdminTab('assemblies', this)">🌈 Assemblies</button>
+            <button class="admin-tab" onclick="switchAdminTab('members', this)">👤 Meet NJ Rainbow</button>
+            <button class="admin-tab" onclick="switchAdminTab('events', this)">📅 Events</button>
+            <button class="admin-tab" onclick="switchAdminTab('speakers', this)">🎤 Speakers</button>
+            <button class="admin-tab" onclick="switchAdminTab('notifications', this)">📢 Notifications</button>
+            <button class="admin-tab" onclick="switchAdminTab('sync', this)">🔄 Data Sync</button>
         </div>
 
-        <!-- EVENTS SECTION -->
-        <div id="eventsSection" class="admin-section active">
-            <div class="section-header">
-                <h2 class="section-title">📅 Manage Events</h2>
-                <button class="btn-add" onclick="showAddEventForm()">➕ Add Event</button>
-            </div>
-
-            <div class="data-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Title</th>
-                            <th>Day</th>
-                            <th>Time</th>
-                            <th>End Time</th>
-                            <th>Location</th>
-                            <th>Type</th>
-                            <th>Speaker</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="eventsTableBody">
-                        <tr><td colspan="9" style="text-align: center;">Loading...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- SPEAKERS SECTION -->
-        <div id="speakersSection" class="admin-section">
-            <div class="section-header">
-                <h2 class="section-title">🎤 Manage Speakers</h2>
-                <button class="btn-add" onclick="showAddSpeakerForm()">➕ Add Speaker</button>
-            </div>
-
-            <div class="data-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Title</th>
-                            <th>Event</th>
-                            <th>Photo</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="speakersTableBody">
-                        <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- GALLERY SECTION -->
-        <div id="gallerySection" class="admin-section">
-            <div class="section-header">
-                <h2 class="section-title">🖼️ Manage Gallery</h2>
-                <button class="btn-add" onclick="showAddGalleryForm()">➕ Add Image</button>
-            </div>
-
-            <div class="data-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Image</th>
-                            <th>Caption</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="galleryTableBody">
-                        <tr><td colspan="4" style="text-align: center;">Loading...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- USERS SECTION -->
-        <div id="usersSection" class="admin-section">
-            <div class="section-header">
-                <h2 class="section-title">👥 Registered Users</h2>
-            </div>
-
-            <div class="data-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>User ID</th>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Name</th>
-                            <th>Role</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersTableBody">
-                        <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- ANNOUNCEMENTS SECTION -->
-        <div id="announcementsSection" class="admin-section">
-            <div class="section-header">
-                <h2 class="section-title">📢 Announcements</h2>
-            </div>
-
-            <div class="info-text">
-                <p><strong>Coming Soon:</strong> Manage push notifications and announcements for convention attendees.</p>
-                <p>Features will include:</p>
-                <ul>
-                    <li>Send instant notifications to all users</li>
-                    <li>Schedule announcements in advance</li>
-                    <li>Target specific user groups</li>
-                    <li>Track notification delivery and opens</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- SETTINGS SECTION -->
-        <div id="settingsSection" class="admin-section">
-            <div class="section-header">
-                <h2 class="section-title">⚙️ Admin Settings</h2>
-            </div>
-
-            <div class="info-text">
-                <h3 style="color: var(--primary-gold);">Google Sheets Configuration</h3>
-                <p><strong>Script URL:</strong> https://script.google.com/macros/s/AKfycbzfJr5u8tE_W6jHeUc_MJINzOBAuXp2lDioCMmhXjkpwAQ91Lf9rC3uCE3t5Zj7Cmc1/exec</p>
+        <!-- USERS TAB -->
+        <div id="users" class="admin-tab-content active">
+            <div class="admin-section">
+                <h3>👥 User Management</h3>
+                <p>View and edit user profiles. Click on a user to modify their information.</p>
                 
-                <h3 style="color: var(--primary-gold); margin-top: 2rem;">Required Sheet Tabs</h3>
-                <ul>
-                    <li><strong>Events:</strong> id | title | day | time | timeEnd | location | type | speaker | description</li>
-                    <li><strong>Speakers:</strong> id | name | title | event | bio | photo</li>
-                    <li><strong>Gallery:</strong> id | imageUrl | caption | category</li>
-                    <li><strong>Users:</strong> userId | username | email | name | role | password | dateCreated</li>
-                </ul>
+                <div class="search-box" style="margin-bottom: 1rem;">
+                    <input type="text" id="userSearch" placeholder="🔍 Search users by name, email, or role...">
+                </div>
 
-                <h3 style="color: var(--primary-gold); margin-top: 2rem;">Data Management</h3>
-                <p>All changes made in this admin panel are automatically synced to your Google Sheet in real-time. Users will see updates when they refresh the app.</p>
+                <button class="btn-save" onclick="createAdminUser()">➕ Create Admin User</button>
+
+                <div id="usersList" style="margin-top: 1.5rem;"></div>
+            </div>
+
+            <!-- User Edit Modal -->
+            <div id="userEditModal" style="display: none;" class="admin-section">
+                <h3>Edit User Profile</h3>
+                <input type="hidden" id="editUserId">
                 
-                <h3 style="color: var(--primary-gold); margin-top: 2rem;">Current Admin</h3>
-                <p><strong>Name:</strong> <span id="adminName"></span></p>
-                <p><strong>Role:</strong> <span id="adminRole"></span></p>
-                <p><strong>Email:</strong> <span id="adminEmail"></span></p>
-            </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="editUserName">
+                </div>
+                
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="editUserEmail">
+                </div>
+                
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="editUserUsername" disabled>
+                </div>
+                
+                <div class="form-group">
+                    <label>Roles (select multiple)</label>
+                    <div id="editUserRoles" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                        <!-- Roles loaded dynamically -->
+                    </div>
+                </div>
 
-            <script>
-                document.getElementById('adminName').textContent = currentUser.name || 'N/A';
-                document.getElementById('adminRole').textContent = currentUser.role || 'N/A';
-                document.getElementById('adminEmail').textContent = currentUser.email || 'N/A';
-            </script>
+                <div class="btn-group">
+                    <button class="btn-save" onclick="saveUserEdit()">💾 Save Changes</button>
+                    <button class="btn-secondary" onclick="closeUserEdit()">❌ Cancel</button>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <!-- EVENT FORM OVERLAY -->
-    <div id="eventFormContainer" class="form-overlay">
-        <div class="form-container">
-            <div class="form-header">
-                <h3 class="form-title" id="eventFormTitle">➕ Add New Event</h3>
-                <button class="close-btn" onclick="hideEventForm()">×</button>
+        <!-- EMERGENCY CONTACTS TAB -->
+        <div id="emergency" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>🚨 Emergency Contact Information</h3>
+                <p>View emergency contact information for all registered users.</p>
+                
+                <div class="search-box" style="margin-bottom: 1rem;">
+                    <input type="text" id="emergencySearch" placeholder="🔍 Search by name...">
+                </div>
+
+                <button class="btn-secondary" onclick="exportEmergencyContacts()">📥 Export to CSV</button>
+
+                <div id="emergencyList" style="margin-top: 1.5rem;"></div>
             </div>
-
-            <form id="eventForm" onsubmit="return saveEvent(event)">
-                <input type="hidden" id="eventId">
-
-                <div class="form-group">
-                    <label>Event Title *</label>
-                    <input type="text" id="eventTitle" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Day *</label>
-                    <select id="eventDay" required>
-                        <option value="">Select Day</option>
-                        <option value="Friday">Friday</option>
-                        <option value="Saturday">Saturday</option>
-                        <option value="Sunday">Sunday</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Start Time *</label>
-                    <input type="text" id="eventTime" placeholder="e.g., 9:00 AM" required>
-                </div>
-
-                <div class="form-group">
-                    <label>End Time</label>
-                    <input type="text" id="eventTimeEnd" placeholder="e.g., 10:00 AM">
-                </div>
-
-                <div class="form-group">
-                    <label>Location</label>
-                    <input type="text" id="eventLocation" placeholder="e.g., Main Ballroom">
-                </div>
-
-                <div class="form-group">
-                    <label>Type</label>
-                    <select id="eventType">
-                        <option value="">Select Type</option>
-                        <option value="Workshop">Workshop</option>
-                        <option value="Ceremony">Ceremony</option>
-                        <option value="Social">Social</option>
-                        <option value="Meeting">Meeting</option>
-                        <option value="Performance">Performance</option>
-                        <option value="Competition">Competition</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Speaker</label>
-                    <input type="text" id="eventSpeaker" placeholder="Speaker name">
-                </div>
-
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="eventDescription" placeholder="Event description..."></textarea>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn-save">💾 Save Event</button>
-                    <button type="button" class="btn-cancel" onclick="hideEventForm()">Cancel</button>
-                </div>
-            </form>
         </div>
-    </div>
 
-    <!-- SPEAKER FORM OVERLAY -->
-    <div id="speakerFormContainer" class="form-overlay">
-        <div class="form-container">
-            <div class="form-header">
-                <h3 class="form-title" id="speakerFormTitle">➕ Add New Speaker</h3>
-                <button class="close-btn" onclick="hideSpeakerForm()">×</button>
+        <!-- ROLE MANAGEMENT TAB -->
+        <div id="roles" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>🏷️ Role Management</h3>
+                <p>Manage the list of available roles for users.</p>
+                
+                <div class="form-group">
+                    <label>Add New Role</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="newRole" placeholder="Role name (e.g., 'Mother Advisor')">
+                        <button class="btn-save" onclick="addRole()">➕ Add</button>
+                    </div>
+                </div>
+
+                <h4 style="color: var(--primary-gold); margin: 1.5rem 0 1rem;">Current Roles</h4>
+                <div id="rolesList"></div>
             </div>
-
-            <form id="speakerForm" onsubmit="return saveSpeaker(event)">
-                <input type="hidden" id="speakerId">
-
-                <div class="form-group">
-                    <label>Speaker Name *</label>
-                    <input type="text" id="speakerName" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Title/Affiliation</label>
-                    <input type="text" id="speakerTitle" placeholder="e.g., Grand Worthy Advisor">
-                </div>
-
-                <div class="form-group">
-                    <label>Event/Session</label>
-                    <input type="text" id="speakerEvent" placeholder="Which event are they speaking at?">
-                </div>
-
-                <div class="form-group">
-                    <label>Bio</label>
-                    <textarea id="speakerBio" placeholder="Speaker biography..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Photo URL</label>
-                    <input type="url" id="speakerPhoto" placeholder="https://...">
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn-save">💾 Save Speaker</button>
-                    <button type="button" class="btn-cancel" onclick="hideSpeakerForm()">Cancel</button>
-                </div>
-            </form>
         </div>
-    </div>
 
-    <!-- GALLERY FORM OVERLAY -->
-    <div id="galleryFormContainer" class="form-overlay">
-        <div class="form-container">
-            <div class="form-header">
-                <h3 class="form-title">➕ Add Gallery Image</h3>
-                <button class="close-btn" onclick="hideGalleryForm()">×</button>
+        <!-- REQUIRED EVENTS TAB -->
+        <div id="required" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>⭐ Required Events by Role</h3>
+                <p>Mark events as required for specific roles. These will appear in gold on users' schedules.</p>
+                
+                <button class="btn-save" onclick="showRequiredEventForm()">➕ Add Required Event</button>
+
+                <!-- Required Event Form -->
+                <div id="requiredEventForm" style="display: none; margin-top: 1rem;" class="required-event-form">
+                    <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Set Event as Required</h4>
+                    
+                    <div class="form-group">
+                        <label>Select Event</label>
+                        <select id="requiredEventSelect">
+                            <option value="">Select an event...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Required for Roles (select multiple)</label>
+                        <div id="requiredRolesCheckboxes" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                            <!-- Roles loaded dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-save" onclick="saveRequiredEvent()">💾 Save</button>
+                        <button class="btn-secondary" onclick="hideRequiredEventForm()">❌ Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Required Events List -->
+                <div id="requiredEventsList" style="margin-top: 1.5rem;"></div>
+            </div>
+        </div>
+
+        <!-- CHECKLIST MANAGEMENT TAB -->
+        <div id="checklist" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>✓ Required Checklist Items</h3>
+                <p>Manage the required items that all attendees should pack. These appear on everyone's checklist.</p>
+                
+                <button class="btn-save" onclick="showChecklistItemForm()">➕ Add Required Item</button>
+
+                <!-- Checklist Item Form -->
+                <div id="checklistItemForm" style="display: none; margin-top: 1rem; border-top: 2px solid var(--primary-gold); padding-top: 1rem;">
+                    <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Add/Edit Required Item</h4>
+                    <input type="hidden" id="checklistItemEditId">
+                    
+                    <div class="form-group">
+                        <label>Item Description</label>
+                        <input type="text" id="checklistItemText" placeholder="e.g., Convention registration confirmation">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="checklistItemCategory">
+                            <option value="Documents">Documents</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Personal Care">Personal Care</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-save" onclick="saveChecklistItem()">💾 Save Item</button>
+                        <button class="btn-secondary" onclick="hideChecklistItemForm()">❌ Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Organize by Category -->
+                <div style="margin-top: 2rem;">
+                    <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Items by Category</h4>
+                    
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                        <button class="filter-btn active" onclick="filterChecklistItems('All', this)">All Items</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Documents', this)">📄 Documents</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Clothing', this)">👗 Clothing</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Personal Care', this)">🧴 Personal Care</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Electronics', this)">🔌 Electronics</button>
+                        <button class="filter-btn" onclick="filterChecklistItems('Other', this)">📦 Other</button>
+                    </div>
+
+                    <div id="checklistItemsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ASSEMBLIES TAB -->
+        <div id="assemblies" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>🌈 Assembly Management</h3>
+                <p>Manage the list of assemblies available in user profile dropdowns.</p>
+                
+                <div class="form-group">
+                    <label>Add New Assembly</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="newAssembly" placeholder="Rainbow Assembly #XX - City Name">
+                        <button class="btn-save" onclick="addAssembly()">➕ Add</button>
+                    </div>
+                </div>
+
+                <h4 style="color: var(--primary-gold); margin: 1.5rem 0 1rem;">Current Assemblies</h4>
+                <div id="assembliesList"></div>
+            </div>
+        </div>
+
+        <!-- MEET NJ RAINBOW TAB -->
+        <div id="members" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>👤 Meet NJ Rainbow Management</h3>
+                <p>Add and manage members featured in the Meet NJ Rainbow section.</p>
+                
+                <button class="btn-save" onclick="showMemberForm()">➕ Add New Member</button>
+
+                <!-- Member Form -->
+                <div id="memberForm" style="display: none; margin-top: 1rem; border-top: 2px solid var(--primary-gold); padding-top: 1rem;">
+                    <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Add/Edit Member</h4>
+                    <input type="hidden" id="memberEditId">
+                    
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="memberName" placeholder="Full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Station/Office</label>
+                        <input type="text" id="memberStation" placeholder="Grand Worthy Advisor, etc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Assembly</label>
+                        <select id="memberAssembly"></select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Photo URL</label>
+                        <input type="text" id="memberPhoto" placeholder="https://example.com/photo.jpg">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Biography</label>
+                        <textarea id="memberBio" rows="3" placeholder="Short bio about the member"></textarea>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-save" onclick="saveMember()">💾 Save Member</button>
+                        <button class="btn-secondary" onclick="hideMemberForm()">❌ Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Members List -->
+                <div id="membersList" style="margin-top: 1.5rem;"></div>
+            </div>
+        </div>
+
+        <!-- EVENTS TAB -->
+        <div id="events" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>📅 Event Management</h3>
+                <button class="btn-save" onclick="showEventForm()">➕ Add New Event</button>
+                
+                <!-- Event Form -->
+                <div id="eventForm" style="display: none; margin-top: 1rem; border-top: 2px solid var(--primary-gold); padding-top: 1rem;">
+                    <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Add/Edit Event</h4>
+                    <input type="hidden" id="eventEditId">
+                    
+                    <div class="form-group">
+                        <label>Event Title</label>
+                        <input type="text" id="eventTitle" placeholder="Event title">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Day</label>
+                        <select id="eventDay">
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Start Time</label>
+                            <input type="text" id="eventTime" placeholder="9:00 AM">
+                        </div>
+                        <div class="form-group">
+                            <label>End Time</label>
+                            <input type="text" id="eventTimeEnd" placeholder="10:30 AM">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="eventLocation" placeholder="Main Ballroom">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="eventDescription" rows="3" placeholder="Event description"></textarea>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Type (optional)</label>
+                            <input type="text" id="eventType" placeholder="Workshop, General Session, etc.">
+                        </div>
+                        <div class="form-group">
+                            <label>Speaker (optional)</label>
+                            <input type="text" id="eventSpeaker" placeholder="Speaker name">
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-save" onclick="saveEvent()">💾 Save Event</button>
+                        <button class="btn-secondary" onclick="hideEventForm()">❌ Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Events List -->
+                <div id="eventsList" style="margin-top: 1.5rem;"></div>
+            </div>
+        </div>
+
+        <!-- SPEAKERS TAB -->
+        <div id="speakers" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>🎤 Speaker Management</h3>
+                <button class="btn-save" onclick="showSpeakerForm()">➕ Add New Speaker</button>
+                
+                <!-- Speaker Form -->
+                <div id="speakerForm" style="display: none; margin-top: 1rem; border-top: 2px solid var(--primary-gold); padding-top: 1rem;">
+                    <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Add/Edit Speaker</h4>
+                    <input type="hidden" id="speakerEditId">
+                    
+                    <div class="form-group">
+                        <label>Speaker Name</label>
+                        <input type="text" id="speakerName" placeholder="Full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Title/Role</label>
+                        <input type="text" id="speakerTitle" placeholder="Leadership Coach, etc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Photo URL</label>
+                        <input type="text" id="speakerPhoto" placeholder="https://example.com/photo.jpg">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Bio</label>
+                        <textarea id="speakerBio" rows="3" placeholder="Speaker biography"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Speaking At (Event Name)</label>
+                        <input type="text" id="speakerEvent" placeholder="Event name from schedule">
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-save" onclick="saveSpeaker()">💾 Save Speaker</button>
+                        <button class="btn-secondary" onclick="hideSpeakerForm()">❌ Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Speakers List -->
+                <div id="speakersList" style="margin-top: 1.5rem;"></div>
+            </div>
+        </div>
+
+        <!-- NOTIFICATIONS TAB -->
+        <div id="notifications" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>📢 Send Notification</h3>
+                <p>Send notifications to all convention attendees.</p>
+                
+                <div class="form-group">
+                    <label>Notification Title</label>
+                    <input type="text" id="notifTitle" placeholder="Enter notification title">
+                </div>
+                
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="notifMessage" placeholder="Enter notification message" rows="4"></textarea>
+                </div>
+                
+                <button class="btn-save" onclick="sendNotification()">📤 Send Notification to All Users</button>
+            </div>
+        </div>
+
+        <!-- SYNC TAB -->
+        <div id="sync" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>🔄 Data Sync</h3>
+                <p id="syncStatus">Ready to sync with Google Sheets</p>
+                <button class="btn-save" onclick="syncData()">🔄 Sync Data Now</button>
             </div>
 
-            <form id="galleryForm" onsubmit="return saveGalleryItem(event)">
-                <div class="form-group">
-                    <label>Image URL *</label>
-                    <input type="url" id="galleryImageUrl" placeholder="https://..." required>
+            <div class="admin-section">
+                <h3>📊 App Statistics</h3>
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-number" id="statsEvents">0</div>
+                        <div class="stat-label">Events</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="statsMembers">0</div>
+                        <div class="stat-label">Members</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="statsSpeakers">0</div>
+                        <div class="stat-label">Speakers</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="statsUsers">0</div>
+                        <div class="stat-label">Users</div>
+                    </div>
                 </div>
-
-                <div class="form-group">
-                    <label>Caption</label>
-                    <input type="text" id="galleryCaption" placeholder="Photo caption">
-                </div>
-
-                <div class="form-group">
-                    <label>Category</label>
-                    <select id="galleryCategory">
-                        <option value="All">All</option>
-                        <option value="Workshops">Workshops</option>
-                        <option value="Ceremonies">Ceremonies</option>
-                        <option value="Social Events">Social Events</option>
-                        <option value="Competitions">Competitions</option>
-                    </select>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn-save">💾 Save Image</button>
-                    <button type="button" class="btn-cancel" onclick="hideGalleryForm()">Cancel</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
