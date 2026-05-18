@@ -168,8 +168,46 @@
             if (buttonElement) {
                 buttonElement.classList.add('active');
             }
-}
-
+            
+            // Load data for the selected tab
+            // Wait a tiny bit for the script file to load
+            setTimeout(() => {
+                switch(tabName) {
+                    case 'users':
+                        if (typeof loadUsers === 'function') loadUsers();
+                        break;
+                    case 'emergency':
+                        if (typeof loadEmergencyContacts === 'function') loadEmergencyContacts();
+                        break;
+                    case 'roles':
+                        if (typeof loadRoles === 'function') loadRoles();
+                        break;
+                    case 'required':
+                        if (typeof loadRequiredEvents === 'function') loadRequiredEvents();
+                        if (typeof loadEventsForDropdown === 'function') loadEventsForDropdown();
+                        break;
+                    case 'checklist':
+                        if (typeof loadChecklistItems === 'function') loadChecklistItems();
+                        break;
+                    case 'assemblies':
+                        if (typeof loadAssemblies === 'function') loadAssemblies();
+                        break;
+                    case 'members':
+                        if (typeof loadMembers === 'function') loadMembers();
+                        if (typeof loadAssembliesForDropdown === 'function') loadAssembliesForDropdown();
+                        break;
+                    case 'events':
+                        if (typeof loadEvents === 'function') loadEvents();
+                        break;
+                    case 'speakers':
+                        if (typeof loadSpeakers === 'function') loadSpeakers();
+                        break;
+                    case 'sync':
+                        if (typeof updateStats === 'function') updateStats();
+                        break;
+                }
+            }, 100);
+        }
     </script>
 
     <header class="app-header">
@@ -611,7 +649,6 @@
         </div>
     </div>
 
-    <script src="admin-script.js?v=2"></script>
-
+    <script src="admin-script.js?v=3"></script>
 </body>
 </html>
