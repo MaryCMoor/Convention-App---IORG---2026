@@ -231,13 +231,78 @@
 
         let allEvents = [];
 
+        // Parse CSV helper
+        function parseCSV(text) {
+            const rows = [];
+            let currentRow = [];
+            let currentField = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const nextChar = text[i + 1];
+                
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        currentField += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    currentRow.push(currentField.trim());
+                    currentField = '';
+                } else if ((char === '\n' || char === '\r') && !inQuotes) {
+                    if (currentField || currentRow.length > 0) {
+                        currentRow.push(currentField.trim());
+                        rows.push(currentRow);
+                        currentRow = [];
+                        currentField = '';
+                    }
+                    if (char === '\r' && nextChar === '\n') {
+                        i++;
+                    }
+                } else {
+                    currentField += char;
+                }
+            }
+            
+            if (currentField || currentRow.length > 0) {
+                currentRow.push(currentField.trim());
+                rows.push(currentRow);
+            }
+            
+            return rows;
+        }
+
         // Load all events
         async function loadEvents() {
             try {
                 // Load from Google Sheets
                 const response = await fetch(`https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEETS_ID}/pub?gid=0&single=true&output=csv`);
                 const csvText = await response.text();
-                const sheetEvents = parseCSV(csvText);
+                const rows = parseCSV(csvText);
+                
+                const sheetEvents = [];
+                if (rows.length > 1) {
+                    const headers = rows[0].map(h => h.toLowerCase());
+                    
+                    for (let i = 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        const event = {};
+                        
+                        headers.forEach((header, index) => {
+                            event[header] = row[index] || '';
+                        });
+                        
+                        if (event.title && event.day) {
+                            // Ensure numeric ID
+                            if (event.id) event.id = parseInt(event.id) || (Date.now() + i);
+                            else event.id = Date.now() + i;
+                            sheetEvents.push(event);
+                        }
+                    }
+                }
                 
                 // Load admin-added events
                 const adminEvents = JSON.parse(localStorage.getItem('admin_events') || '[]');
@@ -255,30 +320,6 @@
             }
         }
 
-        // Parse CSV from Google Sheets
-        function parseCSV(csv) {
-            const lines = csv.split('\n').filter(line => line.trim());
-            if (lines.length < 2) return [];
-            
-            const headers = lines[0].split(',').map(h => h.trim());
-            const events = [];
-            
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',').map(v => v.trim());
-                const event = {};
-                
-                headers.forEach((header, index) => {
-                    event[header] = values[index] || '';
-                });
-                
-                if (event.title && event.day) {
-                    events.push(event);
-                }
-            }
-            
-            return events;
-        }
-
         // Get user's favorites
         function getFavorites() {
             return JSON.parse(localStorage.getItem(`favorites_${userId}`) || '[]');
@@ -289,7 +330,10 @@
             if (!confirm('Remove this event from your schedule?')) return;
             
             let favorites = getFavorites();
-            favorites = favorites.filter(id => id !== eventId);
+            const index = favorites.indexOf(eventId);
+            if (index > -1) {
+                favorites.splice(index, 1);
+            }
             localStorage.setItem(`favorites_${userId}`, JSON.stringify(favorites));
             
             renderMySchedule();
@@ -303,8 +347,7 @@
             
             // Filter to only favorited events
             const favoriteEvents = allEvents.filter(event => {
-                const eventId = event.id || event.title;
-                return favorites.includes(eventId);
+                return favorites.includes(event.id);
             });
             
             // Update stats
@@ -363,28 +406,28 @@
                     `;
                     
                     eventsByDay[day].forEach(event => {
-                        const eventId = event.id || event.title;
+                        const eventId = event.id;
                         
                         html += `
                             <div class="event-card">
-                                <button class="remove-btn" onclick="removeFavorite('${eventId}')" title="Remove from schedule">
+                                <button class="remove-btn" onclick="removeFavorite(${eventId})" title="Remove from schedule">
                                     ✕
                                 </button>
                                 
                                 <div class="event-time">
-                                    ⏰ ${event.time}${event.timeEnd ? ' - ' + event.timeEnd : ''}
+                                    ⏰ ${escapeHtml(event.time)}${event.timeEnd ? ' - ' + escapeHtml(event.timeEnd) : ''}
                                 </div>
                                 
-                                <div class="event-title">${event.title}</div>
+                                <div class="event-title">${escapeHtml(event.title)}</div>
                                 
                                 <div class="event-meta">
-                                    ${event.type ? `<span class="event-type-badge">${event.type}</span>` : ''}
-                                    ${event.location ? `📍 ${event.location}` : ''}
-                                    ${event.speaker ? ` | 🎤 ${event.speaker}` : ''}
+                                    ${event.type ? `<span class="event-type-badge">${escapeHtml(event.type)}</span>` : ''}
+                                    ${event.location ? `📍 ${escapeHtml(event.location)}` : ''}
+                                    ${event.speaker ? ` | 🎤 ${escapeHtml(event.speaker)}` : ''}
                                 </div>
                                 
                                 ${event.description ? `
-                                    <div class="event-description">${event.description}</div>
+                                    <div class="event-description">${escapeHtml(event.description)}</div>
                                 ` : ''}
                             </div>
                         `;
@@ -420,10 +463,7 @@
         // Export schedule as text
         function exportSchedule() {
             const favorites = getFavorites();
-            const favoriteEvents = allEvents.filter(event => {
-                const eventId = event.id || event.title;
-                return favorites.includes(eventId);
-            });
+            const favoriteEvents = allEvents.filter(event => favorites.includes(event.id));
             
             if (favoriteEvents.length === 0) {
                 alert('Your schedule is empty. Add some events first!');
@@ -486,6 +526,14 @@
             URL.revokeObjectURL(url);
             
             alert('✅ Schedule exported! Check your downloads.');
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // Initialize
