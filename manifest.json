@@ -1,12 +1,12 @@
 {
   "name": "NJ Rainbow Convention 2026",
-  "short_name": "NJ Rainbow 2026",
-  "description": "The official app for NJ Rainbow Convention 2026 - The Greatest Show on Earth",
+  "short_name": "NJ Rainbow",
+  "description": "The Greatest Show on Earth",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#1a0505",
   "theme_color": "#8b0000",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "icon-192.png",
@@ -19,34 +19,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    }
-  ],
-  "categories": ["lifestyle", "social"],
-  "screenshots": [],
-  "shortcuts": [
-    {
-      "name": "My Schedule",
-      "short_name": "Schedule",
-      "description": "View your personal schedule",
-      "url": "/my-schedule.html",
-      "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "Notifications",
-      "short_name": "Notifications",
-      "description": "View latest notifications",
-      "url": "/notifications.html",
-      "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
     }
   ]
 }
