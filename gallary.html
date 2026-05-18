@@ -221,13 +221,75 @@
 
         let allPhotos = [];
 
+        // Parse CSV helper
+        function parseCSV(text) {
+            const rows = [];
+            let currentRow = [];
+            let currentField = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const nextChar = text[i + 1];
+                
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        currentField += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    currentRow.push(currentField.trim());
+                    currentField = '';
+                } else if ((char === '\n' || char === '\r') && !inQuotes) {
+                    if (currentField || currentRow.length > 0) {
+                        currentRow.push(currentField.trim());
+                        rows.push(currentRow);
+                        currentRow = [];
+                        currentField = '';
+                    }
+                    if (char === '\r' && nextChar === '\n') {
+                        i++;
+                    }
+                } else {
+                    currentField += char;
+                }
+            }
+            
+            if (currentField || currentRow.length > 0) {
+                currentRow.push(currentField.trim());
+                rows.push(currentRow);
+            }
+            
+            return rows;
+        }
+
         // Load gallery
         async function loadGallery() {
             try {
                 // Load from Google Sheets (Gallery tab)
                 const response = await fetch(`https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEETS_ID}/pub?gid=4&single=true&output=csv`);
                 const csvText = await response.text();
-                const sheetPhotos = parseCSV(csvText);
+                const rows = parseCSV(csvText);
+                
+                const sheetPhotos = [];
+                if (rows.length > 1) {
+                    const headers = rows[0].map(h => h.toLowerCase());
+                    
+                    for (let i = 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        const photo = {};
+                        
+                        headers.forEach((header, index) => {
+                            photo[header] = row[index] || '';
+                        });
+                        
+                        if (photo.url) {
+                            sheetPhotos.push(photo);
+                        }
+                    }
+                }
                 
                 // Load user-uploaded photos
                 const userPhotos = JSON.parse(localStorage.getItem('gallery_photos') || '[]');
@@ -243,30 +305,6 @@
                 allPhotos = JSON.parse(localStorage.getItem('gallery_photos') || '[]');
                 renderGallery();
             }
-        }
-
-        // Parse CSV
-        function parseCSV(csv) {
-            const lines = csv.split('\n').filter(line => line.trim());
-            if (lines.length < 2) return [];
-            
-            const headers = lines[0].split(',').map(h => h.trim());
-            const photos = [];
-            
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',').map(v => v.trim());
-                const photo = {};
-                
-                headers.forEach((header, index) => {
-                    photo[header] = values[index] || '';
-                });
-                
-                if (photo.url) {
-                    photos.push(photo);
-                }
-            }
-            
-            return photos;
         }
 
         // Render gallery
@@ -285,10 +323,12 @@
             // Sort by most recent first
             const sortedPhotos = [...allPhotos].reverse();
             
-            container.innerHTML = sortedPhotos.map((photo, index) => `
-                <div class="gallery-item" onclick="openLightbox('${escapeHtml(photo.url)}', '${escapeHtml(photo.caption || '')}')">
+            container.innerHTML = sortedPhotos.map((photo, index) => {
+                const photoIndex = index;
+                return `
+                <div class="gallery-item" data-photo-index="${photoIndex}">
                     ${photo.url ? 
-                        `<img src="${photo.url}" alt="${photo.caption || 'Gallery photo'}" class="gallery-image" onerror="this.parentElement.innerHTML='<div class=gallery-placeholder>📸</div><div class=gallery-caption>${escapeHtml(photo.caption || 'Image unavailable')}</div>'">` :
+                        `<img src="${escapeHtml(photo.url)}" alt="${escapeHtml(photo.caption || 'Gallery photo')}" class="gallery-image" onerror="this.parentElement.innerHTML='<div class=gallery-placeholder>📸</div><div class=gallery-caption>${escapeHtml(photo.caption || 'Image unavailable')}</div>'">` :
                         `<div class="gallery-placeholder">📸</div>`
                     }
                     ${photo.caption ? 
@@ -296,7 +336,19 @@
                         ''
                     }
                 </div>
-            `).join('');
+            `;
+            }).join('');
+
+            // Add click listeners
+            document.querySelectorAll('.gallery-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const photoIndex = parseInt(this.getAttribute('data-photo-index'));
+                    const photo = sortedPhotos[photoIndex];
+                    if (photo) {
+                        openLightbox(photo.url, photo.caption || '');
+                    }
+                });
+            });
         }
 
         // Upload photo
@@ -362,6 +414,7 @@
 
         // Escape HTML
         function escapeHtml(text) {
+            if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
