@@ -35,7 +35,7 @@ async function saveToGoogleSheets(action, data) {
 }
 
 // Tab switching
-function switchAdminTab(tabName) {
+function switchAdminTab(tabName, buttonElement) {
     // Hide all tabs
     const tabs = document.querySelectorAll('.admin-tab-content');
     tabs.forEach(tab => tab.classList.remove('active'));
@@ -46,7 +46,7 @@ function switchAdminTab(tabName) {
     
     // Show selected tab
     document.getElementById(tabName).classList.add('active');
-    event.target.classList.add('active');
+    if (buttonElement) buttonElement.classList.add('active');
     
     // Load data for the tab
     switch(tabName) {
@@ -99,22 +99,25 @@ function loadUsers() {
     }
     
     container.innerHTML = users.map(user => {
-        const roleDisplay = Array.isArray(user.roles) ? user.roles.join(', ') : (user.role || 'User');
+        const roles = Array.isArray(user.roles) ? user.roles : [user.role || 'User'];
+        const roleDisplay = roles.join(', ');
+        const roleBadges = roles.map(r => `<span class="role-badge">${escapeHtml(r)}</span>`).join('');
+        
         return `
             <div class="user-item">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <strong style="color: var(--primary-gold);">${user.name || user.username}</strong>
+                        <strong style="color: var(--primary-gold);">${escapeHtml(user.name || user.username)}</strong>
                         <br>
                         <span style="color: var(--text-light); font-size: 0.9rem;">
-                            📧 ${user.email} | 🆔 ${user.username}
+                            📧 ${escapeHtml(user.email)} | 🆔 ${escapeHtml(user.username)}
                         </span>
                         <br>
                         <div style="margin-top: 0.5rem;">
-                            ${Array.isArray(user.roles) ? user.roles.map(r => `<span class="role-badge">${r}</span>`).join('') : `<span class="role-badge">${user.role || 'User'}</span>`}
+                            ${roleBadges}
                         </div>
                     </div>
-                    <button class="btn-secondary" onclick="editUser('${user.userId}')">✏️ Edit</button>
+                    <button class="btn-secondary" onclick="editUser('${escapeHtml(user.userId)}')">✏️ Edit</button>
                 </div>
             </div>
         `;
@@ -123,21 +126,25 @@ function loadUsers() {
 
 function getAllUsers() {
     const users = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith('profile_')) {
-            const userId = key.replace('profile_', '');
-            const profile = JSON.parse(localStorage.getItem(key) || '{}');
-            
-            users.push({
-                userId: userId,
-                name: profile.name || 'Unknown',
-                email: profile.email || 'No email',
-                username: userId,
-                role: profile.role || 'User',
-                roles: profile.roles || [profile.role || 'User']
-            });
+    try {
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('profile_')) {
+                const userId = key.replace('profile_', '');
+                const profile = JSON.parse(localStorage.getItem(key) || '{}');
+                
+                users.push({
+                    userId: userId,
+                    name: profile.name || 'Unknown',
+                    email: profile.email || 'No email',
+                    username: userId,
+                    role: profile.role || 'User',
+                    roles: profile.roles || [profile.role || 'User']
+                });
+            }
         }
+    } catch (error) {
+        console.error('Error loading users:', error);
     }
     return users;
 }
@@ -156,8 +163,8 @@ function editUser(userId) {
     const rolesContainer = document.getElementById('editUserRoles');
     rolesContainer.innerHTML = availableRoles.map(role => `
         <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-light); cursor: pointer;">
-            <input type="checkbox" value="${role}" ${userRoles.includes(role) ? 'checked' : ''}>
-            ${role}
+            <input type="checkbox" value="${escapeHtml(role)}" ${userRoles.includes(role) ? 'checked' : ''}>
+            ${escapeHtml(role)}
         </label>
     `).join('');
     
@@ -268,13 +275,14 @@ function loadEmergencyContacts() {
     
     container.innerHTML = usersWithEmergency.map(user => {
         const hasMissing = !user.emergencyName || !user.emergencyPhone;
+        const roles = Array.isArray(user.roles) ? user.roles.join(', ') : user.role;
         
         return `
             <div class="emergency-contact-card ${hasMissing ? 'missing' : ''}">
-                <strong style="color: var(--primary-gold); font-size: 1.1rem;">${user.name}</strong>
+                <strong style="color: var(--primary-gold); font-size: 1.1rem;">${escapeHtml(user.name)}</strong>
                 <br>
                 <span style="color: var(--text-light); font-size: 0.9rem;">
-                    📧 ${user.email} | ${Array.isArray(user.roles) ? user.roles.join(', ') : user.role}
+                    📧 ${escapeHtml(user.email)} | ${escapeHtml(roles)}
                 </span>
                 <hr style="border: 1px solid var(--primary-gold); margin: 0.75rem 0;">
                 ${hasMissing ? 
@@ -282,9 +290,9 @@ function loadEmergencyContacts() {
                     `
                     <div style="color: var(--text-light);">
                         <strong style="color: #66ff66;">Emergency Contact:</strong><br>
-                        👤 ${user.emergencyName}<br>
-                        📞 ${user.emergencyPhone}<br>
-                        🔗 Relationship: ${user.emergencyRelation}
+                        👤 ${escapeHtml(user.emergencyName)}<br>
+                        📞 ${escapeHtml(user.emergencyPhone)}<br>
+                        🔗 Relationship: ${escapeHtml(user.emergencyRelation)}
                     </div>
                     `
                 }
@@ -372,10 +380,10 @@ function loadRoles() {
         return `
             <div class="assembly-item">
                 <span style="color: var(--text-light);">
-                    ${role} ${isDefault ? '<em style="font-size: 0.8rem; opacity: 0.7;">(Default)</em>' : ''}
+                    ${escapeHtml(role)} ${isDefault ? '<em style="font-size: 0.8rem; opacity: 0.7;">(Default)</em>' : ''}
                 </span>
                 ${!isDefault ? 
-                    `<button class="btn-danger" onclick="deleteRole('${role}')">🗑️ Remove</button>` :
+                    `<button class="btn-danger" onclick="deleteRole('${escapeHtml(role)}')">🗑️ Remove</button>` :
                     '<span style="color: var(--text-light); font-size: 0.8rem;">Cannot delete default role</span>'
                 }
             </div>
@@ -434,10 +442,10 @@ function loadRequiredEvents() {
     
     container.innerHTML = requiredEvents.map(req => `
         <div class="event-item">
-            <strong style="color: var(--primary-gold);">${req.eventTitle}</strong>
+            <strong style="color: var(--primary-gold);">${escapeHtml(req.eventTitle)}</strong>
             <br>
             <span style="color: var(--text-light);">
-                Required for: ${req.roles.map(r => `<span class="role-badge">${r}</span>`).join(' ')}
+                Required for: ${req.roles.map(r => `<span class="role-badge">${escapeHtml(r)}</span>`).join(' ')}
             </span>
             <div class="btn-group" style="margin-top: 0.5rem;">
                 <button class="btn-danger" onclick="deleteRequiredEvent('${req.eventId}')">🗑️ Remove</button>
@@ -467,8 +475,8 @@ function showRequiredEventForm() {
     
     container.innerHTML = roles.map(role => `
         <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-light); cursor: pointer;">
-            <input type="checkbox" value="${role}">
-            ${role}
+            <input type="checkbox" value="${escapeHtml(role)}">
+            ${escapeHtml(role)}
         </label>
     `).join('');
     
@@ -558,9 +566,9 @@ function loadChecklistItems() {
     container.innerHTML = filteredItems.map(item => `
         <div class="checklist-admin-item">
             <div>
-                <strong style="color: var(--primary-gold);">${item.text}</strong>
+                <strong style="color: var(--primary-gold);">${escapeHtml(item.text)}</strong>
                 <br>
-                <span style="color: var(--text-light); font-size: 0.9rem;">Category: ${item.category}</span>
+                <span style="color: var(--text-light); font-size: 0.9rem;">Category: ${escapeHtml(item.category)}</span>
             </div>
             <div class="btn-group">
                 <button class="btn-secondary" onclick="editChecklistItem(${item.id})">✏️ Edit</button>
@@ -646,13 +654,13 @@ async function deleteChecklistItem(id) {
     alert('✅ Item deleted!');
 }
 
-function filterChecklistItems(category) {
+function filterChecklistItems(category, buttonElement) {
     currentChecklistFilter = category;
     
     // Update active button
     const buttons = document.querySelectorAll('.filter-btn');
     buttons.forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    if (buttonElement) buttonElement.classList.add('active');
     
     loadChecklistItems();
 }
@@ -672,7 +680,7 @@ function loadAssemblies() {
     
     container.innerHTML = assemblies.map((assembly, index) => `
         <div class="assembly-item">
-            <span style="color: var(--text-light);">${assembly}</span>
+            <span style="color: var(--text-light);">${escapeHtml(assembly)}</span>
             <button class="btn-danger" onclick="deleteAssembly(${index})">🗑️ Remove</button>
         </div>
     `).join('');
@@ -742,14 +750,14 @@ function loadMembers() {
     container.innerHTML = members.map(member => `
         <div class="event-item">
             <div style="display: flex; gap: 1rem; align-items: center;">
-                ${member.photo ? `<img src="${member.photo}" alt="${member.name}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-gold);">` : '<div style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary-gold); display: flex; align-items: center; justify-content: center; font-size: 2rem;">👤</div>'}
+                ${member.photo ? `<img src="${escapeHtml(member.photo)}" alt="${escapeHtml(member.name)}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-gold);">` : '<div style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary-gold); display: flex; align-items: center; justify-content: center; font-size: 2rem;">👤</div>'}
                 <div style="flex: 1;">
-                    <strong style="color: var(--primary-gold); font-size: 1.1rem;">${member.name}</strong>
+                    <strong style="color: var(--primary-gold); font-size: 1.1rem;">${escapeHtml(member.name)}</strong>
                     <br>
                     <span style="color: var(--text-light);">
-                        ${member.station ? `⭐ ${member.station}<br>` : ''}
-                        ${member.assembly ? `🌈 ${member.assembly}<br>` : ''}
-                        ${member.bio ? `📝 ${member.bio}` : ''}
+                        ${member.station ? `⭐ ${escapeHtml(member.station)}<br>` : ''}
+                        ${member.assembly ? `🌈 ${escapeHtml(member.assembly)}<br>` : ''}
+                        ${member.bio ? `📝 ${escapeHtml(member.bio)}` : ''}
                     </span>
                 </div>
                 <div class="btn-group">
@@ -769,6 +777,7 @@ function showMemberForm() {
     document.getElementById('memberAssembly').value = '';
     document.getElementById('memberPhoto').value = '';
     document.getElementById('memberBio').value = '';
+    loadAssembliesForDropdown();
 }
 
 function hideMemberForm() {
@@ -828,6 +837,7 @@ function editMember(id) {
     document.getElementById('memberPhoto').value = member.photo || '';
     document.getElementById('memberBio').value = member.bio || '';
     
+    loadAssembliesForDropdown();
     document.getElementById('memberForm').style.display = 'block';
 }
 
@@ -860,10 +870,10 @@ function loadEvents() {
     
     container.innerHTML = events.map(event => `
         <div class="event-item">
-            <strong style="color: var(--primary-gold);">${event.title}</strong>
+            <strong style="color: var(--primary-gold);">${escapeHtml(event.title)}</strong>
             <br>
             <span style="color: var(--text-light);">
-                📅 ${event.day} | ⏰ ${event.time}${event.timeEnd ? ' - ' + event.timeEnd : ''} | 📍 ${event.location}
+                📅 ${escapeHtml(event.day)} | ⏰ ${escapeHtml(event.time)}${event.timeEnd ? ' - ' + escapeHtml(event.timeEnd) : ''} | 📍 ${escapeHtml(event.location)}
             </span>
             <div class="btn-group" style="margin-top: 0.5rem;">
                 <button class="btn-secondary" onclick="editEvent(${event.id})">✏️ Edit</button>
@@ -981,11 +991,11 @@ function loadSpeakers() {
     
     container.innerHTML = speakers.map(speaker => `
         <div class="event-item">
-            <strong style="color: var(--primary-gold);">${speaker.name}</strong>
+            <strong style="color: var(--primary-gold);">${escapeHtml(speaker.name)}</strong>
             <br>
             <span style="color: var(--text-light);">
-                ${speaker.title ? `📋 ${speaker.title}<br>` : ''}
-                ${speaker.event ? `🎤 Speaking at: ${speaker.event}` : ''}
+                ${speaker.title ? `📋 ${escapeHtml(speaker.title)}<br>` : ''}
+                ${speaker.event ? `🎤 Speaking at: ${escapeHtml(speaker.event)}` : ''}
             </span>
             <div class="btn-group" style="margin-top: 0.5rem;">
                 <button class="btn-secondary" onclick="editSpeaker(${speaker.id})">✏️ Edit</button>
@@ -1144,8 +1154,12 @@ async function syncData() {
         const activeTab = document.querySelector('.admin-tab.active');
         if (activeTab) {
             const onclick = activeTab.getAttribute('onclick');
-            const tabName = onclick.match(/'(.+)'/)[1];
-            switchAdminTab(tabName);
+            const match = onclick.match(/'(.+?)'/);
+            if (match) {
+                const tabName = match[1];
+                const tabButton = document.querySelector(`.admin-tab[onclick*="${tabName}"]`);
+                switchAdminTab(tabName, tabButton);
+            }
         }
         
     } catch (error) {
@@ -1161,10 +1175,26 @@ function updateStats() {
     const speakers = JSON.parse(localStorage.getItem('admin_speakers') || '[]');
     const users = getAllUsers();
     
-    document.getElementById('statsEvents').textContent = events.length;
-    document.getElementById('statsMembers').textContent = members.length;
-    document.getElementById('statsSpeakers').textContent = speakers.length;
-    document.getElementById('statsUsers').textContent = users.length;
+    const statsEvents = document.getElementById('statsEvents');
+    const statsMembers = document.getElementById('statsMembers');
+    const statsSpeakers = document.getElementById('statsSpeakers');
+    const statsUsers = document.getElementById('statsUsers');
+    
+    if (statsEvents) statsEvents.textContent = events.length;
+    if (statsMembers) statsMembers.textContent = members.length;
+    if (statsSpeakers) statsSpeakers.textContent = speakers.length;
+    if (statsUsers) statsUsers.textContent = users.length;
+}
+
+// ========================================
+// UTILITY FUNCTIONS
+// ========================================
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // ========================================
