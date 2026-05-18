@@ -7,13 +7,6 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfJr5u8tE_W6jHeUc_M
 
 let currentChecklistFilter = 'All';
 
-// Check admin access
-const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-if (currentUser.role !== 'Admin' && currentUser.role !== 'Grand Officer') {
-    alert('Access Denied: Admin privileges required');
-    window.location.href = 'index.html';
-}
-
 // ========================================
 // GOOGLE SHEETS SYNC HELPER
 // ========================================
@@ -38,67 +31,6 @@ async function saveToGoogleSheets(action, data) {
     } catch (error) {
         console.error('Error saving to Google Sheets:', error);
         return { success: false, error: error.toString() };
-    }
-}
-
-// Tab switching - defined globally and inline in HTML
-function switchAdminTab(tabName, buttonElement) {
-    // Hide all tabs
-    const tabs = document.querySelectorAll('.admin-tab-content');
-    tabs.forEach(tab => tab.classList.remove('active'));
-    
-    // Remove active from all tab buttons
-    const tabButtons = document.querySelectorAll('.admin-tab');
-    tabButtons.forEach(btn => btn.classList.remove('active'));
-    
-    // Show selected tab
-    const targetTab = document.getElementById(tabName);
-    if (targetTab) {
-        targetTab.classList.add('active');
-    }
-    
-    // Set button active
-    if (buttonElement) {
-        buttonElement.classList.add('active');
-    }
-    
-    // Load data for the tab
-    switch(tabName) {
-        case 'users':
-            loadUsers();
-            break;
-        case 'emergency':
-            loadEmergencyContacts();
-            break;
-        case 'roles':
-            loadRoles();
-            break;
-        case 'required':
-            loadRequiredEvents();
-            loadEventsForDropdown();
-            break;
-        case 'checklist':
-            loadChecklistItems();
-            break;
-        case 'assemblies':
-            loadAssemblies();
-            break;
-        case 'members':
-            loadMembers();
-            loadAssembliesForDropdown();
-            break;
-        case 'events':
-            loadEvents();
-            break;
-        case 'speakers':
-            loadSpeakers();
-            break;
-        case 'gallery':
-            loadGallery();
-            break;
-        case 'sync':
-            updateStats();
-            break;
     }
 }
 
@@ -1346,6 +1278,8 @@ function updateStats() {
 // INITIALIZATION
 // ========================================
 
-// Load initial data
-loadUsers();
-updateStats();
+// Load initial data when page loads
+window.addEventListener('DOMContentLoaded', () => {
+    loadUsers();
+    updateStats();
+});
