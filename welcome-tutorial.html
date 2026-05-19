@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8b0000">
+    <title>Welcome Tutorial - NJ Rainbow Convention 2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .tutorial-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: rgba(212, 175, 55, 0.1);
+            border: 3px solid var(--primary-gold);
+            border-radius: 16px;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tutorial-step {
+            display: none;
+            flex: 1;
+            animation: fadeIn 0.5s;
+        }
+
+        .tutorial-step.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tutorial-icon {
+            font-size: 5rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .tutorial-title {
+            color: var(--primary-gold);
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .tutorial-description {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .tutorial-features {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .tutorial-features li {
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--primary-gold);
+            border-radius: 4px;
+            color: var(--text-light);
+        }
+
+        .tutorial-features li strong {
+            color: var(--primary-gold);
+        }
+
+        .tutorial-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 2rem;
+            border-top: 2px solid var(--primary-gold);
+        }
+
+        .tutorial-progress {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.3);
+            transition: all 0.3s;
+        }
+
+        .progress-dot.active {
+            background: var(--primary-gold);
+            width: 30px;
+            border-radius: 6px;
+        }
+
+        .btn-tutorial {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary-gold);
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--primary-gold);
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .btn-tutorial:hover {
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+        }
+
+        .btn-tutorial.primary {
+            background: var(--primary-gold);
+            color: var(--dark-bg);
+        }
+
+        .btn-tutorial.primary:hover {
+            background: #ffd700;
+        }
+
+        .btn-tutorial:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 2px solid var(--primary-gold);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(212, 175, 55, 0.2);
+        }
+
+        .feature-card-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card-title {
+            color: var(--primary-gold);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card-desc {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .tutorial-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .tutorial-icon {
+                font-size: 3.5rem;
+            }
+
+            .tutorial-title {
+                font-size: 1.5rem;
+            }
+
+            .tutorial-description {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+        <div class="subtitle">✦ Welcome Tutorial ✦</div>
+    </header>
+
+    <div class="content">
+        <div class="tutorial-container">
+            <!-- Step 1: Welcome -->
+            <div class="tutorial-step active" data-step="1">
+                <div class="tutorial-icon">🌈</div>
+                <h2 class="tutorial-title">Welcome to NJ Rainbow Convention 2026!</h2>
+                <p class="tutorial-description">
+                    We're so excited to have you here! This quick tutorial will walk you through all the features 
+                    of the convention app to help you make the most of your experience.
+                </p>
+                <p class="tutorial-description" style="font-size: 1rem;">
+                    📱 This app works offline once loaded<br>
+                    💾 All your data is saved on your device<br>
+                    🔒 Your information is private and secure
+                </p>
+            </div>
+
+            <!-- Step 2: Schedule -->
+            <div class="tutorial-step" data-step="2">
+                <div class="tutorial-icon">📅</div>
+                <h2 class="tutorial-title">Event Schedule</h2>
+                <p class="tutorial-description">
+                    View the complete convention schedule with all events, workshops, and activities.
+                </p>
+                <ul class="tutorial-features">
+                    <li><strong>📅 View by Day:</strong> Filter events by Friday, Saturday, or Sunday</li>
+                    <li><strong>⭐ Favorite Events:</strong> Tap the star icon to add events to your personal schedule</li>
+                    <li><strong>🔍 Search:</strong> Quickly find events by name or speaker</li>
+                    <li><strong>⚡ Required Events:</strong> Events marked in gold are required for your role</li>
+                    <li><strong>ℹ️ Event Details:</strong> Tap any event to see full description, location, and time</li>
+                </ul>
+            </div>
+
+            <!-- Step 3: My Schedule -->
+            <div class="tutorial-step" data-step="3">
+                <div class="tutorial-icon">⭐</div>
+                <h2 class="tutorial-title">My Schedule</h2>
+                <p class="tutorial-description">
+                    Your personalized schedule with only the events you've favorited plus any required events.
+                </p>
+                <ul class="tutorial-features">
+                    <li><strong>⭐ Your Favorites:</strong> See all events you've starred in one place</li>
+                    <li><strong>🎯 Required Events:</strong> Automatically includes events required for your role</li>
+                    <li><strong>📥 Export:</strong> Download your schedule to share or print</li>
+                    <li><strong>🗓️ Organized by Day:</strong> Easily see your daily agenda</li>
+                    <li><strong>🔔 Stay on Track:</strong> Keep track of what you need to attend</li>
+                </ul>
+            </div>
+
+            <!-- Step 4: Profile -->
+            <div class="tutorial-step" data-step="4">
+                <div class="tutorial-icon">👤</div>
+                <h2 class="tutorial-title">Your Profile</h2>
+                <p class="tutorial-description">
+                    Manage your personal information and preferences.
+                </p>
+                <ul class="tutorial-features">
+                    <li><strong>📋 Personal Info:</strong> Update your name, email, phone, and assembly</li>
+                    <li><strong>🚨 Emergency Contact:</strong> Required - Add emergency contact information</li>
+                    <li><strong>🍽️ Dietary Needs:</strong> Let us know about dietary restrictions and allergies</li>
+                    <li><strong>♿ Accessibility:</strong> Request accommodations for hearing, vision, or mobility</li>
+                    <li><strong>📝 Role Changes:</strong> Request role changes for admin approval</li>
+                    <li><strong>💾 Auto-Save:</strong> All changes are saved to your device</li>
+                </ul>
+            </div>
+
+            <!-- Step 5: Additional Features -->
+            <div class="tutorial-step" data-step="5">
+                <div class="tutorial-icon">✨</div>
+                <h2 class="tutorial-title">More Features</h2>
+                <p class="tutorial-description">
+                    Explore these additional features to enhance your convention experience:
+                </p>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-icon">🎤</div>
+                        <div class="feature-card-title">Speakers</div>
+                        <div class="feature-card-desc">Learn about our amazing speakers and their sessions</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-icon">📸</div>
+                        <div class="feature-card-title">Gallery</div>
+                        <div class="feature-card-desc">View photos from the convention</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-icon">🌈</div>
+                        <div class="feature-card-title">Meet NJ Rainbow</div>
+                        <div class="feature-card-desc">Meet our state officers and leaders</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-icon">✓</div>
+                        <div class="feature-card-title">Packing List</div>
+                        <div class="feature-card-desc">Use the checklist to pack for the convention</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-icon">📝</div>
+                        <div class="feature-card-title">Notes</div>
+                        <div class="feature-card-desc">Take personal notes during sessions</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-icon">🔔</div>
+                        <div class="feature-card-title">Notifications</div>
+                        <div class="feature-card-icon">Receive important announcements</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 6: Tips & Finish -->
+            <div class="tutorial-step" data-step="6">
+                <div class="tutorial-icon">💡</div>
+                <h2 class="tutorial-title">Quick Tips</h2>
+                <p class="tutorial-description">
+                    Here are some helpful tips to get the most out of the app:
+                </p>
+                <ul class="tutorial-features">
+                    <li><strong>📱 Add to Home Screen:</strong> Install this app for quick access (look for browser menu)</li>
+                    <li><strong>🔄 Offline Access:</strong> The app works without internet once loaded</li>
+                    <li><strong>💾 Data Sync:</strong> Your favorites and notes are stored locally on your device</li>
+                    <li><strong>🔒 Privacy:</strong> Your personal information never leaves your device</li>
+                    <li><strong>❓ Need Help?:</strong> Visit the tutorial again anytime from your profile</li>
+                    <li><strong>🎉 Have Fun:</strong> Enjoy the convention and make amazing memories!</li>
+                </ul>
+                <div style="text-align: center; margin-top: 2rem; padding: 1.5rem; background: rgba(212, 175, 55, 0.2); border-radius: 8px;">
+                    <p style="color: var(--primary-gold); font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem;">
+                        You're all set! 🎊
+                    </p>
+                    <p style="color: var(--text-light);">
+                        Click "Get Started" below to begin exploring the app.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Progress Dots -->
+            <div class="tutorial-progress">
+                <span class="progress-dot active" data-dot="1"></span>
+                <span class="progress-dot" data-dot="2"></span>
+                <span class="progress-dot" data-dot="3"></span>
+                <span class="progress-dot" data-dot="4"></span>
+                <span class="progress-dot" data-dot="5"></span>
+                <span class="progress-dot" data-dot="6"></span>
+            </div>
+
+            <!-- Navigation -->
+            <div class="tutorial-navigation">
+                <button class="btn-tutorial" id="skipBtn" onclick="skipTutorial()">
+                    Skip Tutorial
+                </button>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn-tutorial" id="prevBtn" onclick="previousStep()" disabled>
+                        ← Previous
+                    </button>
+                    <button class="btn-tutorial primary" id="nextBtn" onclick="nextStep()">
+                        Next →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 6;
+
+        function updateStepDisplay() {
+            // Hide all steps
+            document.querySelectorAll('.tutorial-step').forEach(step => {
+                step.classList.remove('active');
+            });
+
+            // Show current step
+            document.querySelector(`.tutorial-step[data-step="${currentStep}"]`).classList.add('active');
+
+            // Update progress dots
+            document.querySelectorAll('.progress-dot').forEach(dot => {
+                const dotStep = parseInt(dot.getAttribute('data-dot'));
+                if (dotStep === currentStep) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+
+            // Update buttons
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const skipBtn = document.getElementById('skipBtn');
+
+            prevBtn.disabled = currentStep === 1;
+
+            if (currentStep === totalSteps) {
+                nextBtn.textContent = 'Get Started! 🚀';
+                skipBtn.style.display = 'none';
+            } else {
+                nextBtn.textContent = 'Next →';
+                skipBtn.style.display = 'block';
+            }
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateStepDisplay();
+            } else {
+                completeTutorial();
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepDisplay();
+            }
+        }
+
+        function skipTutorial() {
+            if (confirm('Are you sure you want to skip the tutorial? You can always view it again from your profile.')) {
+                completeTutorial();
+            }
+        }
+
+        function completeTutorial() {
+            // Mark tutorial as completed
+            localStorage.setItem('tutorial_completed', 'true');
+            
+            // Redirect to home
+            window.location.href = 'index.html';
+        }
+
+        // Check if coming back to tutorial voluntarily
+        const urlParams = new URLSearchParams(window.location.search);
+        const isReturning = urlParams.get('returning') === 'true';
+
+        if (isReturning) {
+            document.getElementById('skipBtn').textContent = 'Return to Profile';
+            document.getElementById('skipBtn').onclick = function() {
+                window.location.href = 'profile.html';
+            };
+        }
+
+        // Initialize
+        updateStepDisplay();
+    </script>
+</body>
+</html>
