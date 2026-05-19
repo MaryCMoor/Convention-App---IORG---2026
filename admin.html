@@ -170,7 +170,6 @@
             }
             
             // Load data for the selected tab
-            // Wait a tiny bit for the script file to load
             setTimeout(() => {
                 switch(tabName) {
                     case 'users':
@@ -202,6 +201,9 @@
                     case 'speakers':
                         if (typeof loadSpeakers === 'function') loadSpeakers();
                         break;
+                    case 'roleRequests':
+                        if (typeof loadRoleRequests === 'function') loadRoleRequests();
+                        break;
                     case 'sync':
                         if (typeof updateStats === 'function') updateStats();
                         break;
@@ -230,6 +232,7 @@
             <button class="admin-tab active" onclick="switchAdminTab('users', this)">👥 Users</button>
             <button class="admin-tab" onclick="switchAdminTab('emergency', this)">🚨 Emergency Contacts</button>
             <button class="admin-tab" onclick="switchAdminTab('roles', this)">🏷️ Role Management</button>
+            <button class="admin-tab" onclick="switchAdminTab('roleRequests', this)">📨 Role Requests</button>
             <button class="admin-tab" onclick="switchAdminTab('required', this)">⭐ Required Events</button>
             <button class="admin-tab" onclick="switchAdminTab('checklist', this)">✓ Checklist Items</button>
             <button class="admin-tab" onclick="switchAdminTab('assemblies', this)">🌈 Assemblies</button>
@@ -321,6 +324,24 @@
 
                 <h4 style="color: var(--primary-gold); margin: 1.5rem 0 1rem;">Current Roles</h4>
                 <div id="rolesList"></div>
+            </div>
+        </div>
+
+        <!-- ROLE REQUESTS TAB -->
+        <div id="roleRequests" class="admin-tab-content">
+            <div class="admin-section">
+                <h3>📨 Role Change Requests</h3>
+                <p>Review and approve/deny user requests to change their roles.</p>
+                
+                <div id="roleRequestsList" style="margin-top: 1.5rem;">
+                    <!-- Requests loaded here -->
+                </div>
+                
+                <div id="noRequests" style="display: none; text-align: center; padding: 3rem; color: var(--text-light);">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
+                    <h3 style="color: var(--primary-gold);">No Pending Requests</h3>
+                    <p>All role change requests have been processed.</p>
+                </div>
             </div>
         </div>
 
@@ -649,6 +670,6 @@
         </div>
     </div>
 
-    <script src="admin-script.js?v=3"></script>
+    <script src="admin-script.js?v=4"></script>
 </body>
 </html>
