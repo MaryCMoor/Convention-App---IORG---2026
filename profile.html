@@ -234,6 +234,8 @@
             window.location.href = 'login.html';
         }
 
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfJr5u8tE_W6jHeUc_MJINzOBAuXp2lDioCMmhXjkpwAQ91Lf9rC3uCE3t5Zj7Cmc1/exec';
+
         // Escape HTML
         function escapeHtml(text) {
             if (!text) return '';
@@ -308,8 +310,8 @@
             document.getElementById('accessOther').value = profile.accessOther || '';
         }
 
-        // Save profile
-        function saveProfile() {
+        // Save profile (with Google Sheets sync)
+        async function saveProfile() {
             const profile = JSON.parse(localStorage.getItem(`profile_${currentUser.username}`) || '{}');
             
             profile.name = document.getElementById('profileName').value;
@@ -342,6 +344,31 @@
             currentUser.name = profile.name;
             currentUser.email = profile.email;
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Save to Google Sheets
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'saveUser',
+                        userId: currentUser.username,
+                        username: currentUser.username,
+                        email: profile.email,
+                        name: profile.name,
+                        role: (profile.roles || [profile.role]).join(';'),
+                        password: profile.password,
+                        dateCreated: profile.dateCreated || new Date().toISOString()
+                    })
+                });
+                
+                console.log('Profile saved to Google Sheets');
+            } catch (error) {
+                console.error('Error saving to Google Sheets:', error);
+            }
             
             alert('✅ Profile saved successfully!');
         }
