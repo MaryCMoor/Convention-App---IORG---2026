@@ -154,6 +154,21 @@
             margin-bottom: 1rem;
             display: none;
         }
+
+        .default-credentials {
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid var(--primary-gold);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .default-credentials strong {
+            color: var(--primary-gold);
+        }
     </style>
 </head>
 <body>
@@ -184,6 +199,13 @@
                     <input type="password" id="loginPassword" placeholder="Enter your password" required>
                 </div>
                 <button type="submit" class="submit-btn">🎭 Enter the Show</button>
+                
+                <!-- Default Admin Credentials Info -->
+                <div class="default-credentials">
+                    <strong>💡 First Time?</strong><br>
+                    Default Admin: <strong>admin</strong> / <strong>admin123</strong><br>
+                    <small>(Change password after first login)</small>
+                </div>
             </form>
 
             <!-- SIGNUP FORM -->
@@ -204,15 +226,15 @@
                     <label>👥 I am a...</label>
                     <select id="signupRole" required>
                         <option value="">Select your role</option>
-                        <option value="Rainbow">Rainbow Girl</option>
+                        <option value="Rainbow Girl">Rainbow Girl</option>
                         <option value="DeMolay">DeMolay</option>
                         <option value="Mason">Mason</option>
                         <option value="Eastern Star">Eastern Star</option>
-                        <option value="Amaranth">Order of Amaranth</option>
+                        <option value="Order of Amaranth">Order of Amaranth</option>
                         <option value="Grand Officer">Grand Officer</option>
                         <option value="Advisor">Advisor</option>
-                        <option value="Parent">Parent/Guardian</option>
-                        <option value="Admin">Admin</option>
+                        <option value="Mother Advisor">Mother Advisor</option>
+                        <option value="Parent/Guardian">Parent/Guardian</option>
                     </select>
                 </div>
                 <div class="form-group">
