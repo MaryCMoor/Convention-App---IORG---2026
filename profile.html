@@ -1,495 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#8b0000">
-    <title>My Profile - NJ Rainbow Convention 2026</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="manifest" href="manifest.json">
-</head>
-<body>
-    <header class="app-header">
-        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%; padding: 0 1rem;">
-            <div>
-                <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
-                <div class="subtitle">✦ My Profile ✦</div>
-            </div>
-            <button onclick="window.location.href='index.html'" class="back-btn" style="background: var(--primary-gold); color: var(--dark-bg); padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-family: inherit;">
-                ← Back to Home
-            </button>
-        </div>
-    </header>
-
-    <div class="content">
-        <div class="profile-section">
-            <h2 class="section-title">👤 Profile Information</h2>
-            
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="profileName" placeholder="Your full name">
-            </div>
-            
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="profileEmail" placeholder="your.email@example.com">
-            </div>
-            
-            <div class="form-group">
-                <label>Phone Number</label>
-                <input type="tel" id="profilePhone" placeholder="(123) 456-7890">
-            </div>
-            
-            <div class="form-group">
-                <label>Age</label>
-                <input type="number" id="profileAge" placeholder="18">
-            </div>
-            
-            <div class="form-group">
-                <label>Assembly (if applicable)</label>
-                <select id="profileAssembly">
-                    <option value="">Select your assembly...</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Current Roles</label>
-                <div id="currentRolesDisplay" style="padding: 1rem; background: rgba(212, 175, 55, 0.1); border: 2px solid var(--primary-gold); border-radius: 8px; min-height: 50px;">
-                    <!-- Roles displayed here -->
-                </div>
-                <p style="color: var(--text-light); font-size: 0.85rem; margin-top: 0.5rem;">
-                    💡 To change your roles, use the "Request Role Change" button below.
-                </p>
-            </div>
-        </div>
-
-        <!-- Emergency Contact Section -->
-        <div class="profile-section">
-            <h3 style="color: var(--primary-gold);">🚨 Emergency Contact Information</h3>
-            <p style="color: var(--text-light); font-size: 0.9rem;">Required for all attendees. This information will only be used in case of emergency.</p>
-            
-            <div class="form-group">
-                <label>Emergency Contact Name</label>
-                <input type="text" id="emergencyName" placeholder="Full name">
-            </div>
-            
-            <div class="form-group">
-                <label>Emergency Contact Phone</label>
-                <input type="tel" id="emergencyPhone" placeholder="(123) 456-7890">
-            </div>
-            
-            <div class="form-group">
-                <label>Relationship to You</label>
-                <input type="text" id="emergencyRelation" placeholder="e.g., Parent, Spouse, Guardian">
-            </div>
-        </div>
-
-        <!-- Dietary Restrictions Section -->
-        <div class="profile-section">
-            <h3 style="color: var(--primary-gold);">🍽️ Dietary Restrictions & Allergies</h3>
-            <p style="color: var(--text-light); font-size: 0.9rem;">Help us accommodate your dietary needs.</p>
-            
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="dietVegetarian"> Vegetarian
-                </label>
-            </div>
-            
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="dietVegan"> Vegan
-                </label>
-            </div>
-            
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="dietGlutenFree"> Gluten-Free
-                </label>
-            </div>
-            
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="dietDairyFree"> Dairy-Free
-                </label>
-            </div>
-            
-            <div class="form-group">
-                <label>Other Dietary Restrictions or Allergies</label>
-                <textarea id="dietOther" rows="3" placeholder="Please list any other dietary restrictions or food allergies..."></textarea>
-            </div>
-        </div>
-
-        <!-- Accessibility Needs Section -->
-        <div class="profile-section">
-            <h3 style="color: var(--primary-gold);">♿ Accessibility Needs</h3>
-            <p style="color: var(--text-light); font-size: 0.9rem;">Let us know how we can make your convention experience better.</p>
-            
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="accessWheelchair"> Wheelchair accessible seating required
-                </label>
-            </div>
-            
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="accessHearing"> Hearing assistance needed
-                </label>
-            </div>
-            
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="accessVisual"> Visual assistance needed
-                </label>
-            </div>
-            
-            <div class="form-group">
-                <label>Other Accessibility Needs</label>
-                <textarea id="accessOther" rows="3" placeholder="Please describe any other accessibility needs..."></textarea>
-            </div>
-        </div>
-
-        <!-- Role Change Request Section -->
-        <div class="profile-section" style="margin-top: 2rem;">
-            <h3 style="color: var(--primary-gold);">📝 Request Role Change</h3>
-            <p style="color: var(--text-light); font-size: 0.9rem;">
-                If your roles have changed or need updating, submit a request here. An administrator will review and approve your request.
-            </p>
-            
-            <!-- Pending Request Notice -->
-            <div id="pendingRequestNotice" style="display: none; background: rgba(255, 165, 0, 0.2); border: 2px solid orange; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                <strong style="color: orange;">⏳ Pending Request</strong>
-                <p style="color: var(--text-light); margin: 0.5rem 0 0 0;" id="pendingRequestDetails"></p>
-            </div>
-            
-            <button onclick="showRoleRequestForm()" id="requestRoleBtn" class="btn-primary" style="margin-top: 1rem;">
-                📝 Request Role Change
-            </button>
-            
-            <!-- Role Request Form -->
-            <div id="roleRequestForm" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(212, 175, 55, 0.1); border: 2px solid var(--primary-gold); border-radius: 8px;">
-                <h4 style="color: var(--primary-gold); margin-bottom: 1rem;">Select Your New Roles</h4>
-                <p style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 1rem;">
-                    Select all roles that apply to you. You can select multiple roles.
-                </p>
-                
-                <div id="roleRequestCheckboxes" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px; margin-bottom: 1rem;">
-                    <!-- Roles loaded dynamically -->
-                </div>
-                
-                <div class="form-group">
-                    <label>Reason for Role Change (Optional)</label>
-                    <textarea id="roleRequestReason" rows="3" placeholder="e.g., I recently became a Mother Advisor for Assembly #XX..."></textarea>
-                </div>
-                
-                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                    <button onclick="submitRoleRequest()" class="btn-save">
-                        📤 Submit Request
-                    </button>
-                    <button onclick="cancelRoleRequest()" class="btn-secondary">
-                        ❌ Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tutorial Access Section -->
-        <div class="profile-section" style="margin-top: 2rem; text-align: center; background: rgba(212, 175, 55, 0.05); border: 2px dashed var(--primary-gold);">
-            <h3 style="color: var(--primary-gold);">❓ Need Help?</h3>
-            <p style="color: var(--text-light); font-size: 0.9rem;">
-                Want to review how to use the app? View the tutorial again anytime.
-            </p>
-            <button onclick="window.location.href='welcome-tutorial.html?returning=true'" class="btn-secondary" style="margin-top: 1rem;">
-                📖 View Tutorial Again
-            </button>
-        </div>
-
-        <!-- Save Button -->
-        <button onclick="saveProfile()" class="btn-save" style="width: 100%; margin-top: 2rem;">
-            💾 Save Profile
-        </button>
-    </div>
-
-    <nav class="bottom-nav">
-        <a href="index.html" class="nav-item">
-            <span class="nav-icon">🏠</span>
-            <span class="nav-label">Home</span>
-        </a>
-        <a href="schedule.html" class="nav-item">
-            <span class="nav-icon">📅</span>
-            <span class="nav-label">Schedule</span>
-        </a>
-        <a href="my-schedule.html" class="nav-item">
-            <span class="nav-icon">⭐</span>
-            <span class="nav-label">My Schedule</span>
-        </a>
-        <a href="profile.html" class="nav-item active">
-            <span class="nav-icon">👤</span>
-            <span class="nav-label">Profile</span>
-        </a>
-    </nav>
-
-    <script>
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        if (!currentUser.username) {
-            window.location.href = 'login.html';
-        }
-
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfJr5u8tE_W6jHeUc_MJINzOBAuXp2lDioCMmhXjkpwAQ91Lf9rC3uCE3t5Zj7Cmc1/exec';
-
-        // Escape HTML
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Get available roles (excluding Admin)
-        function getAvailableRoles() {
-            const defaultRoles = [
-                'Rainbow Girl',
-                'DeMolay',
-                'Mason',
-                'Eastern Star',
-                'Order of Amaranth',
-                'Grand Officer',
-                'Advisor',
-                'Mother Advisor',
-                'Parent/Guardian'
-            ];
-            
-            const customRoles = JSON.parse(localStorage.getItem('custom_roles') || '[]');
-            const allRoles = [...defaultRoles, ...customRoles];
-            
-            // Exclude Admin role from user-selectable roles
-            return allRoles.filter(role => role !== 'Admin');
-        }
-
-        // Load assemblies
-        function loadAssemblies() {
-            const assemblies = JSON.parse(localStorage.getItem('assemblies') || '[]');
-            const select = document.getElementById('profileAssembly');
-            
-            select.innerHTML = '<option value="">Select your assembly...</option>' +
-                assemblies.map(assembly => `<option value="${escapeHtml(assembly)}">${escapeHtml(assembly)}</option>`).join('');
-        }
-
-        // Load profile data
-        function loadProfile() {
-            const profile = JSON.parse(localStorage.getItem(`profile_${currentUser.username}`) || '{}');
-            
-            document.getElementById('profileName').value = profile.name || '';
-            document.getElementById('profileEmail').value = profile.email || '';
-            document.getElementById('profilePhone').value = profile.phone || '';
-            document.getElementById('profileAge').value = profile.age || '';
-            document.getElementById('profileAssembly').value = profile.assembly || '';
-            
-            // Display current roles
-            const roles = profile.roles || [profile.role || 'User'];
-            const rolesDisplay = document.getElementById('currentRolesDisplay');
-            rolesDisplay.innerHTML = roles.map(role => 
-                `<span class="role-badge" style="display: inline-block; padding: 0.5rem 1rem; background: var(--primary-gold); color: var(--dark-bg); border-radius: 20px; margin: 0.25rem; font-weight: bold;">${escapeHtml(role)}</span>`
-            ).join('');
-            
-            // Emergency contact
-            document.getElementById('emergencyName').value = profile.emergencyName || '';
-            document.getElementById('emergencyPhone').value = profile.emergencyPhone || '';
-            document.getElementById('emergencyRelation').value = profile.emergencyRelation || '';
-            
-            // Dietary restrictions
-            document.getElementById('dietVegetarian').checked = profile.dietVegetarian || false;
-            document.getElementById('dietVegan').checked = profile.dietVegan || false;
-            document.getElementById('dietGlutenFree').checked = profile.dietGlutenFree || false;
-            document.getElementById('dietDairyFree').checked = profile.dietDairyFree || false;
-            document.getElementById('dietOther').value = profile.dietOther || '';
-            
-            // Accessibility
-            document.getElementById('accessWheelchair').checked = profile.accessWheelchair || false;
-            document.getElementById('accessHearing').checked = profile.accessHearing || false;
-            document.getElementById('accessVisual').checked = profile.accessVisual || false;
-            document.getElementById('accessOther').value = profile.accessOther || '';
-        }
-
-       // Save profile (with Google Sheets sync and logging)
-        async function saveProfile() {
-            const profile = JSON.parse(localStorage.getItem(`profile_${currentUser.username}`) || '{}');
-            
-            profile.name = document.getElementById('profileName').value;
-            profile.email = document.getElementById('profileEmail').value;
-            profile.phone = document.getElementById('profilePhone').value;
-            profile.age = document.getElementById('profileAge').value;
-            profile.assembly = document.getElementById('profileAssembly').value;
-            
-            // Emergency contact
-            profile.emergencyName = document.getElementById('emergencyName').value;
-            profile.emergencyPhone = document.getElementById('emergencyPhone').value;
-            profile.emergencyRelation = document.getElementById('emergencyRelation').value;
-            
-            // Dietary restrictions
-            profile.dietVegetarian = document.getElementById('dietVegetarian').checked;
-            profile.dietVegan = document.getElementById('dietVegan').checked;
-            profile.dietGlutenFree = document.getElementById('dietGlutenFree').checked;
-            profile.dietDairyFree = document.getElementById('dietDairyFree').checked;
-            profile.dietOther = document.getElementById('dietOther').value;
-            
-            // Accessibility
-            profile.accessWheelchair = document.getElementById('accessWheelchair').checked;
-            profile.accessHearing = document.getElementById('accessHearing').checked;
-            profile.accessVisual = document.getElementById('accessVisual').checked;
-            profile.accessOther = document.getElementById('accessOther').value;
-            
-            localStorage.setItem(`profile_${currentUser.username}`, JSON.stringify(profile));
-            
-            // Update currentUser in localStorage
-            currentUser.name = profile.name;
-            currentUser.email = profile.email;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            
-            // Prepare data for Google Sheets
-            const sheetData = {
-                action: 'saveUser',
-                userId: currentUser.username,
-                username: currentUser.username,
-                email: profile.email || '',
-                name: profile.name || '',
-                role: (profile.roles || [profile.role || 'User']).join(';'),
-                password: profile.password || '',
-                dateCreated: profile.dateCreated || new Date().toISOString()
-            };
-            
-            console.log('Sending to Google Sheets:', sheetData);
-            
-            // Save to Google Sheets
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(sheetData)
-                });
-                
-                console.log('Google Sheets response status:', response.status);
-                
-                // Try to read response text (may not work with no-cors)
-                try {
-                    const text = await response.text();
-                    console.log('Response text:', text);
-                } catch (e) {
-                    console.log('Could not read response (no-cors mode)');
-                }
-                
-                alert('✅ Profile saved successfully!\n\n(Check browser console for Google Sheets sync status)');
-            } catch (error) {
-                console.error('Error saving to Google Sheets:', error);
-                alert('✅ Profile saved locally!\n\n⚠️ Warning: Could not sync to Google Sheets.\nError: ' + error.message);
-            }
-        }
-
-
-        // ========================================
-        // ROLE CHANGE REQUEST FUNCTIONS
-        // ========================================
-
-        function checkPendingRequests() {
-            const requests = JSON.parse(localStorage.getItem('role_change_requests') || '[]');
-            const userRequest = requests.find(r => 
-                r.userId === currentUser.username && r.status === 'pending'
-            );
-            
-            const pendingNotice = document.getElementById('pendingRequestNotice');
-            const requestBtn = document.getElementById('requestRoleBtn');
-            const pendingDetails = document.getElementById('pendingRequestDetails');
-            
-            if (userRequest) {
-                // Show pending notice
-                pendingNotice.style.display = 'block';
-                pendingDetails.innerHTML = `
-                    You submitted a role change request on ${new Date(userRequest.date).toLocaleDateString()}.<br>
-                    <strong>Requested Roles:</strong> ${userRequest.requestedRoles.join(', ')}<br>
-                    Your request is being reviewed by an administrator.
-                `;
-                
-                // Disable request button
-                requestBtn.disabled = true;
-                requestBtn.textContent = '⏳ Request Pending';
-                requestBtn.style.opacity = '0.5';
-                requestBtn.style.cursor = 'not-allowed';
-            } else {
-                pendingNotice.style.display = 'none';
-                requestBtn.disabled = false;
-                requestBtn.textContent = '📝 Request Role Change';
-                requestBtn.style.opacity = '1';
-                requestBtn.style.cursor = 'pointer';
-            }
-        }
-
-        function showRoleRequestForm() {
-            const profile = JSON.parse(localStorage.getItem(`profile_${currentUser.username}`) || '{}');
-            const currentRoles = profile.roles || [profile.role || 'User'];
-            const availableRoles = getAvailableRoles();
-            
-            // Load role checkboxes
-            const container = document.getElementById('roleRequestCheckboxes');
-            container.innerHTML = availableRoles.map(role => `
-                <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-light); cursor: pointer; padding: 0.5rem; background: rgba(212, 175, 55, 0.1); border-radius: 4px;">
-                    <input type="checkbox" value="${escapeHtml(role)}" ${currentRoles.includes(role) ? 'checked' : ''}>
-                    ${escapeHtml(role)}
-                </label>
-            `).join('');
-            
-            document.getElementById('roleRequestForm').style.display = 'block';
-            document.getElementById('requestRoleBtn').style.display = 'none';
-        }
-
-        function cancelRoleRequest() {
-            document.getElementById('roleRequestForm').style.display = 'none';
-            document.getElementById('requestRoleBtn').style.display = 'block';
-            document.getElementById('roleRequestReason').value = '';
-        }
-
-        function submitRoleRequest() {
-            const selectedRoles = Array.from(document.querySelectorAll('#roleRequestCheckboxes input:checked')).map(cb => cb.value);
-            
-            if (selectedRoles.length === 0) {
-                alert('Please select at least one role.');
-                return;
-            }
-            
-            const profile = JSON.parse(localStorage.getItem(`profile_${currentUser.username}`) || '{}');
-            const currentRoles = profile.roles || [profile.role || 'User'];
-            const reason = document.getElementById('roleRequestReason').value.trim();
-            
-            // Create request
-            const request = {
-                id: Date.now(),
-                userId: currentUser.username,
-                username: currentUser.username,
-                name: profile.name || currentUser.username,
-                email: profile.email || 'No email provided',
-                currentRoles: currentRoles,
-                requestedRoles: selectedRoles,
-                reason: reason,
-                date: new Date().toISOString(),
-                status: 'pending'
-            };
-            
-            // Save request
-            const requests = JSON.parse(localStorage.getItem('role_change_requests') || '[]');
-            requests.push(request);
-            localStorage.setItem('role_change_requests', JSON.stringify(requests));
-            
-            alert('✅ Role change request submitted!\n\nAn administrator will review your request and update your roles accordingly.');
-            
-            // Reset form
-            cancelRoleRequest();
-            checkPendingRequests();
-        }
-
-        // Initialize
-        loadAssemblies();
-        loadProfile();
-        checkPendingRequests();
-    </script>
-</body>
-</html>
+async function saveProfile() {
+    const profile = JSON.parse(localStorage.getItem(`profile_${currentUser.username}`) || '{}');
+    
+    profile.name = document.getElementById('profileName').value;
+    profile.email = document.getElementById('profileEmail').value;
+    profile.phone = document.getElementById('profilePhone').value;
+    profile.age = document.getElementById('profileAge').value;
+    profile.assembly = document.getElementById('profileAssembly').value;
+    
+    // Emergency contact
+    profile.emergencyName = document.getElementById('emergencyName').value;
+    profile.emergencyPhone = document.getElementById('emergencyPhone').value;
+    profile.emergencyRelation = document.getElementById('emergencyRelation').value;
+    
+    // Dietary restrictions
+    profile.dietVegetarian = document.getElementById('dietVegetarian').checked;
+    profile.dietVegan = document.getElementById('dietVegan').checked;
+    profile.dietGlutenFree = document.getElementById('dietGlutenFree').checked;
+    profile.dietDairyFree = document.getElementById('dietDairyFree').checked;
+    profile.dietOther = document.getElementById('dietOther').value;
+    
+    // Accessibility
+    profile.accessWheelchair = document.getElementById('accessWheelchair').checked;
+    profile.accessHearing = document.getElementById('accessHearing').checked;
+    profile.accessVisual = document.getElementById('accessVisual').checked;
+    profile.accessOther = document.getElementById('accessOther').value;
+    
+    localStorage.setItem(`profile_${currentUser.username}`, JSON.stringify(profile));
+    
+    // Update currentUser in localStorage
+    currentUser.name = profile.name;
+    currentUser.email = profile.email;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    console.log('=== SAVE PROFILE STARTED ===');
+    
+    // Prepare data for Google Sheets
+    const sheetData = {
+        action: 'saveUser',
+        userId: currentUser.username,
+        username: currentUser.username,
+        email: profile.email || '',
+        name: profile.name || '',
+        role: (profile.roles || [profile.role || 'User']).join(';'),
+        password: profile.password || '',
+        dateCreated: profile.dateCreated || new Date().toISOString()
+    };
+    
+    console.log('Data to send to Google Sheets:', sheetData);
+    
+    // Save to Google Sheets
+    try {
+        console.log('Sending fetch request...');
+        
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',           // ← ADDED THIS!
+            redirect: 'follow',        // ← ADDED THIS!
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(sheetData)
+        });
+        
+        console.log('Fetch completed');
+        console.log('Response status:', response.status);
+        console.log('Response type:', response.type);
+        
+        alert('✅ Profile saved successfully!');
+    } catch (error) {
+        console.error('Error saving to Google Sheets:', error);
+        alert('✅ Profile saved locally!\n\n⚠️ Warning: Could not sync to Google Sheets.\nError: ' + error.message);
+    }
+}
