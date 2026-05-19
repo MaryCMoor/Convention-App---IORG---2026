@@ -1,5 +1,5 @@
 // ========================================
-// AUTHENTICATION SCRIPT
+// AUTHENTICATION SCRIPT WITH GOOGLE SHEETS
 // ========================================
 
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfJr5u8tE_W6jHeUc_MJINzOBAuXp2lDioCMmhXjkpwAQ91Lf9rC3uCE3t5Zj7Cmc1/exec';
@@ -10,6 +10,30 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Save to Google Sheets
+async function saveToGoogleSheets(action, data) {
+    try {
+        await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: action,
+                ...data
+            })
+        });
+        
+        console.log(`Saved ${action} to Google Sheets`);
+        return { success: true };
+        
+    } catch (error) {
+        console.error('Error saving to Google Sheets:', error);
+        return { success: false, error: error.toString() };
+    }
 }
 
 // Get available roles (excluding Admin for signup)
@@ -110,19 +134,34 @@ async function signup() {
         return;
     }
     
+    const userId = username;
+    const dateCreated = new Date().toISOString();
+    
     // Create user profile
     const profile = {
+        userId: userId,
         username: username,
         email: email,
         password: password,
         name: name,
         role: selectedRoles[0], // Primary role
         roles: selectedRoles,
-        dateCreated: new Date().toISOString()
+        dateCreated: dateCreated
     };
     
     // Save to localStorage
     localStorage.setItem(`profile_${username}`, JSON.stringify(profile));
+    
+    // Save to Google Sheets
+    await saveToGoogleSheets('saveUser', {
+        userId: userId,
+        username: username,
+        email: email,
+        name: name,
+        role: selectedRoles.join(';'), // Save multiple roles separated by semicolon
+        password: password,
+        dateCreated: dateCreated
+    });
     
     // Auto-login
     const user = {
