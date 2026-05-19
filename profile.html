@@ -310,7 +310,7 @@
             document.getElementById('accessOther').value = profile.accessOther || '';
         }
 
-        // Save profile (with Google Sheets sync)
+       // Save profile (with Google Sheets sync and logging)
         async function saveProfile() {
             const profile = JSON.parse(localStorage.getItem(`profile_${currentUser.username}`) || '{}');
             
@@ -345,33 +345,47 @@
             currentUser.email = profile.email;
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             
+            // Prepare data for Google Sheets
+            const sheetData = {
+                action: 'saveUser',
+                userId: currentUser.username,
+                username: currentUser.username,
+                email: profile.email || '',
+                name: profile.name || '',
+                role: (profile.roles || [profile.role || 'User']).join(';'),
+                password: profile.password || '',
+                dateCreated: profile.dateCreated || new Date().toISOString()
+            };
+            
+            console.log('Sending to Google Sheets:', sheetData);
+            
             // Save to Google Sheets
             try {
-                await fetch(SCRIPT_URL, {
+                const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        action: 'saveUser',
-                        userId: currentUser.username,
-                        username: currentUser.username,
-                        email: profile.email,
-                        name: profile.name,
-                        role: (profile.roles || [profile.role]).join(';'),
-                        password: profile.password,
-                        dateCreated: profile.dateCreated || new Date().toISOString()
-                    })
+                    body: JSON.stringify(sheetData)
                 });
                 
-                console.log('Profile saved to Google Sheets');
+                console.log('Google Sheets response status:', response.status);
+                
+                // Try to read response text (may not work with no-cors)
+                try {
+                    const text = await response.text();
+                    console.log('Response text:', text);
+                } catch (e) {
+                    console.log('Could not read response (no-cors mode)');
+                }
+                
+                alert('✅ Profile saved successfully!\n\n(Check browser console for Google Sheets sync status)');
             } catch (error) {
                 console.error('Error saving to Google Sheets:', error);
+                alert('✅ Profile saved locally!\n\n⚠️ Warning: Could not sync to Google Sheets.\nError: ' + error.message);
             }
-            
-            alert('✅ Profile saved successfully!');
         }
+
 
         // ========================================
         // ROLE CHANGE REQUEST FUNCTIONS
