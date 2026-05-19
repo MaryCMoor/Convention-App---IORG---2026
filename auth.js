@@ -15,7 +15,9 @@ function escapeHtml(text) {
 // Save to Google Sheets
 async function saveToGoogleSheets(action, data) {
     try {
-        await fetch(SCRIPT_URL, {
+        console.log('Saving to Google Sheets:', action, data);
+        
+        const response = await fetch(SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
             headers: {
@@ -27,7 +29,7 @@ async function saveToGoogleSheets(action, data) {
             })
         });
         
-        console.log(`Saved ${action} to Google Sheets`);
+        console.log('Save response:', response);
         return { success: true };
         
     } catch (error) {
@@ -73,6 +75,7 @@ async function login() {
         // Simple password check (in production, use proper hashing)
         if (profile.password === password || password === 'admin123') {
             const user = {
+                userId: username,
                 username: username,
                 name: profile.name,
                 email: profile.email,
@@ -81,6 +84,18 @@ async function login() {
             };
             
             localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            // **FIX: Save user to Google Sheets on login**
+            console.log('Syncing user to Google Sheets...');
+            await saveToGoogleSheets('saveUser', {
+                userId: username,
+                username: username,
+                email: profile.email || '',
+                name: profile.name || '',
+                role: (profile.roles || [profile.role]).join(';'),
+                password: password,
+                dateCreated: profile.dateCreated || new Date().toISOString()
+            });
             
             // Check if first-time user
             const tutorialCompleted = localStorage.getItem('tutorial_completed');
@@ -152,19 +167,21 @@ async function signup() {
     // Save to localStorage
     localStorage.setItem(`profile_${username}`, JSON.stringify(profile));
     
-    // Save to Google Sheets
+    // **FIX: Save to Google Sheets with correct structure**
+    console.log('Saving new user to Google Sheets...');
     await saveToGoogleSheets('saveUser', {
         userId: userId,
         username: username,
         email: email,
         name: name,
-        role: selectedRoles.join(';'), // Save multiple roles separated by semicolon
+        role: selectedRoles.join(';'), // Multiple roles separated by semicolon
         password: password,
         dateCreated: dateCreated
     });
     
     // Auto-login
     const user = {
+        userId: username,
         username: username,
         name: name,
         email: email,
