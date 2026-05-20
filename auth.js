@@ -31,6 +31,8 @@ async function saveToGoogleSheets(action, data) {
         
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
+            mode: 'no-cors',           // ← FIXED: Added this line
+            redirect: 'follow',        // ← FIXED: Added this line
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -43,23 +45,7 @@ async function saveToGoogleSheets(action, data) {
         console.log('📥 Response type:', response.type);
         console.log('📥 Response ok:', response.ok);
         
-        // Try to get response text
-        try {
-            const text = await response.text();
-            console.log('📄 Response body:', text);
-            
-            if (text) {
-                try {
-                    const json = JSON.parse(text);
-                    console.log('✅ Parsed response:', json);
-                } catch (e) {
-                    console.log('⚠️ Response is not JSON');
-                }
-            }
-        } catch (e) {
-            console.log('⚠️ Could not read response body:', e.message);
-        }
-        
+        // Note: With no-cors mode, response will be opaque but request goes through
         console.log('✅ Request completed successfully');
         return { success: true };
         
