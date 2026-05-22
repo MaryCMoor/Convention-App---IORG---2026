@@ -123,83 +123,29 @@ async function signUp(username, email, name, role, password) {
     }
 }
 
-// Login Function - FETCHES REAL ROLES FROM GOOGLE SHEETS
-async function login(username, password) {
+// Login Function - TEMPORARY FIX (GIVES EVERYONE ADMIN)
+function login(username, password) {
     console.log('========================================');
     console.log('🔐 LOGIN FUNCTION STARTED');
     console.log('========================================');
     console.log('Username entered:', username);
     
-    try {
-        // Fetch user data from Google Sheets
-        console.log('🔍 Fetching user data from Google Sheets...');
-        const response = await fetch(`${SCRIPT_URL}?action=getUser&username=${encodeURIComponent(username)}`);
-        const userData = await response.json();
-        
-        console.log('📥 Response from Google Sheets:', userData);
-        
-        if (userData.success) {
-            console.log('✅ User found in Google Sheets!');
-            console.log('👤 User role from Sheets:', userData.role);
-            
-            const userSession = {
-                userId: userData.userId,
-                username: userData.username,
-                email: userData.email,
-                name: userData.name,
-                role: userData.role,  // Real role from Google Sheets!
-                isNewUser: false,
-                needsTraining: false
-            };
-            
-            localStorage.setItem('currentUser', JSON.stringify(userSession));
-            localStorage.setItem('isLoggedIn', 'true');
-            
-            console.log('✅ Login successful with roles:', userSession.role);
-            console.log('========================================');
-            return true;
-        } else {
-            // User not found in Sheets - allow login with default role
-            console.log('⚠️ User not found in Google Sheets - using default role');
-            
-            const userSession = {
-                userId: Date.now().toString(),
-                username: username,
-                email: username.includes('@') ? username : username + '@example.com',
-                name: username,
-                role: 'Rainbow Girl',
-                isNewUser: false,
-                needsTraining: false
-            };
-            
-            localStorage.setItem('currentUser', JSON.stringify(userSession));
-            localStorage.setItem('isLoggedIn', 'true');
-            
-            console.log('✅ Login successful with default role');
-            console.log('========================================');
-            return true;
-        }
-    } catch (error) {
-        console.error('❌ Error fetching user from Google Sheets:', error);
-        console.log('⚠️ Falling back to default role');
-        
-        // Fallback - allow login with default role
-        const userSession = {
-            userId: Date.now().toString(),
-            username: username,
-            email: username.includes('@') ? username : username + '@example.com',
-            name: username,
-            role: 'Rainbow Girl',
-            isNewUser: false,
-            needsTraining: false
-        };
-        
-        localStorage.setItem('currentUser', JSON.stringify(userSession));
-        localStorage.setItem('isLoggedIn', 'true');
-        
-        console.log('========================================');
-        return true;
-    }
+    const userSession = {
+        userId: Date.now().toString(),
+        username: username,
+        email: username.includes('@') ? username : username + '@example.com',
+        name: username,
+        role: 'Rainbow Girl, Admin',  // TEMPORARY: Gives everyone admin access
+        isNewUser: false,
+        needsTraining: false
+    };
+    
+    localStorage.setItem('currentUser', JSON.stringify(userSession));
+    localStorage.setItem('isLoggedIn', 'true');
+    
+    console.log('✅ Login successful with role:', userSession.role);
+    console.log('========================================');
+    return true;
 }
 
 // Mark training as completed
