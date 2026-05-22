@@ -126,41 +126,52 @@
 
     <script src="auth.js"></script>
     <script>
+        console.log('========================================');
+        console.log('📄 login.html loaded');
+        console.log('========================================');
+        
         function showSignup() {
+            console.log('🔄 Switching to signup form');
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('signupForm').style.display = 'block';
         }
         
         function showLogin() {
+            console.log('🔄 Switching to login form');
             document.getElementById('signupForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
         }
         
         function handleLogin(event) {
             event.preventDefault();
-            console.log('Login form submitted');
+            console.log('🔐 Login form submitted');
             
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
             
+            console.log('Attempting login for:', username);
+            
             if (login(username, password)) {
-                console.log('Login successful');
+                console.log('✅ Login successful');
                 
                 if (needsTraining()) {
-                    console.log('New user - redirecting to welcome tutorial...');
+                    console.log('➡️ New user - redirecting to welcome tutorial...');
                     window.location.href = 'welcome-tutorial.html';
                 } else {
-                    console.log('Returning user - redirecting to index...');
+                    console.log('➡️ Returning user - redirecting to index...');
                     window.location.href = 'index.html';
                 }
             } else {
+                console.error('❌ Login failed');
                 alert('Invalid username or password');
             }
         }
         
         async function handleSignup(event) {
             event.preventDefault();
-            console.log('Signup form submitted');
+            console.log('========================================');
+            console.log('📝 Signup form submitted');
+            console.log('========================================');
             
             const name = document.getElementById('signupName').value;
             const email = document.getElementById('signupEmail').value;
@@ -168,43 +179,81 @@
             const password = document.getElementById('signupPassword').value;
             const confirmPassword = document.getElementById('signupConfirmPassword').value;
             
-            // Get selected roles (multiple checkboxes)
+            console.log('📋 Form data collected:');
+            console.log('  Name:', name);
+            console.log('  Email:', email);
+            console.log('  Username:', username);
+            console.log('  Password length:', password.length);
+            
+            // Get selected roles
             const roleCheckboxes = document.querySelectorAll('input[name="role"]:checked');
+            console.log('📋 Roles checked:', roleCheckboxes.length);
+            
             if (roleCheckboxes.length === 0) {
+                console.error('❌ No roles selected');
                 alert('Please select at least one role!');
                 return;
             }
-            const roles = Array.from(roleCheckboxes).map(cb => cb.value);
-            const role = roles.join(', '); // Combine multiple roles
             
+            const roles = Array.from(roleCheckboxes).map(cb => cb.value);
+            const role = roles.join(', ');
+            console.log('📋 Combined role:', role);
+            
+            // Validate passwords
             if (password !== confirmPassword) {
+                console.error('❌ Passwords do not match');
                 alert('Passwords do not match!');
                 return;
             }
             
             if (password.length < 6) {
+                console.error('❌ Password too short');
                 alert('Password must be at least 6 characters long!');
                 return;
             }
             
-            console.log('Calling signUp function...');
-            const success = await signUp(username, email, name, role, password);
+            console.log('✅ All validation passed');
             
-            if (success) {
-                console.log('Signup successful - NEW USER - redirecting to welcome tutorial...');
-                window.location.href = 'welcome-tutorial.html';
+            // Check if signUp function exists
+            if (typeof signUp !== 'function') {
+                console.error('❌❌❌ signUp function not found!');
+                console.error('auth.js is not loaded properly!');
+                alert('Error: Authentication system not loaded. Please refresh the page.');
+                return;
+            }
+            
+            console.log('✅ signUp function found, calling it now...');
+            
+            try {
+                const success = await signUp(username, email, name, role, password);
+                console.log('📥 signUp returned:', success);
+                
+                if (success) {
+                    console.log('✅✅✅ Signup successful!');
+                    console.log('➡️ Redirecting to welcome tutorial...');
+                    window.location.href = 'welcome-tutorial.html';
+                } else {
+                    console.error('❌ Signup returned false');
+                }
+            } catch (error) {
+                console.error('❌❌❌ Exception in handleSignup:');
+                console.error(error);
+                alert('An error occurred during signup. Check console for details.');
             }
         }
 
-        // If already logged in, check if they need training
+        // If already logged in, redirect
         if (isLoggedIn()) {
+            console.log('✅ User already logged in');
             if (needsTraining()) {
-                console.log('User logged in but needs training...');
+                console.log('➡️ User needs training, redirecting...');
                 window.location.href = 'welcome-tutorial.html';
             } else {
-                console.log('User already logged in, redirecting to index...');
+                console.log('➡️ Redirecting to index...');
                 window.location.href = 'index.html';
             }
+        } else {
+            console.log('ℹ️ User not logged in, showing login form');
         }
     </script>
 </body>
