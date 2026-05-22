@@ -156,10 +156,10 @@
                 
                 if (needsTraining()) {
                     console.log('➡️ New user - redirecting to welcome tutorial...');
-                    window.location.href = 'welcome-tutorial.html';
+                    window.location.replace('welcome-tutorial.html');
                 } else {
                     console.log('➡️ Returning user - redirecting to index...');
-                    window.location.href = 'index.html';
+                    window.location.replace('index.html');
                 }
             } else {
                 console.error('❌ Login failed');
@@ -231,7 +231,7 @@
                 if (success) {
                     console.log('✅✅✅ Signup successful!');
                     console.log('➡️ Redirecting to welcome tutorial...');
-                    window.location.href = 'welcome-tutorial.html';
+                    window.location.replace('welcome-tutorial.html');
                 } else {
                     console.error('❌ Signup returned false');
                 }
@@ -242,16 +242,26 @@
             }
         }
 
-        // If already logged in, redirect
-        if (isLoggedIn()) {
-            console.log('✅ User already logged in');
-            if (needsTraining()) {
-                console.log('➡️ User needs training, redirecting...');
-                window.location.href = 'welcome-tutorial.html';
-            } else {
-                console.log('➡️ Redirecting to index...');
-                window.location.href = 'index.html';
-            }
+        // Check if already logged in (with extra validation to prevent loops)
+        const loggedIn = isLoggedIn();
+        const currentUser = getCurrentUser();
+
+        console.log('Login check - isLoggedIn:', loggedIn);
+        console.log('Login check - currentUser:', currentUser);
+
+        if (loggedIn && currentUser && currentUser.username) {
+            console.log('✅ User already logged in:', currentUser.username);
+            
+            // Small delay to prevent redirect loops
+            setTimeout(() => {
+                if (needsTraining()) {
+                    console.log('➡️ New user - redirecting to welcome tutorial...');
+                    window.location.replace('welcome-tutorial.html');
+                } else {
+                    console.log('➡️ Returning user - redirecting to index...');
+                    window.location.replace('index.html');
+                }
+            }, 200);
         } else {
             console.log('ℹ️ User not logged in, showing login form');
         }
