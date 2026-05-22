@@ -112,7 +112,7 @@ async function signUp(username, email, name, role, password) {
         console.log('✅✅✅ SIGNUP COMPLETED SUCCESSFULLY ✅✅✅');
         console.log('========================================');
         
-        alert('Account created successfully! ✅\n\nWelcome! You will now go through a quick tutorial.\n\nCheck Apps Script Executions to see if your data was saved!');
+        alert('Account created successfully! ✅\n\nWelcome! You will now go through a quick tutorial.');
         return true;
     } catch (error) {
         console.error('❌❌❌ SIGNUP FAILED ❌❌❌');
@@ -161,16 +161,37 @@ function needsTraining() {
     return user && user.needsTraining === true;
 }
 
-// Logout Function
+// Logout Function - FIXED to prevent loops
 function logout() {
+    console.log('========================================');
+    console.log('🚪 LOGOUT STARTED');
+    console.log('========================================');
+    console.log('Before clear - isLoggedIn:', localStorage.getItem('isLoggedIn'));
+    console.log('Before clear - currentUser:', localStorage.getItem('currentUser'));
+    
+    // Clear all authentication data
     localStorage.removeItem('currentUser');
     localStorage.removeItem('isLoggedIn');
-    window.location.href = 'login.html';
+    
+    // Nuclear option - clear everything to be safe
+    localStorage.clear();
+    
+    console.log('After clear - isLoggedIn:', localStorage.getItem('isLoggedIn'));
+    console.log('After clear - currentUser:', localStorage.getItem('currentUser'));
+    console.log('✅ localStorage cleared completely');
+    
+    // Small delay to ensure clear completes, then redirect
+    setTimeout(() => {
+        console.log('➡️ Redirecting to login page...');
+        console.log('========================================');
+        window.location.replace('login.html'); // Use replace to prevent back button issues
+    }, 100);
 }
 
 // Check if user is logged in
 function isLoggedIn() {
-    return localStorage.getItem('isLoggedIn') === 'true';
+    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    return loggedIn;
 }
 
 // Get current user
@@ -182,7 +203,8 @@ function getCurrentUser() {
 // Require login (redirect to login page if not logged in)
 function requireLogin() {
     if (!isLoggedIn()) {
-        window.location.href = 'login.html';
+        console.log('❌ Not logged in, redirecting to login...');
+        window.location.replace('login.html');
     }
 }
 
