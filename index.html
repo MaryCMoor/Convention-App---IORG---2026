@@ -3,291 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NJ Rainbow Convention 2026 - Dashboard</title>
+    <meta name="description" content="NJ Rainbow Convention 2026 - The Greatest Show on Earth">
+    <meta name="theme-color" content="#8b0000">
+    <title>NJ Rainbow Convention 2026</title>
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .header h1 {
-            margin: 0;
-            color: #667eea;
-            font-size: 2em;
-        }
-
-        .header .subtitle {
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .user-info {
+        .notification-badge {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .user-info span {
-            margin-right: 15px;
-            font-weight: 600;
-            color: #667eea;
-        }
-
-        .logout-btn {
-            background: #764ba2;
+            top: 10px;
+            right: 10px;
+            background: #dc143c;
             color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .logout-btn:hover {
-            background: #667eea;
-            transform: scale(1.05);
-        }
-
-        .dashboard {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 20px;
-        }
-
-        .tiles-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .tile {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        .tile:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-
-        .tile-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
-        }
-
-        .tile h3 {
-            margin: 0 0 10px 0;
-            color: #667eea;
-            font-size: 1.5em;
-        }
-
-        .tile p {
-            color: #666;
-            margin: 0;
-        }
-
-        .tile.admin {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .tile.admin h3 {
-            color: white;
-        }
-
-        .tile.admin p {
-            color: rgba(255,255,255,0.9);
-        }
-
-        .welcome-message {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-
-        .welcome-message h2 {
-            color: #667eea;
-            margin: 0 0 10px 0;
-        }
-
-        .welcome-message p {
-            color: #666;
-            margin: 0;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 2px solid var(--primary-gold);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🌈 NJ Rainbow Convention 2026</h1>
-        <p class="subtitle">Grand Cross of Color Assembly</p>
-    </div>
-
-    <div class="user-info">
-        <span id="userName">Loading...</span>
-        <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
-
-    <div class="dashboard">
-        <div class="welcome-message">
-            <h2>Welcome to Your Dashboard!</h2>
-            <p id="roleDisplay">Your role: Loading...</p>
-        </div>
-
-        <div class="tiles-container">
-            <!-- Schedule Tile -->
-            <a href="schedule.html" class="tile">
-                <div class="tile-icon">📅</div>
-                <h3>Schedule</h3>
-                <p>View the full convention schedule and plan your day</p>
-            </a>
-
-            <!-- Map Tile -->
-            <a href="map.html" class="tile">
-                <div class="tile-icon">🗺️</div>
-                <h3>Interactive Map</h3>
-                <p>Find your way around the convention center</p>
-            </a>
-
-            <!-- Announcements Tile -->
-            <a href="announcements.html" class="tile">
-                <div class="tile-icon">📢</div>
-                <h3>Announcements</h3>
-                <p>Stay updated with the latest news and changes</p>
-            </a>
-
-            <!-- Voting Tile -->
-            <a href="voting.html" class="tile">
-                <div class="tile-icon">🗳️</div>
-                <h3>Voting</h3>
-                <p>Cast your votes on important matters</p>
-            </a>
-
-            <!-- Directory Tile -->
-            <a href="directory.html" class="tile">
-                <div class="tile-icon">👥</div>
-                <h3>Assembly Directory</h3>
-                <p>Find contact information for assemblies and members</p>
-            </a>
-
-            <!-- Resources Tile -->
-            <a href="resources.html" class="tile">
-                <div class="tile-icon">📚</div>
-                <h3>Resources</h3>
-                <p>Access documents, forms, and helpful materials</p>
-            </a>
-
-            <!-- Messages Tile -->
-            <a href="messages.html" class="tile">
-                <div class="tile-icon">💬</div>
-                <h3>Messages</h3>
-                <p>Send and receive messages with other attendees</p>
-            </a>
-
-            <!-- My Profile Tile -->
-            <a href="profile.html" class="tile">
-                <div class="tile-icon">👤</div>
-                <h3>My Profile</h3>
-                <p>View and edit your profile information</p>
-            </a>
-
-            <!-- Events Tile -->
-            <a href="events.html" class="tile">
-                <div class="tile-icon">🎉</div>
-                <h3>Special Events</h3>
-                <p>RSVP and get details about special activities</p>
-            </a>
-
-            <!-- Help Tile -->
-            <a href="help.html" class="tile">
-                <div class="tile-icon">❓</div>
-                <h3>Help & Support</h3>
-                <p>Get assistance and find answers to your questions</p>
-            </a>
-
-            <!-- Admin Tile (only visible to admins) -->
-            <a href="admin.html" class="tile admin" id="adminTile" style="display: none;">
-                <div class="tile-icon">⚙️</div>
-                <h3>Admin Panel</h3>
-                <p>Manage users, content, and app settings</p>
-            </a>
-        </div>
-    </div>
-
-    <script src="auth.js"></script>
+    <!-- Check if user is logged in -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('========================================');
-            console.log('🏠 INDEX.HTML LOADED');
-            console.log('========================================');
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <!-- HEADER -->
+    <header class="app-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
+            <div>
+                <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+                <div class="subtitle">✦ The Greatest Show on Earth ✦</div>
+            </div>
+            <button id="logoutBtn" class="back-btn" style="background: rgba(255,255,255,0.2); color: white;">
+                🚪 Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="content">
+        <div class="welcome-banner">
+            <h2>Welcome, <span id="userName">User</span>! 🎭</h2>
+            <p>Step right up and explore everything Convention 2026 has to offer!</p>
+        </div>
+        
+        <div class="tile-grid">
+            <a href="my-schedule.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">⭐</div>
+                <div class="tile-title">My Schedule</div>
+                <div class="tile-desc">Your favorite events</div>
+            </a>
+
+            <a href="schedule.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">📅</div>
+                <div class="tile-title">Schedule</div>
+                <div class="tile-desc">All convention events</div>
+            </a>
+
+            <a href="meet-nj.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">🌈</div>
+                <div class="tile-title">Meet NJ Rainbow</div>
+                <div class="tile-desc">Our amazing members</div>
+            </a>
+
+            <a href="speakers.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">🎤</div>
+                <div class="tile-title">Speakers</div>
+                <div class="tile-desc">Featured speakers</div>
+            </a>
+
+            <a href="notifications.html" class="tile" style="text-decoration: none; position: relative;" id="notificationsTile">
+                <div class="tile-icon">🔔</div>
+                <div class="tile-title">Notifications</div>
+                <div class="tile-desc">Latest updates</div>
+                <div id="notificationBadge" class="notification-badge" style="display: none;">0</div>
+            </a>
+
+            <a href="checklist.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">✓</div>
+                <div class="tile-title">Checklist</div>
+                <div class="tile-desc">Packing & documents</div>
+            </a>
+
+            <a href="profile.html" class="tile" style="text-decoration: none; position: relative;" id="profileTile">
+                <div class="tile-icon">👤</div>
+                <div class="tile-title">My Profile</div>
+                <div class="tile-desc">Your information</div>
+                <div id="profileAlertBadge" class="notification-badge" style="display: none;">!</div>
+            </a>
+
+            <a href="messages.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">💬</div>
+                <div class="tile-title">Messages</div>
+                <div class="tile-desc">Chat with others</div>
+            </a>
+
+            <a href="notes.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">📝</div>
+                <div class="tile-title">My Notes</div>
+                <div class="tile-desc">Personal notes</div>
+            </a>
+
+            <a href="gallery.html" class="tile" style="text-decoration: none; position: relative;">
+                <div class="tile-icon">📸</div>
+                <div class="tile-title">Gallery</div>
+                <div class="tile-desc">Event photos</div>
+            </a>
+
+            <a href="admin.html" class="tile" style="text-decoration: none; position: relative;" id="adminTile">
+                <div class="tile-icon">⚙️</div>
+                <div class="tile-title">Admin</div>
+                <div class="tile-desc">Admin tools</div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        console.log('========================================');
+        console.log('🏠 INDEX.HTML LOADED');
+        console.log('========================================');
+        
+        // Display user info and check permissions
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        console.log('👤 Current user:', user);
+        console.log('📋 User role string:', user.role);
+        
+        // FIXED: Check if role contains "Admin" (handles comma-separated roles)
+        const userRoles = (user.role || '').split(',').map(r => r.trim().toLowerCase());
+        console.log('📋 Parsed user roles array:', userRoles);
+        
+        const isAdmin = userRoles.includes('admin');
+        console.log('🔍 Is user admin?', isAdmin);
+        
+        // Display username
+        document.getElementById('userName').textContent = user.name || user.username || 'User';
+        
+        // Hide admin tile if not admin
+        if (!isAdmin) {
+            console.log('❌ Hiding admin tile - user is not admin');
+            document.getElementById('adminTile').style.display = 'none';
+        } else {
+            console.log('✅ Showing admin tile - user is admin');
+            document.getElementById('adminTile').style.display = 'block';
+        }
+
+        // Check for unread notifications
+        function checkNotifications() {
+            const lastRead = parseInt(localStorage.getItem(`notifications_last_read_${user.userId}`) || '0');
+            const notifications = JSON.parse(localStorage.getItem('custom_notifications') || '[]');
+            const unreadCount = notifications.filter(n => n.id > lastRead).length;
             
-            // Check if user is logged in
-            if (!isLoggedIn()) {
-                console.log('❌ User not logged in, redirecting...');
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // Get current user
-            const currentUser = getCurrentUser();
-            console.log('👤 Current user:', currentUser);
-            
-            if (!currentUser) {
-                console.log('❌ No user data found, redirecting to login...');
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // Display user name
-            document.getElementById('userName').textContent = currentUser.name || currentUser.username;
-            
-            // Display role
-            document.getElementById('roleDisplay').textContent = `Your role: ${currentUser.role}`;
-            console.log('📋 User role string:', currentUser.role);
-
-            // Check if user has admin role
-            const userRoles = currentUser.role.split(',').map(r => r.trim().toLowerCase());
-            console.log('📋 Parsed user roles array:', userRoles);
-            console.log('🔍 Checking for admin role...');
-            console.log('🔍 Does array include "admin"?', userRoles.includes('admin'));
-
-            if (userRoles.includes('admin')) {
-                console.log('✅ User is an admin! Showing admin tile...');
-                document.getElementById('adminTile').style.display = 'block';
+            const badge = document.getElementById('notificationBadge');
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount;
+                badge.style.display = 'flex';
             } else {
-                console.log('❌ User is NOT an admin. Admin tile will remain hidden.');
-                console.log('💡 User roles detected:', userRoles);
+                badge.style.display = 'none';
             }
+        }
 
-            console.log('========================================');
+        // Check for emergency contact
+        function checkEmergencyContact() {
+            const profile = JSON.parse(localStorage.getItem(`profile_${user.userId}`) || '{}');
+            const hasEmergencyContact = profile.emergencyName && profile.emergencyPhone;
+            
+            const badge = document.getElementById('profileAlertBadge');
+            if (!hasEmergencyContact) {
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
         });
+
+        // Run checks
+        checkNotifications();
+        checkEmergencyContact();
+
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(reg => console.log('Service Worker registered', reg))
+                .catch(err => console.log('Service Worker registration failed', err));
+        }
+        
+        console.log('========================================');
     </script>
 </body>
 </html>
