@@ -1,5 +1,5 @@
 // ========================================
-// AUTHENTICATION & GOOGLE SHEETS INTEGRATION - WITH TRAINING FLOW
+// AUTHENTICATION & GOOGLE SHEETS INTEGRATION
 // ========================================
 
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjIdyY8BPVOvhwGUfGKdcWIoaLOm-m__PDPq5mkOlXSlbTAdj292k-DzCRYjvoPYU/exec';
@@ -18,6 +18,7 @@ async function saveToGoogleSheets(userData) {
                 iframe.name = 'googleSheetsIframe';
                 iframe.style.display = 'none';
                 document.body.appendChild(iframe);
+                console.log('✅ Created hidden iframe');
             }
             
             const form = document.createElement('form');
@@ -42,13 +43,16 @@ async function saveToGoogleSheets(userData) {
             
             document.body.appendChild(form);
             console.log('📤 Submitting form to Google Sheets...');
+            console.log('📤 Form action:', form.action);
+            console.log('📤 Form fields:', Object.keys(userData));
             form.submit();
             
             setTimeout(() => {
                 document.body.removeChild(form);
                 console.log('✅ Form submitted successfully');
+                console.log('⏳ Waiting for Google Sheets to process...');
                 resolve(true);
-            }, 1000);
+            }, 1500);
             
         } catch (error) {
             console.error('❌ Error submitting form:', error);
@@ -59,9 +63,16 @@ async function saveToGoogleSheets(userData) {
 
 // Sign Up Function - NEW USERS GO TO TRAINING
 async function signUp(username, email, name, role, password) {
-    console.log('📝 Starting signup process...');
+    console.log('========================================');
+    console.log('📝 SIGNUP FUNCTION STARTED');
+    console.log('========================================');
+    console.log('Username:', username);
+    console.log('Email:', email);
+    console.log('Name:', name);
+    console.log('Role:', role);
     
     if (!username || !email || !name || !role || !password) {
+        console.error('❌ Validation failed: Missing fields');
         alert('Please fill in all fields!');
         return false;
     }
@@ -79,9 +90,10 @@ async function signUp(username, email, name, role, password) {
     console.log('👤 User data prepared:', userData);
     
     try {
+        console.log('🚀 Calling saveToGoogleSheets...');
         await saveToGoogleSheets(userData);
         
-        console.log('✅ Signup process completed!');
+        console.log('✅ saveToGoogleSheets completed!');
         
         const userSession = {
             userId: userData.userId,
@@ -95,11 +107,18 @@ async function signUp(username, email, name, role, password) {
         localStorage.setItem('currentUser', JSON.stringify(userSession));
         localStorage.setItem('isLoggedIn', 'true');
         
-        alert('Account created successfully! ✅\n\nWelcome! You will now go through a quick tutorial.');
+        console.log('✅ User session saved to localStorage');
+        console.log('========================================');
+        console.log('✅✅✅ SIGNUP COMPLETED SUCCESSFULLY ✅✅✅');
+        console.log('========================================');
+        
+        alert('Account created successfully! ✅\n\nWelcome! You will now go through a quick tutorial.\n\nCheck Apps Script Executions to see if your data was saved!');
         return true;
     } catch (error) {
-        console.error('❌ Signup failed:', error);
-        alert('Signup failed. Please try again.');
+        console.error('❌❌❌ SIGNUP FAILED ❌❌❌');
+        console.error('Error:', error);
+        console.log('========================================');
+        alert('Signup failed. Please try again.\n\nError: ' + error.message);
         return false;
     }
 }
@@ -166,3 +185,6 @@ function requireLogin() {
         window.location.href = 'login.html';
     }
 }
+
+console.log('✅ auth.js loaded successfully');
+console.log('📍 SCRIPT_URL:', SCRIPT_URL);
