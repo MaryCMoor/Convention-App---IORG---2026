@@ -197,27 +197,103 @@
     <script>
         const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
         const userId = user.userId;
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjIdyY8BPVOvhwGUfGKdcWIoaLOm-m__PDPq5mkOlXSlbTAdj292k-DzCRYjvoPYU/exec';
+        
+        // Published CSV URL for Events sheet with correct gid
+        const EVENTS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTcWlhv_bK1thPxqX8ZaWaswTyaam1poIRptaJe-18E7IQbK39_ffnKvTUPtfeB8CiL5avfPgCoflCl/pub?gid=98461157&single=true&output=csv';
 
         let allEvents = [];
         let currentFilter = 'All';
 
-        // Load events from Google Sheets + localStorage fallback
+        // Parse CSV helper
+        function parseCSV(text) {
+            const rows = [];
+            let currentRow = [];
+            let currentField = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const nextChar = text[i + 1];
+                
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        currentField += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    currentRow.push(currentField.trim());
+                    currentField = '';
+                } else if ((char === '\n' || char === '\r') && !inQuotes) {
+                    if (currentField || currentRow.length > 0) {
+                        currentRow.push(currentField.trim());
+                        rows.push(currentRow);
+                        currentRow = [];
+                        currentField = '';
+                    }
+                    if (char === '\r' && nextChar === '\n') {
+                        i++;
+                    }
+                } else {
+                    currentField += char;
+                }
+            }
+            
+            if (currentField || currentRow.length > 0) {
+                currentRow.push(currentField.trim());
+                rows.push(currentRow);
+            }
+            
+            return rows;
+        }
+
+        // Load events from published Google Sheets CSV
         async function loadEvents() {
             try {
-                console.log('📥 Loading events from Google Sheets...');
+                console.log('📥 Loading events from Google Sheets CSV...');
                 
-                // Try to fetch from Google Sheets via Apps Script
-                const response = await fetch(`${SCRIPT_URL}?action=getEvents`);
-                const data = await response.json();
+                const response = await fetch(EVENTS_CSV_URL);
+                const csvText = await response.text();
                 
-                if (data.success && data.events) {
-                    console.log('✅ Loaded ' + data.events.length + ' events from Google Sheets');
-                    allEvents = data.events;
-                } else {
-                    console.log('⚠️ No events from Sheets, using localStorage');
+                console.log('📄 CSV received, parsing...');
+                
+                const rows = parseCSV(csvText);
+                
+                if (rows.length === 0) {
+                    console.log('⚠️ No rows found in CSV');
                     allEvents = JSON.parse(localStorage.getItem('events') || '[]');
+                    renderSchedule();
+                    return;
                 }
+                
+                console.log('📊 Found ' + rows.length + ' rows');
+                console.log('Headers:', rows[0]);
+                
+                const headers = rows[0].map(h => h.toLowerCase().trim());
+                allEvents = [];
+                
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    
+                    // Skip empty rows
+                    if (!row || row.length === 0 || !row.join('').trim()) continue;
+                    
+                    const event = {};
+                    
+                    headers.forEach((header, index) => {
+                        event[header] = row[index] || '';
+                    });
+                    
+                    // Only add if has title and day
+                    if (event.title && event.day) {
+                        // Use eventid or eventId or id
+                        event.id = event.eventid || event.eventId || event.id || Date.now() + i;
+                        allEvents.push(event);
+                    }
+                }
+                
+                console.log('✅ Loaded ' + allEvents.length + ' events from Google Sheets');
                 
             } catch (error) {
                 console.error('❌ Error loading from Google Sheets:', error);
@@ -237,7 +313,7 @@
         function toggleFavorite(eventId) {
             let favorites = getFavorites();
             
-            const index = favorites.findIndex(id => id === eventId || id == eventId);
+            const index = favorites.findIndex(id => id === eventId || id == eventId || String(id) === String(eventId));
             if (index > -1) {
                 favorites.splice(index, 1);
             } else {
@@ -317,8 +393,8 @@
                     `;
                     
                     byDay[day].forEach(event => {
-                        const eventId = event.id || event.eventId;
-                        const isFavorited = favorites.includes(eventId) || favorites.includes(String(eventId));
+                        const eventId = event.id || event.eventid || event.eventId;
+                        const isFavorited = favorites.some(fav => String(fav) === String(eventId));
                         
                         html += `
                             <div class="timeline-item">
@@ -329,7 +405,7 @@
                                     </button>
                                     
                                     <div class="event-time">
-                                        ⏰ ${escapeHtml(event.time)}${event.timeEnd ? ' - ' + escapeHtml(event.timeEnd) : ''}
+                                        ⏰ ${escapeHtml(event.time)}${event.timeend || event.timeEnd ? ' - ' + escapeHtml(event.timeend || event.timeEnd) : ''}
                                     </div>
                                     
                                     <div class="event-title">${escapeHtml(event.title)}</div>
