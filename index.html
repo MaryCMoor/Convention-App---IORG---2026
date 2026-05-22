@@ -149,18 +149,21 @@
             // Display username
             document.getElementById('userName').textContent = currentUser.name || currentUser.username || 'User';
             
-            // Check if user is admin
-            const userRole = (currentUser.role || '').toLowerCase();
-            const isAdmin = userRole.includes('admin');
+            // Check if user is admin - PROPER ARRAY CHECK
+            const userRoles = (currentUser.role || '')
+                .split(',')                          // Split by comma
+                .map(r => r.trim().toLowerCase());   // Trim whitespace and lowercase each role
+
+            const isAdmin = userRoles.includes('admin');
             
             console.log('========================================');
             console.log('🔐 Admin Check:');
-            console.log('User role:', currentUser.role);
-            console.log('Lowercase role:', userRole);
+            console.log('User role string:', currentUser.role);
+            console.log('User roles array:', userRoles);
             console.log('Contains admin?', isAdmin);
             console.log('========================================');
             
-            // Show/Hide admin tile - FORCED
+            // Show/Hide admin tile
             const adminTile = document.getElementById('adminTile');
             
             if (!adminTile) {
