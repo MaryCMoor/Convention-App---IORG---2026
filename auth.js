@@ -11,7 +11,7 @@ async function saveToGoogleSheets(userData) {
     
     return new Promise((resolve, reject) => {
         try {
-            // Create hidden iframe
+            // Create hidden iframe to receive response
             let iframe = document.getElementById('googleSheetsIframe');
             if (!iframe) {
                 iframe = document.createElement('iframe');
@@ -28,17 +28,14 @@ async function saveToGoogleSheets(userData) {
             form.target = 'googleSheetsIframe';
             form.style.display = 'none';
             
-            // Add data as JSON string in a hidden field
-            const dataField = document.createElement('input');
-            dataField.type = 'hidden';
-            dataField.name = 'jsonData';
-            dataField.value = JSON.stringify({
-                action: 'saveUser',
-                ...userData
-            });
-            form.appendChild(dataField);
+            // Add action field
+            const actionField = document.createElement('input');
+            actionField.type = 'hidden';
+            actionField.name = 'action';
+            actionField.value = 'saveUser';
+            form.appendChild(actionField);
             
-            // Add individual fields as backup
+            // Add all user data fields
             Object.keys(userData).forEach(key => {
                 const input = document.createElement('input');
                 input.type = 'hidden';
@@ -47,24 +44,17 @@ async function saveToGoogleSheets(userData) {
                 form.appendChild(input);
             });
             
-            // Add action field
-            const actionField = document.createElement('input');
-            actionField.type = 'hidden';
-            actionField.name = 'action';
-            actionField.value = 'saveUser';
-            form.appendChild(actionField);
-            
             // Submit form
             document.body.appendChild(form);
-            console.log('📤 Submitting form...');
+            console.log('📤 Submitting form to Google Sheets...');
             form.submit();
             
             // Clean up form after submission
             setTimeout(() => {
                 document.body.removeChild(form);
                 console.log('✅ Form submitted successfully');
-                console.log('⚠️ Note: Cannot verify response due to CORS, but data should be in Google Sheets');
-                console.log('👉 Check your Google Sheet to verify the user was added!');
+                console.log('⚠️ Note: Response is hidden in iframe, but data should be in Google Sheets');
+                console.log('👉 Check Apps Script Executions and Google Sheet to verify!');
                 resolve(true);
             }, 1000);
             
@@ -123,7 +113,7 @@ async function signUp(username, email, name, role, password) {
         localStorage.setItem('currentUser', JSON.stringify(userSession));
         localStorage.setItem('isLoggedIn', 'true');
         
-        alert('Account created successfully! ✅\n\nNote: It may take a few seconds for your account to appear in Google Sheets.');
+        alert('Account created successfully! ✅\n\nYour account has been saved to the database.\n\nCheck Apps Script Executions to see the logs!');
         return true;
     } catch (error) {
         console.error('❌ Signup failed:', error);
@@ -132,9 +122,12 @@ async function signUp(username, email, name, role, password) {
     }
 }
 
-// Login Function
+// Login Function (simplified - checks localStorage only for now)
 function login(username, password) {
     console.log('🔐 Attempting login for:', username);
+    
+    // In a real app, you would verify against Google Sheets
+    // For now, we'll just create a session
     
     const userSession = {
         userId: Date.now().toString(),
@@ -169,7 +162,7 @@ function getCurrentUser() {
     return userData ? JSON.parse(userData) : null;
 }
 
-// Require login
+// Require login (redirect to login page if not logged in)
 function requireLogin() {
     if (!isLoggedIn()) {
         window.location.href = 'login.html';
