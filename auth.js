@@ -113,7 +113,7 @@ async function signUp(username, email, name, role, password) {
         localStorage.setItem('currentUser', JSON.stringify(userSession));
         localStorage.setItem('isLoggedIn', 'true');
         
-        alert('Account created successfully! ✅\n\nYour account has been saved to the database.\n\nCheck Apps Script Executions to see the logs!');
+        alert('Account created successfully! ✅\n\nYour account has been saved to the database.');
         return true;
     } catch (error) {
         console.error('❌ Signup failed:', error);
