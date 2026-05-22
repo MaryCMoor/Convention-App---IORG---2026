@@ -128,32 +128,48 @@
         console.log('📄 index.html loaded');
         console.log('========================================');
         
-        // Protect this page - require login (UPDATED)
+        // Protect this page - require login
         const loggedIn = isLoggedIn();
         const currentUser = getCurrentUser();
-
+    
         console.log('Index.html - isLoggedIn:', loggedIn);
         console.log('Index.html - currentUser:', currentUser);
-
+    
         if (!loggedIn || !currentUser || !currentUser.username) {
             console.log('❌ Not logged in, redirecting to login...');
             window.location.replace('login.html');
         } else {
             console.log('✅ User is logged in:', currentUser.username);
+            console.log('✅ User role:', currentUser.role);
         }
-
-        // Display user info and check permissions
-        const user = currentUser || {};
-        const isAdmin = user.role && user.role.includes('Admin');
+    
+        // Use currentUser directly (not creating a new 'user' variable)
+        const user = currentUser;
+        
+        // Check if user is admin - MORE FLEXIBLE CHECK
+        const userRole = (user.role || '').toLowerCase();
+        const isAdmin = userRole.includes('admin');
+        
+        console.log('========================================');
+        console.log('🔐 Admin Check:');
+        console.log('User role:', user.role);
+        console.log('Lowercase role:', userRole);
+        console.log('Is admin?', isAdmin);
+        console.log('========================================');
         
         // Display username
         document.getElementById('userName').textContent = user.name || user.username || 'User';
         
-        // Hide admin tile if not admin
-        if (!isAdmin) {
-            document.getElementById('adminTile').style.display = 'none';
+        // Show/Hide admin tile
+        const adminTile = document.getElementById('adminTile');
+        if (isAdmin) {
+            console.log('✅ Showing admin tile');
+            adminTile.style.display = '';
+        } else {
+            console.log('❌ Hiding admin tile');
+            adminTile.style.display = 'none';
         }
-
+    
         // Check for unread notifications
         function checkNotifications() {
             const lastRead = parseInt(localStorage.getItem(`notifications_last_read_${user.userId}`) || '0');
@@ -168,7 +184,7 @@
                 badge.style.display = 'none';
             }
         }
-
+    
         // Check for emergency contact
         function checkEmergencyContact() {
             const profile = JSON.parse(localStorage.getItem(`profile_${user.userId}`) || '{}');
@@ -181,26 +197,27 @@
                 badge.style.display = 'none';
             }
         }
-
-        // Logout (UPDATED to use auth.js function)
+    
+        // Logout (uses auth.js function)
         document.getElementById('logoutBtn').addEventListener('click', () => {
             if (confirm('Are you sure you want to logout?')) {
                 logout(); // Uses the logout() function from auth.js
             }
         });
-
+    
         // Run checks
         checkNotifications();
         checkEmergencyContact();
-
+    
         // Register service worker for PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js')
                 .then(reg => console.log('Service Worker registered', reg))
                 .catch(err => console.log('Service Worker registration failed', err));
         }
-
+    
         console.log('✅ Index.html fully loaded and ready');
     </script>
+
 </body>
 </html>
