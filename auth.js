@@ -2,7 +2,7 @@
 // AUTHENTICATION SCRIPT WITH GOOGLE SHEETS - FIXED VERSION
 // ========================================
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjIdyY8BPVOvhwGUfGKdcWIoaLOm-m__PDPq5mkOlXSlbTAdj292k-DzCRYjvoPYU/exec';
+const SCRIPT_URL = 'https://script.google.com/a/moor.cc/macros/s/AKfycbwjIdyY8BPVOvhwGUfGKdcWIoaLOm-m__PDPq5mkOlXSlbTAdj292k-DzCRYjvoPYU/exec';
 
 // Escape HTML to prevent XSS
 function escapeHtml(text) {
