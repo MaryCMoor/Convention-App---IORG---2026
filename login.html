@@ -78,8 +78,16 @@
             const password = document.getElementById('loginPassword').value;
             
             if (login(username, password)) {
-                console.log('Login successful, redirecting to index.html...');
-                window.location.href = 'index.html';
+                console.log('Login successful');
+                
+                // Check if user needs training
+                if (needsTraining()) {
+                    console.log('New user - redirecting to welcome tutorial...');
+                    window.location.href = 'welcome-tutorial.html';
+                } else {
+                    console.log('Returning user - redirecting to index...');
+                    window.location.href = 'index.html';
+                }
             } else {
                 alert('Invalid username or password');
             }
@@ -110,14 +118,20 @@
             const success = await signUp(username, email, name, role, password);
             
             if (success) {
-                console.log('Signup successful, redirecting to index.html...');
-                window.location.href = 'index.html';
+                console.log('Signup successful - NEW USER - redirecting to welcome tutorial...');
+                window.location.href = 'welcome-tutorial.html';
             }
         }
 
+        // If already logged in, check if they need training
         if (isLoggedIn()) {
-            console.log('Already logged in, redirecting to index.html...');
-            window.location.href = 'index.html';
+            if (needsTraining()) {
+                console.log('User logged in but needs training...');
+                window.location.href = 'welcome-tutorial.html';
+            } else {
+                console.log('User already logged in, redirecting to index...');
+                window.location.href = 'index.html';
+            }
         }
     </script>
 </body>
