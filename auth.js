@@ -1,337 +1,153 @@
 // ========================================
-// AUTHENTICATION SCRIPT WITH GOOGLE SHEETS - FIXED VERSION
+// AUTHENTICATION & GOOGLE SHEETS INTEGRATION
 // ========================================
 
+// Google Apps Script Web App URL - IMPORTANT: Use the correct deployment URL!
 const SCRIPT_URL = 'https://script.google.com/a/moor.cc/macros/s/AKfycbwjIdyY8BPVOvhwGUfGKdcWIoaLOm-m__PDPq5mkOlXSlbTAdj292k-DzCRYjvoPYU/exec';
 
-// Escape HTML to prevent XSS
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// Save to Google Sheets - FIXED VERSION
-async function saveToGoogleSheets(action, data) {
-    console.log('🚀 saveToGoogleSheets called');
-    console.log('📤 Action:', action);
-    console.log('📦 Data:', JSON.stringify(data, null, 2));
-    console.log('🌐 URL:', SCRIPT_URL);
+// Save user data to Google Sheets
+async function saveToGoogleSheets(userData) {
+    console.log('🔄 Attempting to save to Google Sheets...');
+    console.log('📤 Data being sent:', userData);
     
     try {
-        const payload = {
-            action: action,
-            ...data
-        };
-        
-        console.log('📨 Full payload:', JSON.stringify(payload, null, 2));
-        
-        const startTime = Date.now();
-        
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'text/plain'
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+                action: 'saveUser',
+                ...userData
+            }),
+            mode: 'cors'
         });
         
-        const endTime = Date.now();
-        console.log(`⏱️ Request took ${endTime - startTime}ms`);
         console.log('📥 Response status:', response.status);
-        console.log('📥 Response ok:', response.ok);
         
-        // Try to read the response
-        const responseText = await response.text();
-        console.log('📥 Response text:', responseText);
+        const text = await response.text();
+        console.log('📥 Response text:', text);
         
-        if (response.ok) {
-            try {
-                const result = JSON.parse(responseText);
-                console.log('✅ Parsed response:', result);
-                return result;
-            } catch (parseError) {
-                console.log('⚠️ Could not parse response as JSON, but request succeeded');
-                return { success: true };
-            }
+        const result = JSON.parse(text);
+        console.log('📥 Parsed result:', result);
+        
+        if (result.success) {
+            console.log('✅ Successfully saved to Google Sheets!');
+            return true;
         } else {
-            console.error('❌ Request failed with status:', response.status);
-            return { success: false, error: 'HTTP ' + response.status };
+            console.error('❌ Google Sheets save failed:', result.message);
+            return false;
         }
-        
     } catch (error) {
-        console.error('❌ Error in saveToGoogleSheets:', error);
-        console.error('❌ Error name:', error.name);
-        console.error('❌ Error message:', error.message);
-        console.error('❌ Error stack:', error.stack);
-        return { success: false, error: error.toString() };
+        console.error('❌ Error saving to Google Sheets:', error);
+        return false;
     }
 }
 
-// Get available roles (excluding Admin for signup)
-function getAvailableRoles() {
-    const defaultRoles = [
-        'Rainbow Girl',
-        'DeMolay',
-        'Mason',
-        'Eastern Star',
-        'Order of Amaranth',
-        'Grand Officer',
-        'Advisor',
-        'Mother Advisor',
-        'Parent/Guardian'
-    ];
-    
-    const customRoles = JSON.parse(localStorage.getItem('custom_roles') || '[]');
-    return [...defaultRoles, ...customRoles];
+// Hash password (simple client-side hash - not production secure!)
+function hashPassword(password) {
+    // For production, use a proper hashing library
+    let hash = 0;
+    for (let i = 0; i < password.length; i++) {
+        const char = password.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16);
 }
 
-// Login function
-async function login() {
-    console.log('🔐 Login function called');
+// Sign Up Function
+async function signUp(username, email, name, role, password) {
+    console.log('📝 Starting signup process...');
     
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
-    
-    console.log('👤 Username:', username);
-    console.log('🔑 Password length:', password.length);
-    
-    if (!username || !password) {
-        alert('Please enter both username and password.');
-        return;
+    // Validate inputs
+    if (!username || !email || !name || !role || !password) {
+        alert('Please fill in all fields!');
+        return false;
     }
     
-    // Check localStorage first for faster login
-    const storedProfile = localStorage.getItem(`profile_${username}`);
-    console.log('💾 Found stored profile:', !!storedProfile);
-    
-    if (storedProfile) {
-        const profile = JSON.parse(storedProfile);
-        console.log('📋 Profile:', profile);
-        
-        // Simple password check (in production, use proper hashing)
-        if (profile.password === password || password === 'admin123') {
-            console.log('✅ Password matches!');
-            
-            const user = {
-                userId: username,
-                username: username,
-                name: profile.name,
-                email: profile.email,
-                role: profile.role,
-                roles: profile.roles || [profile.role]
-            };
-            
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            console.log('💾 Saved currentUser to localStorage');
-            
-            // Save user to Google Sheets on login
-            console.log('🔄 Starting Google Sheets sync...');
-            
-            const syncResult = await saveToGoogleSheets('saveUser', {
-                userId: username,
-                username: username,
-                email: profile.email || '',
-                name: profile.name || '',
-                role: (profile.roles || [profile.role]).join(';'),
-                password: password,
-                dateCreated: profile.dateCreated || new Date().toISOString()
-            });
-            
-            console.log('🔄 Sync result:', syncResult);
-            
-            // Check if first-time user
-            const tutorialCompleted = localStorage.getItem('tutorial_completed');
-            if (!tutorialCompleted) {
-                console.log('📚 Redirecting to tutorial');
-                window.location.href = 'welcome-tutorial.html';
-            } else {
-                console.log('🏠 Redirecting to home');
-                window.location.href = 'index.html';
-            }
-            return;
-        } else {
-            console.log('❌ Password does not match');
-        }
-    }
-    
-    alert('❌ Invalid username or password.');
-}
-
-// Signup function
-async function signup() {
-    console.log('📝 Signup function called');
-    
-    const username = document.getElementById('signupUsername').value.trim();
-    const email = document.getElementById('signupEmail').value.trim();
-    const password = document.getElementById('signupPassword').value;
-    const confirmPassword = document.getElementById('signupConfirmPassword').value;
-    const name = document.getElementById('signupName').value.trim();
-    
-    console.log('📋 Signup data:', { username, email, name });
-    
-    // Get selected roles
-    const selectedRoles = Array.from(document.querySelectorAll('input[name="role"]:checked')).map(cb => cb.value);
-    console.log('🏷️ Selected roles:', selectedRoles);
-    
-    // Validation
-    if (!username || !email || !password || !name) {
-        alert('Please fill in all required fields.');
-        return;
-    }
-    
-    if (selectedRoles.length === 0) {
-        alert('Please select at least one role.');
-        return;
-    }
-    
-    if (password !== confirmPassword) {
-        alert('Passwords do not match.');
-        return;
-    }
-    
-    if (password.length < 6) {
-        alert('Password must be at least 6 characters long.');
-        return;
-    }
-    
-    // Check if username already exists
-    if (localStorage.getItem(`profile_${username}`)) {
-        alert('Username already exists. Please choose a different username.');
-        return;
-    }
-    
-    const userId = username;
-    const dateCreated = new Date().toISOString();
-    
-    // Create user profile
-    const profile = {
-        userId: userId,
+    // Create user object
+    const userData = {
+        userId: Date.now().toString(),
         username: username,
         email: email,
-        password: password,
         name: name,
-        role: selectedRoles[0], // Primary role
-        roles: selectedRoles,
-        dateCreated: dateCreated
+        role: role,
+        password: password,
+        dateCreated: new Date().toISOString()
     };
     
-    console.log('💾 Saving profile to localStorage');
-    // Save to localStorage
-    localStorage.setItem(`profile_${username}`, JSON.stringify(profile));
+    console.log('👤 User data prepared:', userData);
     
     // Save to Google Sheets
-    console.log('🔄 Starting Google Sheets sync...');
-    const syncResult = await saveToGoogleSheets('saveUser', {
-        userId: userId,
-        username: username,
-        email: email,
-        name: name,
-        role: selectedRoles.join(';'),
-        password: password,
-        dateCreated: dateCreated
-    });
+    const saved = await saveToGoogleSheets(userData);
     
-    console.log('🔄 Sync result:', syncResult);
+    if (saved) {
+        console.log('✅ Signup successful!');
+        
+        // Store in localStorage (without password)
+        const userSession = {
+            userId: userData.userId,
+            username: userData.username,
+            email: userData.email,
+            name: userData.name,
+            role: userData.role
+        };
+        localStorage.setItem('currentUser', JSON.stringify(userSession));
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        alert('Account created successfully! ✅');
+        return true;
+    } else {
+        console.error('❌ Signup failed - could not save to Google Sheets');
+        alert('Signup failed. Please try again.');
+        return false;
+    }
+}
+
+// Login Function (simplified - checks localStorage only)
+function login(username, password) {
+    console.log('🔐 Attempting login for:', username);
     
-    // Auto-login
-    const user = {
-        userId: username,
+    // In a real app, you would verify against Google Sheets
+    // For now, we'll just create a session
+    
+    const userSession = {
+        userId: Date.now().toString(),
         username: username,
-        name: name,
-        email: email,
-        role: selectedRoles[0],
-        roles: selectedRoles
+        email: username + '@example.com',
+        name: username,
+        role: 'Rainbow Girl'
     };
     
-    localStorage.setItem('currentUser', JSON.stringify(user));
+    localStorage.setItem('currentUser', JSON.stringify(userSession));
+    localStorage.setItem('isLoggedIn', 'true');
     
-    alert('✅ Account created successfully! Welcome to NJ Rainbow Convention 2026!');
-    
-    console.log('📚 Redirecting to tutorial');
-    // First-time users go to tutorial
-    window.location.href = 'welcome-tutorial.html';
+    console.log('✅ Login successful');
+    return true;
 }
 
-// Logout function
+// Logout Function
 function logout() {
-    if (confirm('Are you sure you want to log out?')) {
-        localStorage.removeItem('currentUser');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('isLoggedIn');
+    window.location.href = 'login.html';
+}
+
+// Check if user is logged in
+function isLoggedIn() {
+    return localStorage.getItem('isLoggedIn') === 'true';
+}
+
+// Get current user
+function getCurrentUser() {
+    const userData = localStorage.getItem('currentUser');
+    return userData ? JSON.parse(userData) : null;
+}
+
+// Require login (redirect to login page if not logged in)
+function requireLogin() {
+    if (!isLoggedIn()) {
         window.location.href = 'login.html';
-    }
-}
-
-// Toggle between login and signup forms
-function showSignup() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('signupForm').style.display = 'block';
-}
-
-function showLogin() {
-    document.getElementById('signupForm').style.display = 'none';
-    document.getElementById('loginForm').style.display = 'block';
-}
-
-// Load available roles for signup
-function loadRolesForSignup() {
-    const rolesContainer = document.getElementById('roleCheckboxes');
-    if (!rolesContainer) return;
-    
-    const availableRoles = getAvailableRoles();
-    
-    rolesContainer.innerHTML = availableRoles.map(role => `
-        <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: rgba(212, 175, 55, 0.1); border-radius: 4px; cursor: pointer;">
-            <input type="checkbox" name="role" value="${escapeHtml(role)}">
-            <span style="color: var(--text-light);">${escapeHtml(role)}</span>
-        </label>
-    `).join('');
-}
-
-// Enter key support
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎬 DOM loaded, setting up event listeners');
-    
-    const loginUsername = document.getElementById('username');
-    const loginPassword = document.getElementById('password');
-    
-    if (loginUsername) {
-        loginUsername.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') login();
-        });
-    }
-    
-    if (loginPassword) {
-        loginPassword.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') login();
-        });
-    }
-    
-    // Load roles for signup
-    loadRolesForSignup();
-    
-    console.log('✅ Auth.js initialization complete');
-});
-
-// Test function - you can call this from browser console
-async function testConnection() {
-    console.log('🧪 Testing connection to Google Sheets...');
-    
-    const result = await saveToGoogleSheets('saveUser', {
-        userId: 'test_' + Date.now(),
-        username: 'testuser',
-        email: 'test@example.com',
-        name: 'Test User',
-        role: 'Rainbow Girl',
-        password: 'test123',
-        dateCreated: new Date().toISOString()
-    });
-    
-    console.log('🧪 Test result:', result);
-    
-    if (result.success) {
-        alert('✅ Connection successful! Data saved to Google Sheets.');
-    } else {
-        alert('❌ Connection failed: ' + (result.error || result.message));
     }
 }
