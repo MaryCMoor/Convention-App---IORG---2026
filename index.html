@@ -3,191 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="NJ Rainbow Convention 2026 - The Greatest Show on Earth">
     <meta name="theme-color" content="#8b0000">
     <title>NJ Rainbow Convention 2026</title>
-    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/png" href="icon-192.png">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <style>
-        .notification-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #dc143c;
-            color: white;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            font-weight: bold;
-            border: 2px solid var(--primary-gold);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-    </style>
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <!-- Check if user is logged in -->
-    <script>
-        const currentUser = localStorage.getItem('currentUser');
-        if (!currentUser) {
-            window.location.href = 'login.html';
-        }
-    </script>
-
-    <!-- HEADER -->
     <header class="app-header">
-        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
-            <div>
-                <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
-                <div class="subtitle">✦ The Greatest Show on Earth ✦</div>
-            </div>
-            <button id="logoutBtn" class="back-btn" style="background: rgba(255,255,255,0.2); color: white;">
-                🚪 Logout
-            </button>
-        </div>
+        <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+        <div class="subtitle">✦ June 27-29, 2026 ✦</div>
     </header>
 
-    <!-- MAIN CONTENT -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Home</span>
+        </a>
+        <a href="schedule.html" class="nav-item">
+            <span class="nav-icon">📅</span>
+            <span class="nav-label">Schedule</span>
+        </a>
+        <a href="speakers.html" class="nav-item">
+            <span class="nav-icon">🎤</span>
+            <span class="nav-label">Speakers</span>
+        </a>
+        <a href="favorites.html" class="nav-item">
+            <span class="nav-icon">⭐</span>
+            <span class="nav-label">Favorites</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">Profile</span>
+        </a>
+    </nav>
+
     <div class="content">
-        <div class="welcome-banner">
-            <h2>Welcome, <span id="userName">User</span>! 🎭</h2>
-            <p>Step right up and explore everything Convention 2026 has to offer!</p>
+        <!-- Welcome Message -->
+        <div class="welcome-card">
+            <h2>Welcome, <span id="userName">Rainbow Girl</span>! 🌈</h2>
+            <p>Get ready for an amazing convention experience!</p>
         </div>
-        
-        <div class="tile-grid">
-            <a href="my-schedule.html" class="tile" style="text-decoration: none; position: relative;">
-                <div class="tile-icon">⭐</div>
-                <div class="tile-title">My Schedule</div>
-                <div class="tile-desc">Your favorite events</div>
+
+        <!-- Quick Actions -->
+        <div class="section-title">Quick Actions</div>
+        <div class="dashboard-grid">
+            <a href="schedule.html" class="dashboard-card">
+                <div class="card-icon">📅</div>
+                <div class="card-title">View Schedule</div>
+                <div class="card-subtitle">Browse all events</div>
             </a>
 
-            <a href="schedule.html" class="tile" style="text-decoration: none; position: relative;">
-                <div class="tile-icon">📅</div>
-                <div class="tile-title">Schedule</div>
-                <div class="tile-desc">All convention events</div>
+            <a href="speakers.html" class="dashboard-card">
+                <div class="card-icon">🎤</div>
+                <div class="card-title">Meet Speakers</div>
+                <div class="card-subtitle">Learn about presenters</div>
             </a>
 
-            <a href="meet-nj.html" class="tile" style="text-decoration: none; position: relative;">
-                <div class="tile-icon">🌈</div>
-                <div class="tile-title">Meet NJ Rainbow</div>
-                <div class="tile-desc">Our amazing members</div>
+            <a href="favorites.html" class="dashboard-card">
+                <div class="card-icon">⭐</div>
+                <div class="card-title">My Favorites</div>
+                <div class="card-subtitle">Saved events & notes</div>
             </a>
 
-            <a href="speakers.html" class="tile" style="text-decoration: none; position: relative;">
-                <div class="tile-icon">🎤</div>
-                <div class="tile-title">Speakers</div>
-                <div class="tile-desc">Featured speakers</div>
+            <a href="notifications.html" class="dashboard-card">
+                <div class="card-icon">🔔</div>
+                <div class="card-title">Notifications</div>
+                <div class="card-subtitle">Stay updated</div>
             </a>
 
-            <a href="notifications.html" class="tile" style="text-decoration: none; position: relative;" id="notificationsTile">
-                <div class="tile-icon">🔔</div>
-                <div class="tile-title">Notifications</div>
-                <div class="tile-desc">Latest updates</div>
-                <div id="notificationBadge" class="notification-badge" style="display: none;">0</div>
+            <a href="checklist.html" class="dashboard-card">
+                <div class="card-icon">✅</div>
+                <div class="card-title">Checklist</div>
+                <div class="card-subtitle">What to bring</div>
             </a>
 
-            <a href="checklist.html" class="tile" style="text-decoration: none; position: relative;">
-                <div class="tile-icon">✓</div>
-                <div class="tile-title">Checklist</div>
-                <div class="tile-desc">Packing & documents</div>
-            </a>
-
-            <a href="profile.html" class="tile" style="text-decoration: none; position: relative;" id="profileTile">
-                <div class="tile-icon">👤</div>
-                <div class="tile-title">My Profile</div>
-                <div class="tile-desc">Your information</div>
-                <div id="profileAlertBadge" class="notification-badge" style="display: none;">!</div>
-            </a>
-
-            <a href="messages.html" class="tile" style="text-decoration: none; position: relative;">
-                <div class="tile-icon">💬</div>
-                <div class="tile-title">Messages</div>
-                <div class="tile-desc">Chat with others</div>
-            </a>
-
-            <a href="notes.html" class="tile" style="text-decoration: none; position: relative;">
-                <div class="tile-icon">📝</div>
-                <div class="tile-title">My Notes</div>
-                <div class="tile-desc">Personal notes</div>
-            </a>
-
-            <a href="gallery.html" class="tile" style="text-decoration: none; position: relative;">
-                <div class="tile-icon">📸</div>
-                <div class="tile-title">Gallery</div>
-                <div class="tile-desc">Event photos</div>
-            </a>
-
-            <a href="admin.html" class="tile" style="text-decoration: none; position: relative;" id="adminTile">
-                <div class="tile-icon">⚙️</div>
-                <div class="tile-title">Admin</div>
-                <div class="tile-desc">Admin tools</div>
+            <a href="gallery.html" class="dashboard-card">
+                <div class="card-icon">📸</div>
+                <div class="card-title">Photo Gallery</div>
+                <div class="card-subtitle">Convention memories</div>
             </a>
         </div>
+
+        <!-- Upcoming Events -->
+        <div class="section-title">📌 Featured Events</div>
+        <div class="event-card">
+            <div class="event-time">Friday, 7:00 PM</div>
+            <div class="event-title">Opening Ceremony</div>
+            <div class="event-location">📍 Main Ballroom</div>
+        </div>
+
+        <div class="event-card">
+            <div class="event-time">Saturday, 10:00 AM</div>
+            <div class="event-title">Leadership Workshop</div>
+            <div class="event-location">📍 Conference Room A</div>
+        </div>
+
+        <div class="event-card">
+            <div class="event-time">Sunday, 2:00 PM</div>
+            <div class="event-title">Grand Installation</div>
+            <div class="event-location">📍 Main Ballroom</div>
+        </div>
+
+        <!-- Important Info -->
+        <div class="section-title">📢 Important Information</div>
+        <div class="info-card">
+            <div class="info-icon">🏨</div>
+            <div class="info-content">
+                <div class="info-title">Venue</div>
+                <div class="info-text">Crowne Plaza Hotel, Princeton, NJ</div>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon">👗</div>
+            <div class="info-content">
+                <div class="info-title">Dress Code</div>
+                <div class="info-text">Formals for ceremonies, casual for workshops</div>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon">❓</div>
+            <div class="info-content">
+                <div class="info-title">Need Help?</div>
+                <div class="info-text">Contact: convention@njrainbow.org</div>
+            </div>
+        </div>
+
+        <!-- Logout Button -->
+        <button onclick="logout()" class="btn-secondary" style="width: 100%; margin-top: 2rem;">
+            🚪 Logout
+        </button>
+
+        <div style="height: 100px;"></div>
     </div>
 
+    <script src="auth.js"></script>
     <script>
-        // Display user info and check permissions
-        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        const isAdmin = user.role === 'Admin';
+        console.log('========================================');
+        console.log('📄 index.html loaded');
+        console.log('========================================');
         
-        // Display username
-        document.getElementById('userName').textContent = user.name || user.username || 'User';
-        
-        // Hide admin tile if not admin
-        if (!isAdmin) {
-            document.getElementById('adminTile').style.display = 'none';
-        }
+        // Protect this page - require login
+        const loggedIn = isLoggedIn();
+        const currentUser = getCurrentUser();
 
-        // Check for unread notifications
-        function checkNotifications() {
-            const lastRead = parseInt(localStorage.getItem(`notifications_last_read_${user.userId}`) || '0');
-            const notifications = JSON.parse(localStorage.getItem('custom_notifications') || '[]');
-            const unreadCount = notifications.filter(n => n.id > lastRead).length;
+        console.log('Index.html - isLoggedIn:', loggedIn);
+        console.log('Index.html - currentUser:', currentUser);
+
+        if (!loggedIn || !currentUser || !currentUser.username) {
+            console.log('❌ Not logged in, redirecting to login...');
+            window.location.replace('login.html');
+        } else {
+            console.log('✅ User is logged in:', currentUser.username);
             
-            const badge = document.getElementById('notificationBadge');
-            if (unreadCount > 0) {
-                badge.textContent = unreadCount;
-                badge.style.display = 'flex';
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-
-        // Check for emergency contact
-        function checkEmergencyContact() {
-            const profile = JSON.parse(localStorage.getItem(`profile_${user.userId}`) || '{}');
-            const hasEmergencyContact = profile.emergencyName && profile.emergencyPhone;
+            // Display user's name
+            document.getElementById('userName').textContent = currentUser.name || currentUser.username;
             
-            const badge = document.getElementById('profileAlertBadge');
-            if (!hasEmergencyContact) {
-                badge.style.display = 'flex';
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('currentUser');
-                window.location.href = 'login.html';
-            }
-        });
-
-        // Run checks
-        checkNotifications();
-        checkEmergencyContact();
-
-        // Register service worker for PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js')
-                .then(reg => console.log('Service Worker registered', reg))
-                .catch(err => console.log('Service Worker registration failed', err));
+            console.log('✅ Dashboard loaded successfully');
         }
     </script>
 </body>
