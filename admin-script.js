@@ -3,35 +3,69 @@
 // ========================================
 
 const GOOGLE_SHEETS_ID = '2PACX-1vTcWlhv_bK1thPxqX8ZaWaswTyaam1poIRptaJe-18E7IQbK39_ffnKvTUPtfeB8CiL5avfPgCoflCl';
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfJr5u8tE_W6jHeUc_MJINzOBAuXp2lDioCMmhXjkpwAQ91Lf9rC3uCE3t5Zj7Cmc1/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjIdyY8BPVOvhwGUfGKdcWIoaLOm-m__PDPq5mkOlXSlbTAdj292k-DzCRYjvoPYU/exec';
 
 let currentChecklistFilter = 'All';
 
 // ========================================
-// GOOGLE SHEETS SYNC HELPER
+// GOOGLE SHEETS SYNC HELPER - FIXED TO USE FORM SUBMISSION
 // ========================================
 
 async function saveToGoogleSheets(action, data) {
-    try {
-        await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                action: action,
-                ...data
-            })
-        });
-        
-        console.log(`Saved ${action} to Google Sheets`);
-        return { success: true };
-        
-    } catch (error) {
-        console.error('Error saving to Google Sheets:', error);
-        return { success: false, error: error.toString() };
-    }
+    console.log('🔄 Saving to Google Sheets:', action, data);
+    
+    return new Promise((resolve, reject) => {
+        try {
+            // Create hidden iframe if it doesn't exist
+            let iframe = document.getElementById('adminGoogleSheetsIframe');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.id = 'adminGoogleSheetsIframe';
+                iframe.name = 'adminGoogleSheetsIframe';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+            }
+            
+            // Create form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = SCRIPT_URL;
+            form.target = 'adminGoogleSheetsIframe';
+            form.style.display = 'none';
+            
+            // Add action field
+            const actionField = document.createElement('input');
+            actionField.type = 'hidden';
+            actionField.name = 'action';
+            actionField.value = action;
+            form.appendChild(actionField);
+            
+            // Add all data fields
+            Object.keys(data).forEach(key => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = data[key] || '';
+                form.appendChild(input);
+            });
+            
+            // Submit form
+            document.body.appendChild(form);
+            console.log('📤 Submitting to Google Sheets...');
+            form.submit();
+            
+            // Clean up and resolve
+            setTimeout(() => {
+                document.body.removeChild(form);
+                console.log('✅ Saved to Google Sheets:', action);
+                resolve({ success: true });
+            }, 1500);
+            
+        } catch (error) {
+            console.error('❌ Error saving to Google Sheets:', error);
+            reject(error);
+        }
+    });
 }
 
 // Escape HTML
@@ -494,6 +528,7 @@ function denyRoleRequest(requestId) {
     alert('❌ Role change request denied.');
     loadRoleRequests();
 }
+
 // ========================================
 // REQUIRED EVENTS MANAGEMENT
 // ========================================
@@ -916,7 +951,7 @@ function deleteMember(memberId) {
 }
 
 // ========================================
-// EVENTS MANAGEMENT
+// EVENTS MANAGEMENT - NOW SAVES TO GOOGLE SHEETS
 // ========================================
 
 function loadEvents() {
@@ -1012,7 +1047,8 @@ async function saveEvent() {
         location: location,
         description: description,
         type: type,
-        speaker: speaker
+        speaker: speaker,
+        dateCreated: new Date().toISOString()
     };
     
     if (editId) {
@@ -1029,14 +1065,23 @@ async function saveEvent() {
     localStorage.setItem('events', JSON.stringify(events));
     
     // Save to Google Sheets
-    await saveToGoogleSheets('saveEvent', eventData);
+    console.log('📤 Saving event to Google Sheets...');
+    await saveToGoogleSheets('saveEvent', {
+        eventId: eventData.id,
+        title: eventData.title,
+        day: eventData.day,
+        time: eventData.time,
+        timeEnd: eventData.timeEnd,
+        location: eventData.location,
+        description: eventData.description,
+        type: eventData.type,
+        speaker: eventData.speaker,
+        dateCreated: eventData.dateCreated
+    });
     
-    alert('✅ Event saved!');
+    alert('✅ Event saved to both localStorage and Google Sheets!');
     hideEventForm();
-    
-    setTimeout(() => {
-        loadEvents();
-    }, 1000);
+    loadEvents();
 }
 
 async function deleteEvent(eventId) {
@@ -1047,13 +1092,11 @@ async function deleteEvent(eventId) {
     localStorage.setItem('events', JSON.stringify(events));
     
     // Delete from Google Sheets
-    await saveToGoogleSheets('deleteEvent', { id: eventId });
+    console.log('🗑️ Deleting event from Google Sheets...');
+    await saveToGoogleSheets('deleteEvent', { eventId: eventId });
     
-    setTimeout(() => {
-        loadEvents();
-    }, 1000);
-    
-    alert('✅ Event deleted.');
+    alert('✅ Event deleted from both localStorage and Google Sheets!');
+    loadEvents();
 }
 
 // ========================================
@@ -1163,10 +1206,7 @@ async function saveSpeaker() {
     
     alert('✅ Speaker saved!');
     hideSpeakerForm();
-    
-    setTimeout(() => {
-        loadSpeakers();
-    }, 1000);
+    loadSpeakers();
 }
 
 async function deleteSpeaker(speakerId) {
@@ -1179,11 +1219,8 @@ async function deleteSpeaker(speakerId) {
     // Delete from Google Sheets
     await saveToGoogleSheets('deleteSpeaker', { id: speakerId });
     
-    setTimeout(() => {
-        loadSpeakers();
-    }, 1000);
-    
     alert('✅ Speaker deleted.');
+    loadSpeakers();
 }
 
 // ========================================
@@ -1200,21 +1237,18 @@ function sendNotification() {
     }
     
     const notification = {
-        id: 'notif_' + Date.now(),
+        id: Date.now(),
         title: title,
         message: message,
         date: new Date().toISOString()
     };
     
-    // Add to all users' notifications
-    const users = getAllUsers();
-    users.forEach(user => {
-        const notifs = JSON.parse(localStorage.getItem(`notifications_${user.userId}`) || '[]');
-        notifs.unshift(notification);
-        localStorage.setItem(`notifications_${user.userId}`, JSON.stringify(notifs));
-    });
+    // Add to custom notifications (shared across all users)
+    const notifications = JSON.parse(localStorage.getItem('custom_notifications') || '[]');
+    notifications.unshift(notification);
+    localStorage.setItem('custom_notifications', JSON.stringify(notifications));
     
-    alert(`✅ Notification sent to ${users.length} users!`);
+    alert(`✅ Notification sent to all users!`);
     
     document.getElementById('notifTitle').value = '';
     document.getElementById('notifMessage').value = '';
