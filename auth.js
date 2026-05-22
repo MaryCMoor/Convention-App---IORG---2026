@@ -123,25 +123,83 @@ async function signUp(username, email, name, role, password) {
     }
 }
 
-// Login Function - RETURNING USERS SKIP TRAINING
-function login(username, password) {
-    console.log('🔐 Attempting login for:', username);
+// Login Function - FETCHES REAL ROLES FROM GOOGLE SHEETS
+async function login(username, password) {
+    console.log('========================================');
+    console.log('🔐 LOGIN FUNCTION STARTED');
+    console.log('========================================');
+    console.log('Username entered:', username);
     
-    const userSession = {
-        userId: Date.now().toString(),
-        username: username,
-        email: username + '@example.com',
-        name: username,
-        role: 'Rainbow Girl',
-        isNewUser: false,
-        needsTraining: false
-    };
-    
-    localStorage.setItem('currentUser', JSON.stringify(userSession));
-    localStorage.setItem('isLoggedIn', 'true');
-    
-    console.log('✅ Login successful');
-    return true;
+    try {
+        // Fetch user data from Google Sheets
+        console.log('🔍 Fetching user data from Google Sheets...');
+        const response = await fetch(`${SCRIPT_URL}?action=getUser&username=${encodeURIComponent(username)}`);
+        const userData = await response.json();
+        
+        console.log('📥 Response from Google Sheets:', userData);
+        
+        if (userData.success) {
+            console.log('✅ User found in Google Sheets!');
+            console.log('👤 User role from Sheets:', userData.role);
+            
+            const userSession = {
+                userId: userData.userId,
+                username: userData.username,
+                email: userData.email,
+                name: userData.name,
+                role: userData.role,  // Real role from Google Sheets!
+                isNewUser: false,
+                needsTraining: false
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(userSession));
+            localStorage.setItem('isLoggedIn', 'true');
+            
+            console.log('✅ Login successful with roles:', userSession.role);
+            console.log('========================================');
+            return true;
+        } else {
+            // User not found in Sheets - allow login with default role
+            console.log('⚠️ User not found in Google Sheets - using default role');
+            
+            const userSession = {
+                userId: Date.now().toString(),
+                username: username,
+                email: username.includes('@') ? username : username + '@example.com',
+                name: username,
+                role: 'Rainbow Girl',
+                isNewUser: false,
+                needsTraining: false
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(userSession));
+            localStorage.setItem('isLoggedIn', 'true');
+            
+            console.log('✅ Login successful with default role');
+            console.log('========================================');
+            return true;
+        }
+    } catch (error) {
+        console.error('❌ Error fetching user from Google Sheets:', error);
+        console.log('⚠️ Falling back to default role');
+        
+        // Fallback - allow login with default role
+        const userSession = {
+            userId: Date.now().toString(),
+            username: username,
+            email: username.includes('@') ? username : username + '@example.com',
+            name: username,
+            role: 'Rainbow Girl',
+            isNewUser: false,
+            needsTraining: false
+        };
+        
+        localStorage.setItem('currentUser', JSON.stringify(userSession));
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        console.log('========================================');
+        return true;
+    }
 }
 
 // Mark training as completed
@@ -161,7 +219,7 @@ function needsTraining() {
     return user && user.needsTraining === true;
 }
 
-// Logout Function - FIXED to prevent loops
+// Logout Function
 function logout() {
     console.log('========================================');
     console.log('🚪 LOGOUT STARTED');
@@ -169,22 +227,18 @@ function logout() {
     console.log('Before clear - isLoggedIn:', localStorage.getItem('isLoggedIn'));
     console.log('Before clear - currentUser:', localStorage.getItem('currentUser'));
     
-    // Clear all authentication data
+    // Clear session data
     localStorage.removeItem('currentUser');
     localStorage.removeItem('isLoggedIn');
     
-    // Nuclear option - clear everything to be safe
-    localStorage.clear();
-    
     console.log('After clear - isLoggedIn:', localStorage.getItem('isLoggedIn'));
     console.log('After clear - currentUser:', localStorage.getItem('currentUser'));
-    console.log('✅ localStorage cleared completely');
+    console.log('✅ Session cleared');
     
-    // Small delay to ensure clear completes, then redirect
     setTimeout(() => {
         console.log('➡️ Redirecting to login page...');
         console.log('========================================');
-        window.location.replace('login.html'); // Use replace to prevent back button issues
+        window.location.replace('login.html');
     }, 100);
 }
 
