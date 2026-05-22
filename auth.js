@@ -1,5 +1,5 @@
 // ========================================
-// AUTHENTICATION SCRIPT WITH GOOGLE SHEETS - DEBUG VERSION
+// AUTHENTICATION SCRIPT WITH GOOGLE SHEETS - FIXED VERSION
 // ========================================
 
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfJr5u8tE_W6jHeUc_MJINzOBAuXp2lDioCMmhXjkpwAQ91Lf9rC3uCE3t5Zj7Cmc1/exec';
@@ -12,7 +12,7 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Save to Google Sheets - WITH DETAILED LOGGING
+// Save to Google Sheets - FIXED VERSION
 async function saveToGoogleSheets(action, data) {
     console.log('🚀 saveToGoogleSheets called');
     console.log('📤 Action:', action);
@@ -31,10 +31,8 @@ async function saveToGoogleSheets(action, data) {
         
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors',           // ← FIXED: Added this line
-            redirect: 'follow',        // ← FIXED: Added this line
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'text/plain'
             },
             body: JSON.stringify(payload)
         });
@@ -42,12 +40,25 @@ async function saveToGoogleSheets(action, data) {
         const endTime = Date.now();
         console.log(`⏱️ Request took ${endTime - startTime}ms`);
         console.log('📥 Response status:', response.status);
-        console.log('📥 Response type:', response.type);
         console.log('📥 Response ok:', response.ok);
         
-        // Note: With no-cors mode, response will be opaque but request goes through
-        console.log('✅ Request completed successfully');
-        return { success: true };
+        // Try to read the response
+        const responseText = await response.text();
+        console.log('📥 Response text:', responseText);
+        
+        if (response.ok) {
+            try {
+                const result = JSON.parse(responseText);
+                console.log('✅ Parsed response:', result);
+                return result;
+            } catch (parseError) {
+                console.log('⚠️ Could not parse response as JSON, but request succeeded');
+                return { success: true };
+            }
+        } else {
+            console.error('❌ Request failed with status:', response.status);
+            return { success: false, error: 'HTTP ' + response.status };
+        }
         
     } catch (error) {
         console.error('❌ Error in saveToGoogleSheets:', error);
@@ -301,3 +312,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('✅ Auth.js initialization complete');
 });
+
+// Test function - you can call this from browser console
+async function testConnection() {
+    console.log('🧪 Testing connection to Google Sheets...');
+    
+    const result = await saveToGoogleSheets('saveUser', {
+        userId: 'test_' + Date.now(),
+        username: 'testuser',
+        email: 'test@example.com',
+        name: 'Test User',
+        role: 'Rainbow Girl',
+        password: 'test123',
+        dateCreated: new Date().toISOString()
+    });
+    
+    console.log('🧪 Test result:', result);
+    
+    if (result.success) {
+        alert('✅ Connection successful! Data saved to Google Sheets.');
+    } else {
+        alert('❌ Connection failed: ' + (result.error || result.message));
+    }
+}
