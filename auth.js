@@ -1,8 +1,8 @@
 // ========================================
-// AUTHENTICATION & GOOGLE SHEETS INTEGRATION - CORS FIXED
+// AUTHENTICATION & GOOGLE SHEETS INTEGRATION - WITH TRAINING FLOW
 // ========================================
 
-const SCRIPT_URL = 'https://script.google.com/a/moor.cc/macros/s/AKfycbwjIdyY8BPVOvhwGUfGKdcWIoaLOm-m__PDPq5mkOlXSlbTAdj292k-DzCRYjvoPYU/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjIdyY8BPVOvhwGUfGKdcWIoaLOm-m__PDPq5mkOlXSlbTAdj292k-DzCRYjvoPYU/exec';
 
 // Save user data to Google Sheets using form submission (bypasses CORS)
 async function saveToGoogleSheets(userData) {
@@ -11,7 +11,6 @@ async function saveToGoogleSheets(userData) {
     
     return new Promise((resolve, reject) => {
         try {
-            // Create hidden iframe to receive response
             let iframe = document.getElementById('googleSheetsIframe');
             if (!iframe) {
                 iframe = document.createElement('iframe');
@@ -21,21 +20,18 @@ async function saveToGoogleSheets(userData) {
                 document.body.appendChild(iframe);
             }
             
-            // Create form
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = SCRIPT_URL;
             form.target = 'googleSheetsIframe';
             form.style.display = 'none';
             
-            // Add action field
             const actionField = document.createElement('input');
             actionField.type = 'hidden';
             actionField.name = 'action';
             actionField.value = 'saveUser';
             form.appendChild(actionField);
             
-            // Add all user data fields
             Object.keys(userData).forEach(key => {
                 const input = document.createElement('input');
                 input.type = 'hidden';
@@ -44,17 +40,13 @@ async function saveToGoogleSheets(userData) {
                 form.appendChild(input);
             });
             
-            // Submit form
             document.body.appendChild(form);
             console.log('📤 Submitting form to Google Sheets...');
             form.submit();
             
-            // Clean up form after submission
             setTimeout(() => {
                 document.body.removeChild(form);
                 console.log('✅ Form submitted successfully');
-                console.log('⚠️ Note: Response is hidden in iframe, but data should be in Google Sheets');
-                console.log('👉 Check Apps Script Executions and Google Sheet to verify!');
                 resolve(true);
             }, 1000);
             
@@ -65,18 +57,7 @@ async function saveToGoogleSheets(userData) {
     });
 }
 
-// Hash password (simple client-side hash)
-function hashPassword(password) {
-    let hash = 0;
-    for (let i = 0; i < password.length; i++) {
-        const char = password.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash;
-    }
-    return Math.abs(hash).toString(16);
-}
-
-// Sign Up Function
+// Sign Up Function - NEW USERS GO TO TRAINING
 async function signUp(username, email, name, role, password) {
     console.log('📝 Starting signup process...');
     
@@ -102,18 +83,19 @@ async function signUp(username, email, name, role, password) {
         
         console.log('✅ Signup process completed!');
         
-        // Store in localStorage
         const userSession = {
             userId: userData.userId,
             username: userData.username,
             email: userData.email,
             name: userData.name,
-            role: userData.role
+            role: userData.role,
+            isNewUser: true,
+            needsTraining: true
         };
         localStorage.setItem('currentUser', JSON.stringify(userSession));
         localStorage.setItem('isLoggedIn', 'true');
         
-        alert('Account created successfully! ✅\n\nYour account has been saved to the database.');
+        alert('Account created successfully! ✅\n\nWelcome! You will now go through a quick tutorial.');
         return true;
     } catch (error) {
         console.error('❌ Signup failed:', error);
@@ -122,19 +104,18 @@ async function signUp(username, email, name, role, password) {
     }
 }
 
-// Login Function (simplified - checks localStorage only for now)
+// Login Function - RETURNING USERS SKIP TRAINING
 function login(username, password) {
     console.log('🔐 Attempting login for:', username);
-    
-    // In a real app, you would verify against Google Sheets
-    // For now, we'll just create a session
     
     const userSession = {
         userId: Date.now().toString(),
         username: username,
         email: username + '@example.com',
         name: username,
-        role: 'Rainbow Girl'
+        role: 'Rainbow Girl',
+        isNewUser: false,
+        needsTraining: false
     };
     
     localStorage.setItem('currentUser', JSON.stringify(userSession));
@@ -142,6 +123,23 @@ function login(username, password) {
     
     console.log('✅ Login successful');
     return true;
+}
+
+// Mark training as completed
+function completeTraining() {
+    const user = getCurrentUser();
+    if (user) {
+        user.needsTraining = false;
+        user.isNewUser = false;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        console.log('✅ Training marked as complete');
+    }
+}
+
+// Check if user needs training
+function needsTraining() {
+    const user = getCurrentUser();
+    return user && user.needsTraining === true;
 }
 
 // Logout Function
