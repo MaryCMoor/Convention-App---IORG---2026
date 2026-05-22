@@ -5,26 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - NJ Rainbow Convention 2026</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        .test-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            background: #4CAF50;
-            color: white;
-            padding: 15px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            font-size: 14px;
-        }
-        .test-button:hover {
-            background: #45a049;
-        }
-    </style>
 </head>
 <body>
     <div class="login-container">
@@ -46,7 +26,7 @@
                 </p>
             </div>
             
-            <!-- Signup Form (Hidden by default) -->
+            <!-- Signup Form -->
             <div id="signupForm" class="form-container" style="display: none;">
                 <h2>Create Account</h2>
                 <form onsubmit="handleSignup(event)">
@@ -78,14 +58,8 @@
         </div>
     </div>
 
-    <!-- Test Button -->
-    <button onclick="testDirectPost()" class="test-button">
-        🧪 Test Form Submit
-    </button>
-
     <script src="auth.js"></script>
     <script>
-        // Show/Hide Forms
         function showSignup() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('signupForm').style.display = 'block';
@@ -96,23 +70,24 @@
             document.getElementById('loginForm').style.display = 'block';
         }
         
-        // Handle Login
         function handleLogin(event) {
             event.preventDefault();
+            console.log('Login form submitted');
             
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
             
             if (login(username, password)) {
-                window.location.href = 'home.html';
+                console.log('Login successful, redirecting to index.html...');
+                window.location.href = 'index.html';
             } else {
                 alert('Invalid username or password');
             }
         }
         
-        // Handle Signup
         async function handleSignup(event) {
             event.preventDefault();
+            console.log('Signup form submitted');
             
             const name = document.getElementById('signupName').value;
             const email = document.getElementById('signupEmail').value;
@@ -121,76 +96,28 @@
             const password = document.getElementById('signupPassword').value;
             const confirmPassword = document.getElementById('signupConfirmPassword').value;
             
-            // Validate password match
             if (password !== confirmPassword) {
                 alert('Passwords do not match!');
                 return;
             }
             
-            // Validate password strength
             if (password.length < 6) {
                 alert('Password must be at least 6 characters long!');
                 return;
             }
             
-            console.log('📝 Form submitted, calling signUp function...');
-            
+            console.log('Calling signUp function...');
             const success = await signUp(username, email, name, role, password);
             
             if (success) {
-                console.log('✅ Signup completed, redirecting to home...');
-                window.location.href = 'home.html';
-            } else {
-                console.error('❌ Signup failed');
+                console.log('Signup successful, redirecting to index.html...');
+                window.location.href = 'index.html';
             }
         }
 
-        // Test form submission (bypasses CORS)
-        function testDirectPost() {
-            console.log('🧪 Testing form submission...');
-            
-            const SCRIPT_URL = 'https://script.google.com/a/moor.cc/macros/s/AKfycbwjIdyY8BPVOvhwGUfGKdcWIoaLOm-m__PDPq5mkOlXSlbTAdj292k-DzCRYjvoPYU/exec';
-            
-            const testData = {
-                action: 'saveUser',
-                userId: 'form_test_' + Date.now(),
-                username: 'formtest',
-                email: 'form@test.com',
-                name: 'Form Test User',
-                role: 'Rainbow Girl',
-                password: 'test123',
-                dateCreated: new Date().toISOString()
-            };
-            
-            console.log('📤 Creating form with data:', testData);
-            
-            // Create form
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = SCRIPT_URL;
-            form.target = '_blank';
-            
-            // Add fields
-            Object.keys(testData).forEach(key => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = testData[key];
-                form.appendChild(input);
-            });
-            
-            document.body.appendChild(form);
-            console.log('📤 Submitting form...');
-            form.submit();
-            document.body.removeChild(form);
-            
-            console.log('✅ Form submitted!');
-            alert('✅ Test form submitted!\n\nA new tab will open showing the response.\n\nCheck:\n1. The new tab for success message\n2. Apps Script → Executions for logs\n3. Your Google Sheet for the new test user');
-        }
-
-        // Check if already logged in
         if (isLoggedIn()) {
-            window.location.href = 'home.html';
+            console.log('Already logged in, redirecting to index.html...');
+            window.location.href = 'index.html';
         }
     </script>
 </body>
