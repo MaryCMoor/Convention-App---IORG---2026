@@ -3,57 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8b0000">
     <title>Login - NJ Rainbow Convention 2026</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-box">
-            <h1>🎪 NJ Rainbow Convention 2026</h1>
-            <p class="tagline">Welcome! Please sign in or create an account.</p>
+    <header class="app-header">
+        <h1>🎪 NJ RAINBOW CONVENTION 2026 🎪</h1>
+        <div class="subtitle">✦ Welcome ✦</div>
+    </header>
+
+    <div class="content" style="max-width: 500px; margin: 2rem auto;">
+        <!-- LOGIN FORM -->
+        <div id="loginForm" class="auth-form">
+            <h2 class="section-title">🔐 Login</h2>
             
-            <!-- Login Form -->
-            <div id="loginForm" class="form-container">
-                <h2>Sign In</h2>
-                <form onsubmit="handleLogin(event)">
-                    <input type="text" id="loginUsername" placeholder="Username or Email" required>
-                    <input type="password" id="loginPassword" placeholder="Password" required>
-                    <button type="submit" class="btn-primary">Sign In</button>
-                </form>
-                <p class="switch-form">
-                    Don't have an account? 
-                    <a href="#" onclick="showSignup(); return false;">Create Account</a>
-                </p>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="loginUsername" placeholder="Enter your username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="btn-save" style="width: 100%;">
+                    🔓 Login
+                </button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <p style="color: var(--text-light);">Don't have an account?</p>
+                <button onclick="showSignup()" class="btn-secondary" style="margin-top: 0.5rem;">
+                    ➕ Create New Account
+                </button>
             </div>
+        </div>
+
+        <!-- SIGNUP FORM -->
+        <div id="signupForm" class="auth-form" style="display: none;">
+            <h2 class="section-title">📝 Create Account</h2>
             
-            <!-- Signup Form -->
-            <div id="signupForm" class="form-container" style="display: none;">
-                <h2>Create Account</h2>
-                <form onsubmit="handleSignup(event)">
-                    <input type="text" id="signupName" placeholder="Full Name" required>
-                    <input type="email" id="signupEmail" placeholder="Email" required>
-                    <input type="text" id="signupUsername" placeholder="Username" required>
-                    
-                    <select id="signupRole" required>
-                        <option value="">Select Your Role</option>
-                        <option value="Rainbow Girl">Rainbow Girl</option>
-                        <option value="Grand Officer">Grand Officer</option>
-                        <option value="Mother Advisor">Mother Advisor</option>
-                        <option value="Advisory Board">Advisory Board Member</option>
-                        <option value="Supreme Officer">Supreme Officer</option>
-                        <option value="Past Grand Officer">Past Grand Officer</option>
-                        <option value="Visitor">Visitor</option>
-                    </select>
-                    
-                    <input type="password" id="signupPassword" placeholder="Password" required>
-                    <input type="password" id="signupConfirmPassword" placeholder="Confirm Password" required>
-                    
-                    <button type="submit" class="btn-primary">Create Account</button>
-                </form>
-                <p class="switch-form">
-                    Already have an account? 
-                    <a href="#" onclick="showLogin(); return false;">Sign In</a>
-                </p>
+            <form onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="signupName" placeholder="Your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Username *</label>
+                    <input type="text" id="signupUsername" placeholder="Choose a username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email Address *</label>
+                    <input type="email" id="signupEmail" placeholder="your.email@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" id="signupPassword" placeholder="At least 6 characters" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Confirm Password *</label>
+                    <input type="password" id="signupConfirmPassword" placeholder="Re-enter password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Select Your Role(s) *</label>
+                    <p style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 0.5rem;">
+                        You can select multiple roles that apply to you.
+                    </p>
+                    <div id="roleCheckboxes" style="display: grid; grid-template-columns: 1fr; gap: 0.5rem; max-height: 300px; overflow-y: auto; padding: 0.5rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                        <label style="display: flex; align-items: center; padding: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" name="role" value="Rainbow Girl" style="margin-right: 0.5rem;">
+                            <span>Rainbow Girl</span>
+                        </label>
+                        <label style="display: flex; align-items: center; padding: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" name="role" value="Grand Officer" style="margin-right: 0.5rem;">
+                            <span>Grand Officer</span>
+                        </label>
+                        <label style="display: flex; align-items: center; padding: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" name="role" value="Mother Advisor" style="margin-right: 0.5rem;">
+                            <span>Mother Advisor</span>
+                        </label>
+                        <label style="display: flex; align-items: center; padding: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" name="role" value="Advisory Board" style="margin-right: 0.5rem;">
+                            <span>Advisory Board Member</span>
+                        </label>
+                        <label style="display: flex; align-items: center; padding: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" name="role" value="Supreme Officer" style="margin-right: 0.5rem;">
+                            <span>Supreme Officer</span>
+                        </label>
+                        <label style="display: flex; align-items: center; padding: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" name="role" value="Past Grand Officer" style="margin-right: 0.5rem;">
+                            <span>Past Grand Officer</span>
+                        </label>
+                        <label style="display: flex; align-items: center; padding: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" name="role" value="Visitor" style="margin-right: 0.5rem;">
+                            <span>Visitor</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-save" style="width: 100%;">
+                    ✅ Create Account
+                </button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <p style="color: var(--text-light);">Already have an account?</p>
+                <button onclick="showLogin()" class="btn-secondary" style="margin-top: 0.5rem;">
+                    🔐 Back to Login
+                </button>
             </div>
         </div>
     </div>
@@ -80,7 +146,6 @@
             if (login(username, password)) {
                 console.log('Login successful');
                 
-                // Check if user needs training
                 if (needsTraining()) {
                     console.log('New user - redirecting to welcome tutorial...');
                     window.location.href = 'welcome-tutorial.html';
@@ -100,9 +165,17 @@
             const name = document.getElementById('signupName').value;
             const email = document.getElementById('signupEmail').value;
             const username = document.getElementById('signupUsername').value;
-            const role = document.getElementById('signupRole').value;
             const password = document.getElementById('signupPassword').value;
             const confirmPassword = document.getElementById('signupConfirmPassword').value;
+            
+            // Get selected roles (multiple checkboxes)
+            const roleCheckboxes = document.querySelectorAll('input[name="role"]:checked');
+            if (roleCheckboxes.length === 0) {
+                alert('Please select at least one role!');
+                return;
+            }
+            const roles = Array.from(roleCheckboxes).map(cb => cb.value);
+            const role = roles.join(', '); // Combine multiple roles
             
             if (password !== confirmPassword) {
                 alert('Passwords do not match!');
