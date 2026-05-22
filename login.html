@@ -80,7 +80,7 @@
 
     <!-- Test Button -->
     <button onclick="testDirectPost()" class="test-button">
-        🧪 Test POST to Google
+        🧪 Test Form Submit
     </button>
 
     <script src="auth.js"></script>
@@ -145,59 +145,47 @@
             }
         }
 
-        // Test POST directly
-        async function testDirectPost() {
-            console.log('🧪 Testing POST request...');
+        // Test form submission (bypasses CORS)
+        function testDirectPost() {
+            console.log('🧪 Testing form submission...');
             
             const SCRIPT_URL = 'https://script.google.com/a/moor.cc/macros/s/AKfycbwjIdyY8BPVOvhwGUfGKdcWIoaLOm-m__PDPq5mkOlXSlbTAdj292k-DzCRYjvoPYU/exec';
             
             const testData = {
                 action: 'saveUser',
-                userId: 'direct_test_' + Date.now(),
-                username: 'directtest',
-                email: 'direct@test.com',
-                name: 'Direct Test User',
+                userId: 'form_test_' + Date.now(),
+                username: 'formtest',
+                email: 'form@test.com',
+                name: 'Form Test User',
                 role: 'Rainbow Girl',
                 password: 'test123',
                 dateCreated: new Date().toISOString()
             };
             
-            console.log('📤 Sending:', testData);
+            console.log('📤 Creating form with data:', testData);
             
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain'
-                    },
-                    body: JSON.stringify(testData),
-                    mode: 'cors'
-                });
-                
-                console.log('📥 Response status:', response.status);
-                console.log('📥 Response headers:', [...response.headers.entries()]);
-                
-                const text = await response.text();
-                console.log('📥 Response text:', text);
-                
-                try {
-                    const result = JSON.parse(text);
-                    console.log('📥 Parsed result:', result);
-                    
-                    if (result.success) {
-                        alert('✅ SUCCESS!\n\nUser saved to Google Sheets!\n\nUser ID: ' + result.userId + '\nRow: ' + result.rowNumber + '\n\nCheck your Google Sheet!\n\nOpen console (F12) to see full logs.');
-                    } else {
-                        alert('❌ FAILED\n\n' + result.message + '\n\nCheck console (F12) for details.');
-                    }
-                } catch (parseError) {
-                    console.error('❌ JSON parse error:', parseError);
-                    alert('❌ ERROR: Response is not valid JSON\n\n' + parseError.message + '\n\nResponse was:\n' + text.substring(0, 200));
-                }
-                
-            } catch (error) {
-                console.error('❌ Fetch error:', error);
-                alert('❌ REQUEST FAILED\n\n' + error.message + '\n\nCheck console (F12) for details.');
-            }
+            // Create form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = SCRIPT_URL;
+            form.target = '_blank';
+            
+            // Add fields
+            Object.keys(testData).forEach(key => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = testData[key];
+                form.appendChild(input);
+            });
+            
+            document.body.appendChild(form);
+            console.log('📤 Submitting form...');
+            form.submit();
+            document.body.removeChild(form);
+            
+            console.log('✅ Form submitted!');
+            alert('✅ Test form submitted!\n\nA new tab will open showing the response.\n\nCheck:\n1. The new tab for success message\n2. Apps Script → Executions for logs\n3. Your Google Sheet for the new test user');
         }
 
         // Check if already logged in
