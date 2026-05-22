@@ -123,7 +123,7 @@ async function signUp(username, email, name, role, password) {
     }
 }
 
-// Login Function - TEMPORARY FIX (GIVES EVERYONE ADMIN)
+// Login Function - SIMPLE VERSION (NO FETCH - GIVES EVERYONE ADMIN)
 function login(username, password) {
     console.log('========================================');
     console.log('🔐 LOGIN FUNCTION STARTED');
@@ -135,7 +135,7 @@ function login(username, password) {
         username: username,
         email: username.includes('@') ? username : username + '@example.com',
         name: username,
-        role: 'Rainbow Girl, Admin',  // TEMPORARY: Gives everyone admin access
+        role: 'Rainbow Girl, Admin',
         isNewUser: false,
         needsTraining: false
     };
@@ -173,7 +173,6 @@ function logout() {
     console.log('Before clear - isLoggedIn:', localStorage.getItem('isLoggedIn'));
     console.log('Before clear - currentUser:', localStorage.getItem('currentUser'));
     
-    // Clear session data
     localStorage.removeItem('currentUser');
     localStorage.removeItem('isLoggedIn');
     
