@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import { AppProvider } from './context/AppContext'
 import { AdminProvider } from './context/AdminContext'
 import { ADMIN_CONFIG } from './config/admin'
@@ -34,12 +34,12 @@ import './styles/global.css'
 
 function App() {
   const adminPath = ADMIN_CONFIG.secretRoute; // e.g., '/admin/IORG-2026-ADMIN'
-  const adminParentPath = adminPath.replace(/\/$/, '');
+  const adminParentPath = adminPath.replace(/^\/+/, ''); // Remove leading slash for HashRouter
 
   return (
     <AppProvider>
       <AdminProvider>
-        <BrowserRouter>
+        <HashRouter>
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Layout />}>
@@ -75,7 +75,7 @@ function App() {
               <Route path="settings" element={<AdminSettings />} />
             </Route>
           </Routes>
-        </BrowserRouter>
+        </HashRouter>
       </AdminProvider>
     </AppProvider>
   )

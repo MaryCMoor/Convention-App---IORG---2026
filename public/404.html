@@ -1,15 +1,21 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>rainbow-convention</title>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
     <script>
       // Single Page Apps for GitHub Pages
       // https://github.com/rafgraph/spa-github-pages
+      // Copyright (c) 2016 Rafael Pedicini, licensed under the MIT License
+      // ----------------------------------------------------------------------
+      // This script takes the current url and converts the path and query
+      // string into just a query string, and then redirects the browser
+      // to the new url with only a query string and hash fragment,
+      // e.g. https://user.github.io/repo/path?query=1#fragment
+      // becomes https://user.github.io/repo/?path=path&query=1#fragment
+      // ----------------------------------------------------------------------
       (function() {
-        var segmentCount = 1;
+        var segmentCount = 1; // Only the repo name segment
         var l = window.location;
         
         // Don't redirect if already in the correct format (has ?/)
@@ -30,7 +36,6 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    Redirecting...
   </body>
 </html>
