@@ -14,7 +14,7 @@
       // e.g. https://user.github.io/repo/path?query=1#fragment
       // becomes https://user.github.io/repo/?path=path&query=1#fragment
       // ----------------------------------------------------------------------
-      var segmentCount = 2; // repo name + path segments before the actual route
+      var segmentCount = 1; // Only the repo name segment
       var l = window.location;
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
