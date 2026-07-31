@@ -1,0 +1,731 @@
+/* Housing Page Styles */
+.housing-page {
+  min-height: 100vh;
+  background: var(--color-background);
+}
+
+.housing-page .page-header {
+  text-align: center;
+  padding: var(--space-xl) var(--space-md);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-red-700));
+  color: var(--color-white);
+  margin-bottom: 0;
+}
+
+.housing-page .page-title {
+  color: var(--color-white);
+  justify-content: center;
+}
+
+.housing-page .page-subtitle {
+  color: var(--color-gold-300);
+}
+
+/* My Housing Card */
+.my-housing-card {
+  max-width: 1400px;
+  margin: var(--space-lg) auto 0;
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border: 2px solid var(--color-gold-500);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-gold);
+}
+
+.my-housing-main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-gold-200);
+}
+
+.my-housing-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-red-700));
+  border-radius: var(--radius-lg);
+  color: var(--color-white);
+  box-shadow: var(--shadow-gold);
+}
+
+.my-housing-info {
+  flex: 1;
+}
+
+.my-housing-info h2 {
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  margin: 0 0 var(--space-md);
+}
+
+.my-housing-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.room-number {
+  font-family: var(--font-marquee);
+  font-size: 1.25rem;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.room-type {
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-gold-100);
+  color: var(--color-gold-800);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+}
+
+.building {
+  color: var(--color-text-light);
+  font-size: 0.875rem;
+}
+
+.my-housing-status {
+  flex-shrink: 0;
+}
+
+.my-housing-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-md);
+}
+
+.meta-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.meta-item svg {
+  color: var(--color-gold-600);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.meta-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.meta-item strong {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.meta-item span {
+  color: var(--color-text);
+}
+
+.meta-item.roommates {
+  grid-column: 1 / -1;
+}
+
+/* Hotel Info Section */
+.hotel-info-section {
+  max-width: 1400px;
+  margin: var(--space-xl) auto 0;
+  padding: 0 var(--space-md);
+}
+
+.hotel-main {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.hotel-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.hotel-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--color-gold-400), var(--color-gold-500));
+  border-radius: var(--radius-lg);
+  color: var(--color-charcoal);
+}
+
+.hotel-header h3 {
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  margin: 0 0 var(--space-xs);
+}
+
+.hotel-header p {
+  color: var(--color-text-light);
+  margin: 0;
+}
+
+.hotel-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.hotel-contact a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.hotel-contact a:hover {
+  text-decoration: underline;
+}
+
+.hotel-amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.amenity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-white);
+  border: 1px solid var(--color-gold-300);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  color: var(--color-gold-800);
+}
+
+/* Room Types Section */
+.room-types-section {
+  max-width: 1400px;
+  margin: var(--space-xl) auto 0;
+  padding: 0 var(--space-md);
+}
+
+.room-types-section h2 {
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  margin: 0 0 var(--space-lg);
+  text-align: center;
+}
+
+.room-types-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-md);
+}
+
+.room-type-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  transition: all var(--transition-fast);
+}
+
+.room-type-card:hover {
+  border-color: var(--color-gold-400);
+  box-shadow: var(--shadow-md);
+}
+
+.room-type-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-md);
+}
+
+.room-type-header h3 {
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.availability-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+}
+
+.availability-badge.available {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.availability-badge.full {
+  background: var(--color-red-100);
+  color: var(--color-error);
+}
+
+.room-type-card > p {
+  color: var(--color-text);
+  margin: 0 0 var(--space-md);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.room-type-features {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+  font-size: 0.8125rem;
+  color: var(--color-text);
+}
+
+.room-type-occupancy {
+  margin-bottom: var(--space-md);
+}
+
+.occupancy-bar {
+  height: 8px;
+  background: var(--color-gray-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--space-xs);
+}
+
+.occupancy-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-gold-400), var(--color-gold-500));
+  border-radius: var(--radius-full);
+  transition: width var(--transition-normal);
+}
+
+.occupancy-text {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+}
+
+.room-type-amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.room-amenity {
+  font-size: 0.6875rem;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-gold-50);
+  color: var(--color-gold-700);
+  border-radius: var(--radius-full);
+}
+
+/* Filter Bar */
+.filter-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  max-width: 1400px;
+  margin: var(--space-xl) auto 0;
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.filter-group label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filter-select {
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  min-width: 180px;
+  transition: all var(--transition-fast);
+}
+
+.filter-select:focus {
+  border-color: var(--color-gold-500);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+  outline: none;
+}
+
+.filter-search {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.filter-search svg {
+  position: absolute;
+  left: var(--space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-light);
+}
+
+.search-input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md) var(--space-sm) 44px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  transition: all var(--transition-fast);
+}
+
+.search-input:focus {
+  border-color: var(--color-gold-500);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+  outline: none;
+}
+
+/* Assignments Container */
+.assignments-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-md);
+}
+
+.assignments-container > h2 {
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  margin: 0 0 var(--space-lg);
+}
+
+.assignments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: var(--space-md);
+}
+
+/* Assignment Card */
+.assignment-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.assignment-card:hover {
+  border-color: var(--color-gold-300);
+  box-shadow: var(--shadow-md);
+}
+
+.assignment-card.user-room {
+  border-color: var(--color-gold-500);
+  box-shadow: var(--shadow-gold);
+}
+
+.assignment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--space-md);
+  cursor: pointer;
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+  transition: all var(--transition-fast);
+}
+
+.assignment-header:hover {
+  background: var(--color-gold-50);
+}
+
+.assignment-main {
+  flex: 1;
+}
+
+.assignment-room {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
+}
+
+.room-number {
+  font-family: var(--font-marquee);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.room-type-name {
+  font-size: 0.8125rem;
+  color: var(--color-gold-700);
+  font-weight: 600;
+  background: var(--color-gold-100);
+  display: inline-block;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  width: fit-content;
+}
+
+.assignment-building {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.8125rem;
+  color: var(--color-text-light);
+}
+
+.assignment-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+.assignment-status .rotated {
+  transform: rotate(180deg);
+}
+
+/* Assignment Expanded */
+.assignment-expanded {
+  padding: var(--space-md);
+  background: var(--color-gold-50);
+  border-top: 1px solid var(--color-gold-200);
+  animation: slideDown var(--transition-fast) ease;
+}
+
+.expanded-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-lg);
+}
+
+.expanded-section h4 {
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  margin: 0 0 var(--space-md);
+  font-size: 0.875rem;
+}
+
+.expanded-section dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-xs) var(--space-md);
+  margin: 0;
+}
+
+.expanded-section dt {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+}
+
+.expanded-section dd {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.8125rem;
+}
+
+.roommates-list {
+  margin: 0;
+  padding-left: var(--space-lg);
+  color: var(--color-text);
+}
+
+.roommates-list li {
+  margin: var(--space-xs) 0;
+}
+
+.no-roommates {
+  color: var(--color-text-light);
+  font-style: italic;
+  margin: 0;
+}
+
+.amenities-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+/* Housing Policies */
+.housing-policies {
+  max-width: 1400px;
+  margin: var(--space-xl) auto 0;
+  padding: var(--space-xl) var(--space-md);
+}
+
+.housing-policies h2 {
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  margin: 0 0 var(--space-xl);
+  text-align: center;
+}
+
+.policies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-md);
+}
+
+.policy-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.policy-card:hover {
+  border-color: var(--color-gold-400);
+  box-shadow: var(--shadow-md);
+}
+
+.policy-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--color-gold-400), var(--color-gold-500));
+  border-radius: var(--radius-lg);
+  color: var(--color-charcoal);
+  margin-bottom: var(--space-md);
+}
+
+.policy-card h3 {
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  margin: 0 0 var(--space-md);
+}
+
+.policy-card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.policy-card li {
+  padding: var(--space-xs) 0;
+  padding-left: var(--space-lg);
+  position: relative;
+  color: var(--color-text);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.policy-card li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  margin: var(--space-lg) 0;
+}
+
+.empty-state-icon {
+  color: var(--color-gold-400);
+  margin-bottom: var(--space-lg);
+  opacity: 0.5;
+}
+
+.empty-state-title {
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  margin: 0 0 var(--space-sm);
+}
+
+.empty-state-message {
+  color: var(--color-text-light);
+  margin: 0;
+  max-width: 300px;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .my-housing-main {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .my-housing-details {
+    justify-content: center;
+  }
+  
+  .my-housing-meta {
+    grid-template-columns: 1fr;
+  }
+  
+  .hotel-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .hotel-contact {
+    justify-content: center;
+  }
+  
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  .filter-select {
+    width: 100%;
+  }
+  
+  .filter-search {
+    max-width: none;
+  }
+  
+  .assignments-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .expanded-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .policies-grid {
+    grid-template-columns: 1fr;
+  }
+}
